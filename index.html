@@ -2140,10 +2140,12 @@ function buyPrem() {
   }
 
   const btn = document.getElementById('prem-btn');
+  if (!btn) return;
   btn.textContent = 'Processing...';
   btn.disabled = true;
 
   if (typeof Pi !== 'undefined') {
+
     Pi.createPayment({
       amount: 1,
       memo: 'Haramain Pilgrim Pass — Premium Access',
@@ -2152,90 +2154,101 @@ function buyPrem() {
       // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
       onReadyForServerApproval: (paymentId) => {
         return fetch("/.netlify/functions/approve", {
-          method: 'POST',
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId })
         });
       },
+
       // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
       onReadyForServerCompletion: (paymentId, txid) => {
         return fetch("/.netlify/functions/complete", {
-          method: 'POST',
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId, txid })
         }).then(() => {
           localStorage.setItem(K + 'prem', '1');
           btn.textContent = '✅ Pilgrim Pass Active';
           btn.disabled = true;
-          addTx('💰 Paid 1π — Pilgrim Pass Unlocked · Testnet · txid:' + txid.slice(0,12) + '...');
+          addTx('💰 Paid 1π — Pilgrim Pass Unlocked · Testnet · txid:' + txid.slice(0, 12) + '...');
           syncUI();
           toast('⭐ Pilgrim Pass activated! Taqabbal Allah!');
           addNotif('⭐', 'Pilgrim Pass Activated!', 'All premium features unlocked. Barakallah feek!', 'just now');
         });
       },
+
       onCancel: () => {
         btn.textContent = 'Unlock Pilgrim Pass — 1π';
         btn.disabled = false;
         toast('Payment cancelled');
       },
+
       onError: (err) => {
         btn.textContent = 'Unlock Pilgrim Pass — 1π';
         btn.disabled = false;
         toast('Payment error: ' + err);
-        console.error('[Haramain] buyPrem error:', err);
+        console.error('[Haramain TESTNET] buyPrem error:', err);
       }
     });
+
   } else {
-    // Demo mode — WorldCup exact pattern
+    // Demo mode — outside Pi Browser
     setTimeout(() => {
       localStorage.setItem(K + 'prem', '1');
       btn.textContent = '✅ Pilgrim Pass Active';
       btn.disabled = true;
-      addTx('💰 Demo — Pilgrim Pass Unlocked');
-      toast('⭐ Demo: Pilgrim Pass activated!');
+      addTx('💰 Demo — Pilgrim Pass Unlocked (open in Pi Browser for real payment)');
+      toast('⭐ Demo mode: Pilgrim Pass activated!');
     }, 1200);
   }
 }
 
+
 /* ── SEND PI (WorldCup sendPi exact structure) ── */
 function sendPi() {
-  const to = (document.getElementById('send-to') || {}).value || '';
-  const amt = parseFloat((document.getElementById('send-amt') || {}).value) || 0.1;
+  const to   = (document.getElementById('send-to')   || {}).value || '';
+  const amt  = parseFloat((document.getElementById('send-amt')  || {}).value) || 0.1;
   const memo = (document.getElementById('send-memo') || {}).value || 'Haramain Pilgrim';
 
   if (!to.trim()) { toast('Enter recipient username'); return; }
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: memo,
-    metadata: { type: 'send', to: to, app: 'haramain.pi' }
+    metadata: { type: 'send', to: to.trim(), app: 'haramain.pi', network: 'testnet' }
   }, {
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerApproval: (paymentId) => {
+    onReadyForServerApproval: (paymentId) => {
       return fetch("/.netlify/functions/approve", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
+
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerCompletion: (paymentId, txid) => {
+    onReadyForServerCompletion: (paymentId, txid) => {
       return fetch("/.netlify/functions/complete", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
-        addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo);
+        addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo + ' · txid:' + txid.slice(0, 12) + '...');
         toast('✅ Sent ' + amt + 'π to @' + to.trim() + '!');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); console.error(err); }
+
+    onCancel: () => { toast('Payment cancelled'); },
+
+    onError: (err) => {
+      toast('Payment error: ' + err);
+      console.error('[Haramain TESTNET] sendPi error:', err);
+    }
   });
 }
 
-/* ── REQUEST PI — QR Generator (WorldCup requestPi exact) ── */
+
 function requestPi() {
   const amt = parseFloat((document.getElementById('req-amt') || {}).value) || 0.1;
   const reason = (document.getElementById('req-reason') || {}).value || 'Haramain';
@@ -2263,117 +2276,136 @@ function requestPi() {
 
 /* ── SEND ZAKAT (WorldCup createPayment exact) ── */
 function sendZakat() {
-  const cause = (document.getElementById('zk-cause') || {}).value || 'charity';
-  const amt = parseFloat((document.getElementById('zk-amount') || {}).value) || 0.5;
+  const cause = (document.getElementById('zk-cause')  || {}).value || 'charity';
+  const amt   = parseFloat((document.getElementById('zk-amount') || {}).value) || 0.5;
 
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: 'Zakat — ' + cause + ' — haramain.pi',
-    metadata: { type: 'zakat', cause: cause, app: 'haramain.pi' }
+    metadata: { type: 'zakat', cause: cause, app: 'haramain.pi', network: 'testnet' }
   }, {
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerApproval: (paymentId) => {
+    onReadyForServerApproval: (paymentId) => {
       return fetch("/.netlify/functions/approve", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
+
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerCompletion: (paymentId, txid) => {
+    onReadyForServerCompletion: (paymentId, txid) => {
       return fetch("/.netlify/functions/complete", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
-        addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
+        addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0, 12) + '...');
         toast('🤲 Zakat accepted! Taqabbal Allah!');
         addPts(20, 'Zakat sent');
-        addNotif('🤲','Zakat Sent!', amt+'π donated to '+cause+'. May Allah multiply your reward.','just now');
+        addNotif('🤲', 'Zakat Sent!', amt + 'π donated to ' + cause + '. May Allah multiply your reward.', 'just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); }
+
+    onCancel: () => { toast('Payment cancelled'); },
+
+    onError: (err) => {
+      toast('Payment error: ' + err);
+      console.error('[Haramain TESTNET] sendZakat error:', err);
+    }
   });
 }
 
-/* ── SEND SADAQAH (WorldCup createPayment exact) ── */
+
 function sendSadaqah(cause, amt) {
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: 'Sadaqah — ' + cause + ' — haramain.pi',
-    metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi' }
+    metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi', network: 'testnet' }
   }, {
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerApproval: (paymentId) => {
+    onReadyForServerApproval: (paymentId) => {
       return fetch("/.netlify/functions/approve", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
+
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerCompletion: (paymentId, txid) => {
+    onReadyForServerCompletion: (paymentId, txid) => {
       return fetch("/.netlify/functions/complete", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
-        addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
+        addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0, 12) + '...');
         toast('💝 Sadaqah accepted! Barakallah feek!');
         addPts(10, 'Sadaqah sent');
-        addNotif('💝','Sadaqah Sent!', amt+'π — May Allah multiply your reward 100x.','just now');
+        addNotif('💝', 'Sadaqah Sent!', amt + 'π — May Allah multiply your reward 100x.', 'just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); }
+
+    onCancel: () => { toast('Payment cancelled'); },
+
+    onError: (err) => {
+      toast('Payment error: ' + err);
+      console.error('[Haramain TESTNET] sendSadaqah error:', err);
+    }
   });
 }
 
-/* ── ORDER QURBANI (WorldCup createPayment exact) ── */
-function orderQurbani() {
-  const country = (document.getElementById('qurb-country') || {}).value || 'Yemen';
-  const selected = document.querySelector('.qurb-selected');
-  const animal = selected ? selected.getAttribute('data-animal') : 'Sheep / Goat';
-  const amt = selected ? +(selected.getAttribute('data-price') || 5) : 5;
 
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
+function orderQurbani() {
+  const country  = (document.getElementById('qurb-country') || {}).value || 'Yemen';
+  const selected = document.querySelector('.qurb-selected');
+  const animal   = selected ? selected.getAttribute('data-animal') : 'Sheep / Goat';
+  const amt      = selected ? +(selected.getAttribute('data-price') || 5) : 5;
+
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: 'Qurbani — ' + animal + ' — ' + country + ' — haramain.pi',
-    metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi' }
+    metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi', network: 'testnet' }
   }, {
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerApproval: (paymentId) => {
+    onReadyForServerApproval: (paymentId) => {
       return fetch("/.netlify/functions/approve", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
+
     // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
-      onReadyForServerCompletion: (paymentId, txid) => {
+    onReadyForServerCompletion: (paymentId, txid) => {
       return fetch("/.netlify/functions/complete", {
-        method: 'POST',
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
         const certId = 'QURB-' + Date.now().toString(36).toUpperCase();
-        addTx('🐑 Qurbani ' + animal + ' — ' + country + ' — ' + amt + 'π · Cert:' + certId);
+        addTx('🐑 Qurbani ' + animal + ' — ' + country + ' — ' + amt + 'π · Cert:' + certId + ' · txid:' + txid.slice(0, 12) + '...');
         toast('🐑 Qurbani ordered! Taqabbal Allah!');
         addPts(50, 'Qurbani ordered');
-        addNotif('🐑','Qurbani Ordered!', animal+' for '+country+' · Certificate: '+certId,'just now');
+        addNotif('🐑', 'Qurbani Ordered!', animal + ' for ' + country + ' · Certificate: ' + certId, 'just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); }
+
+    onCancel: () => { toast('Payment cancelled'); },
+
+    onError: (err) => {
+      toast('Payment error: ' + err);
+      console.error('[Haramain TESTNET] orderQurbani error:', err);
+    }
   });
 }
+
 
 /* ══ TAWAF COUNTER ══ */
 var TAWAF_DUAS = [
@@ -3956,10 +3988,8 @@ addTx = function(text) {
    WorldCup pattern + immediate execution for Pi Browser compat
 ══════════════════════════════════════════════════════════════ */
 function _haramainInit() {
-  /* ✅ Pi SDK init — MAINNET · sandbox:true */
-  if (typeof Pi !== 'undefined') {
-    
-  }
+  /* ✅ Pi SDK init — TESTNET · sandbox:true */
+  // Pi.init already called at top of script — FinPi pattern
   /* Apply saved language to landing screen */
   setLang(curLang, null);
   document.querySelectorAll('.il-btn').forEach(function(b) {
@@ -4542,9 +4572,7 @@ if (document.readyState === 'loading') {
 
 /* Also keep window.load as backup — WorldCup pattern */
 window.addEventListener('load', function() {
-  if (typeof Pi !== 'undefined') {
-    
-  }
+  // Pi.init already called at top of script — FinPi pattern
 });
 
 
