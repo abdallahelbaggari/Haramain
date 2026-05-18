@@ -1385,7 +1385,8 @@ select.fi{cursor:pointer;}
 <div id="toast"></div>
 
 <!-- ✅ HARAMAIN SCRIPT — MAINNET · sandbox:true · All inline -->
-<script>
+<script>// ✅ Initialize Pi SDK — FinPi exact
+Pi.init({ version: "2.0", sandbox: true });
 
 /* ================================================================
    HARAMAIN · script.js · Pi Network · MAINNET · sandbox:true
@@ -1707,40 +1708,42 @@ function cUtil() {
    100% identical structure — only names changed
 ══════════════════════════════════════════════════════════════ */
 
-function onIncompletePayment(payment) {
-  console.log('[Haramain] Incomplete payment:', payment);
-}
-
+/* ══════════════════════════════════════════════════════════════
+   PI LOGIN — Copied EXACTLY from FinPi testnet working system
+   FinPi pattern: Pi.authenticate(["username","payments"])
+   No onIncompletePayment — clean simple pattern like FinPi
+══════════════════════════════════════════════════════════════ */
 function piLogin() {
-  const status = document.getElementById('ls-msg');
-  if (status) status.textContent = 'Connecting to Pi Network...';
+  const statusBox = document.getElementById('ls-msg');
+  const btn       = document.getElementById('loginBtn');
+  const btnText   = document.getElementById('loginBtnText');
 
-  const btn = document.getElementById('loginBtn');
-  const btnText = document.getElementById('loginBtnText');
-  if (btn) btn.disabled = true;
-  if (btnText) btnText.textContent = 'Authenticating...';
+  // FinPi exact
+  try {
+    if (statusBox) statusBox.innerText = 'Opening Pi authentication...';
+    if (btn)       btn.disabled = true;
+    if (btnText)   btnText.textContent  = 'Authenticating...';
 
-  if (typeof Pi !== 'undefined') {
-    Pi.init({ version: "2.0", sandbox: true });
-    Pi.authenticate(['username', 'payments'], onIncompletePayment)
+    Pi.authenticate(["username", "payments"])
       .then(auth => {
         user = auth.user;
-        console.log('[Haramain] ✅ Authenticated:', user.username, '| sandbox: true');
+        if (statusBox) statusBox.innerText = 'Logged in as: ' + auth.user.username;
         genPilgrimId();
         launchApp();
-        toast('Welcome, @' + user.username + '! 🕋');
+        toast('Welcome, @' + auth.user.username + '! 🕋');
       })
-      .catch(() => {
-        if (status) status.textContent = 'Login failed. Open in Pi Browser.';
-        if (btn) btn.disabled = false;
-        if (btnText) btnText.textContent = _('signin') || 'Sign In with Pi';
+      .catch(err => {
+        if (statusBox) statusBox.innerText = 'Authentication failed';
+        if (btn)       btn.disabled = false;
+        if (btnText)   btnText.textContent  = 'Sign In with Pi';
+        console.error(err);
       });
-  } else {
-    // Demo mode — WorldCup exact pattern
-    user = { username: 'Pilgrim_Demo' };
-    genPilgrimId();
-    launchApp();
-    toast('Demo mode — open in Pi Browser for real Pi! 🕋');
+
+  } catch(err) {
+    if (statusBox) statusBox.innerText = 'Authentication failed';
+    if (btn)       btn.disabled = false;
+    if (btnText)   btnText.textContent  = 'Sign In with Pi';
+    console.error(err);
   }
 }
 
@@ -2146,17 +2149,19 @@ function buyPrem() {
       memo: 'Haramain Pilgrim Pass — Premium Access',
       metadata: { type: 'pilgrim_pass', app: 'haramain.pi', network: 'testnet' }
     }, {
+      // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
       onReadyForServerApproval: (paymentId) => {
-        return fetch('/.netlify/functions/approve', {
+        return fetch("/.netlify/functions/approve", {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId })
         });
       },
+      // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
       onReadyForServerCompletion: (paymentId, txid) => {
-        return fetch('/.netlify/functions/complete', {
+        return fetch("/.netlify/functions/complete", {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId, txid })
         }).then(() => {
           localStorage.setItem(K + 'prem', '1');
@@ -2206,24 +2211,26 @@ function sendPi() {
     memo: memo,
     metadata: { type: 'send', to: to, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/.netlify/functions/approve', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerApproval: (paymentId) => {
+      return fetch("/.netlify/functions/approve", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/.netlify/functions/complete', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerCompletion: (paymentId, txid) => {
+      return fetch("/.netlify/functions/complete", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
         addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo);
         toast('✅ Sent ' + amt + 'π to @' + to.trim() + '!');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
     onError: (err) => { toast('Payment error: ' + err); console.error(err); }
   });
 }
@@ -2266,17 +2273,19 @@ function sendZakat() {
     memo: 'Zakat — ' + cause + ' — haramain.pi',
     metadata: { type: 'zakat', cause: cause, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/.netlify/functions/approve', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerApproval: (paymentId) => {
+      return fetch("/.netlify/functions/approve", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/.netlify/functions/complete', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerCompletion: (paymentId, txid) => {
+      return fetch("/.netlify/functions/complete", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
         addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
@@ -2285,7 +2294,7 @@ function sendZakat() {
         addNotif('🤲','Zakat Sent!', amt+'π donated to '+cause+'. May Allah multiply your reward.','just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
     onError: (err) => { toast('Payment error: ' + err); }
   });
 }
@@ -2299,17 +2308,19 @@ function sendSadaqah(cause, amt) {
     memo: 'Sadaqah — ' + cause + ' — haramain.pi',
     metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/.netlify/functions/approve', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerApproval: (paymentId) => {
+      return fetch("/.netlify/functions/approve", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/.netlify/functions/complete', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerCompletion: (paymentId, txid) => {
+      return fetch("/.netlify/functions/complete", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
         addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
@@ -2318,7 +2329,7 @@ function sendSadaqah(cause, amt) {
         addNotif('💝','Sadaqah Sent!', amt+'π — May Allah multiply your reward 100x.','just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
     onError: (err) => { toast('Payment error: ' + err); }
   });
 }
@@ -2337,17 +2348,19 @@ function orderQurbani() {
     memo: 'Qurbani — ' + animal + ' — ' + country + ' — haramain.pi',
     metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/.netlify/functions/approve', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerApproval: (paymentId) => {
+      return fetch("/.netlify/functions/approve", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId })
       });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/.netlify/functions/complete', {
+    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
+      onReadyForServerCompletion: (paymentId, txid) => {
+      return fetch("/.netlify/functions/complete", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
         const certId = 'QURB-' + Date.now().toString(36).toUpperCase();
@@ -2357,7 +2370,7 @@ function orderQurbani() {
         addNotif('🐑','Qurbani Ordered!', animal+' for '+country+' · Certificate: '+certId,'just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => { toast('Payment cancelled'); statusBox && (statusBox.innerText = 'Payment cancelled'); },
     onError: (err) => { toast('Payment error: ' + err); }
   });
 }
@@ -3058,7 +3071,7 @@ function askAI(msg) {
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
@@ -3865,7 +3878,7 @@ function askAI(msg) {
   // Try Claude API first
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
@@ -3935,7 +3948,7 @@ addTx = function(text) {
    WINDOW LOAD INIT — EXACT WORLDCUP PATTERN
    Source: worldcup script.js final lines
    window.addEventListener('load', () => {
-     if (typeof Pi !== 'undefined') Pi.init({ version: "2.0", sandbox: true });
+     if (typeof Pi !== 'undefined') 
    })
 ══════════════════════════════════════════════════════════════ */
 /* ══════════════════════════════════════════════════════════════
@@ -3945,7 +3958,7 @@ addTx = function(text) {
 function _haramainInit() {
   /* ✅ Pi SDK init — MAINNET · sandbox:true */
   if (typeof Pi !== 'undefined') {
-    try { Pi.init({ version: "2.0", sandbox: true }); } catch(e) {}
+    
   }
   /* Apply saved language to landing screen */
   setLang(curLang, null);
@@ -4530,7 +4543,7 @@ if (document.readyState === 'loading') {
 /* Also keep window.load as backup — WorldCup pattern */
 window.addEventListener('load', function() {
   if (typeof Pi !== 'undefined') {
-    Pi.init({ version: "2.0", sandbox: true });
+    
   }
 });
 
