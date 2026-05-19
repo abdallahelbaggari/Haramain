@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#020A06">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="HARAMAIN — The Web3 Pilgrimage Infrastructure for Hajj & Umrah. Pi Network Testnet.">
-<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * data: blob:; img-src * data: blob:; style-src * 'unsafe-inline'; font-src * data:; frame-src *; frame-ancestors *;">
+<!-- CSP handled by netlify.toml headers -->
 <title>HARAMAIN · TESTNET · Web3 Pilgrimage Infrastructure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1718,13 +1718,62 @@ function piLogin() {
   const btn       = document.getElementById('loginBtn');
   const btnText   = document.getElementById('loginBtnText');
 
-  // FinPi exact
   try {
     if (statusBox) statusBox.innerText = 'Opening Pi authentication...';
     if (btn)       btn.disabled = true;
     if (btnText)   btnText.textContent  = 'Authenticating...';
 
-    Pi.authenticate(["username", "payments"])
+    /* ══════════════════════════════════════════════════════
+       onIncompletePayment — CRITICAL FIX
+       This runs when Pi finds a pending/stuck payment.
+       We MUST complete it to clear "Pending Payment Found".
+       Without this the user is permanently blocked.
+    ══════════════════════════════════════════════════════ */
+    function onIncompletePayment(payment) {
+      console.log('[Haramain] Incomplete payment found:', payment.identifier);
+
+      const hasTxid = payment.transaction && payment.transaction.txid;
+
+      if (hasTxid) {
+        /* Has txid — payment went through, complete it */
+        fetch("/.netlify/functions/complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentId: payment.identifier,
+            txid: payment.transaction.txid
+          })
+        })
+        .then(r => r.json())
+        .then(d => {
+          console.log('[Haramain] Incomplete payment completed:', d);
+          toast('✅ Previous payment completed');
+        })
+        .catch(err => {
+          console.warn('[Haramain] Complete error:', err);
+        });
+      } else {
+        /* No txid — payment never went through, cancel it */
+        fetch("/.netlify/functions/cancel-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentId: payment.identifier
+          })
+        })
+        .then(r => r.json())
+        .then(d => {
+          console.log('[Haramain] Incomplete payment cancelled:', d);
+          toast('✅ Stuck payment cleared');
+        })
+        .catch(err => {
+          console.warn('[Haramain] Cancel error:', err);
+          /* Still let user in */
+        });
+      }
+    }
+
+    Pi.authenticate(["username", "payments"], onIncompletePayment)
       .then(auth => {
         user = auth.user;
         if (statusBox) statusBox.innerText = 'Logged in as: ' + auth.user.username;
@@ -1733,17 +1782,17 @@ function piLogin() {
         toast('Welcome, @' + auth.user.username + '! 🕋');
       })
       .catch(err => {
-        if (statusBox) statusBox.innerText = 'Authentication failed';
+        if (statusBox) statusBox.innerText = 'Authentication failed. Open in Pi Browser.';
         if (btn)       btn.disabled = false;
         if (btnText)   btnText.textContent  = 'Sign In with Pi';
-        console.error(err);
+        console.error('[Haramain] Auth error:', err);
       });
 
   } catch(err) {
     if (statusBox) statusBox.innerText = 'Authentication failed';
     if (btn)       btn.disabled = false;
     if (btnText)   btnText.textContent  = 'Sign In with Pi';
-    console.error(err);
+    console.error('[Haramain] Login error:', err);
   }
 }
 
@@ -2181,6 +2230,12 @@ function buyPrem() {
         btn.textContent = 'Unlock Pilgrim Pass — 1π';
         btn.disabled = false;
         toast('Payment cancelled');
+        // Notify cancel endpoint
+        fetch("/.netlify/functions/cancel-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId: 'cancelled' })
+        }).catch(() => {});
       },
 
       onError: (err) => {
@@ -2239,7 +2294,14 @@ function sendPi() {
       });
     },
 
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => {
+      toast('Payment cancelled');
+      fetch('/.netlify/functions/cancel-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: 'cancelled' })
+      }).catch(() => {});
+    },
 
     onError: (err) => {
       toast('Payment error: ' + err);
@@ -2309,7 +2371,14 @@ function sendZakat() {
       });
     },
 
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => {
+      toast('Payment cancelled');
+      fetch('/.netlify/functions/cancel-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: 'cancelled' })
+      }).catch(() => {});
+    },
 
     onError: (err) => {
       toast('Payment error: ' + err);
@@ -2350,7 +2419,14 @@ function sendSadaqah(cause, amt) {
       });
     },
 
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => {
+      toast('Payment cancelled');
+      fetch('/.netlify/functions/cancel-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: 'cancelled' })
+      }).catch(() => {});
+    },
 
     onError: (err) => {
       toast('Payment error: ' + err);
@@ -2397,7 +2473,14 @@ function orderQurbani() {
       });
     },
 
-    onCancel: () => { toast('Payment cancelled'); },
+    onCancel: () => {
+      toast('Payment cancelled');
+      fetch('/.netlify/functions/cancel-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: 'cancelled' })
+      }).catch(() => {});
+    },
 
     onError: (err) => {
       toast('Payment error: ' + err);
@@ -3987,9 +4070,21 @@ addTx = function(text) {
    INIT — Runs IMMEDIATELY when script loads
    WorldCup pattern + immediate execution for Pi Browser compat
 ══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   NETLIFY + PI BROWSER COMPATIBILITY
+   Pi Browser adds ?sandbox=true to URL automatically
+   We detect this and ensure correct init
+══════════════════════════════════════════════════════ */
+(function detectEnvironment() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var isSandbox = urlParams.get('sandbox') === 'true' || window.location.hostname !== 'x.minepi.com';
+  // Always testnet for this build
+  console.log('[HARAMAIN TESTNET] sandbox:true | URL:', window.location.href);
+})();
+
 function _haramainInit() {
   /* ✅ Pi SDK init — TESTNET · sandbox:true */
-  // Pi.init already called at top of script — FinPi pattern
+  // Pi.init called at top — sandbox:true confirmed
   /* Apply saved language to landing screen */
   setLang(curLang, null);
   document.querySelectorAll('.il-btn').forEach(function(b) {
@@ -4572,7 +4667,7 @@ if (document.readyState === 'loading') {
 
 /* Also keep window.load as backup — WorldCup pattern */
 window.addEventListener('load', function() {
-  // Pi.init already called at top of script — FinPi pattern
+  // Pi.init called at top — sandbox:true confirmed
 });
 
 
