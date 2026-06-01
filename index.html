@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#020A06">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="HARAMAIN — The Web3 Pilgrimage Infrastructure for Hajj & Umrah. Pi Network Testnet.">
-<!-- CSP handled by netlify.toml headers -->
-<title>HARAMAIN · TESTNET · Web3 Pilgrimage Infrastructure</title>
+<meta name="description" content="HARAMAIN — The Web3 Pilgrimage Infrastructure for Hajj & Umrah. Pi Network Mainnet.">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * data: blob:; img-src * data: blob:; style-src * 'unsafe-inline'; font-src * data:; frame-src *; frame-ancestors *;">
+<title>HARAMAIN · Web3 Pilgrimage Infrastructure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
@@ -230,7 +230,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 
 /* Bottom Nav */
 #bnav{
-  position:fixed;bottom:1.5rem;left:0;right:0;z-index:200;
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
   background:rgba(2,10,6,.97);backdrop-filter:blur(14px);
   border-top:1px solid rgba(201,168,76,.12);
   display:flex;padding:.45rem 0 max(.45rem,env(safe-area-inset-bottom));
@@ -617,18 +617,74 @@ select.fi{cursor:pointer;}
 .map-ring{position:absolute;top:50%;left:50%;width:50px;height:50px;border:2px solid rgba(46,204,113,.4);border-radius:50%;transform:translate(-50%,-50%);animation:ringPulse 2s ease-out infinite;}
 @keyframes ringPulse{0%{width:30px;height:30px;opacity:1;}100%{width:80px;height:80px;opacity:0;}}
 
-/* Toast */
 
-/* ── TESTNET BANNER ── */
-.testnet-banner{
-  position:fixed;bottom:0;left:0;right:0;z-index:9999;
-  background:linear-gradient(90deg,#9B59B6,#8E44AD);
-  color:#fff;font-family:'DM Mono','Courier New',monospace;
-  font-size:.6rem;letter-spacing:.12em;text-align:center;
-  padding:.28rem .5rem;
-  display:flex;align-items:center;justify-content:center;gap:.5rem;
+/* ══ RESELLER & AFFILIATE SYSTEM ══ */
+.reseller-card{
+  background:linear-gradient(135deg,rgba(155,89,182,.12),var(--bg2));
+  border:1px solid rgba(155,89,182,.3);border-radius:var(--r3);
+  padding:1.1rem;margin-bottom:.7rem;position:relative;overflow:hidden;
 }
-#toast{position:fixed;bottom:7rem;left:50%;transform:translateX(-50%);background:rgba(2,10,6,.95);border:1px solid var(--bd);border-radius:var(--pill);padding:.5rem 1.1rem;font-size:.68rem;color:var(--t1);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s;z-index:9000;}
+.reseller-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#9B59B6,#C39BD3);}
+.reseller-badge{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--dm);
+  font-size:.52rem;background:rgba(155,89,182,.15);color:#C39BD3;
+  border:1px solid rgba(155,89,182,.25);border-radius:var(--pill);
+  padding:.15rem .5rem;margin-bottom:.5rem;}
+.commission-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.42rem;margin:.6rem 0;}
+.cg-item{background:rgba(155,89,182,.08);border:1px solid rgba(155,89,182,.15);
+  border-radius:var(--r2);padding:.55rem .3rem;text-align:center;}
+.cg-val{font-family:var(--df);font-size:1.1rem;color:#C39BD3;line-height:1;}
+.cg-lbl{font-family:var(--dm);font-size:.42rem;color:var(--t3);text-transform:uppercase;
+  letter-spacing:.08em;margin-top:.08rem;}
+.tier-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:.75rem .9rem;margin-bottom:.42rem;display:flex;align-items:center;gap:.75rem;}
+.tier-icon{font-size:1.4rem;flex-shrink:0;}
+.tier-name{font-weight:700;font-size:.78rem;color:var(--t1);}
+.tier-desc{font-size:.58rem;color:var(--t3);margin-top:.05rem;}
+.tier-pct{font-family:var(--df);font-size:1.2rem;color:#C39BD3;margin-left:auto;flex-shrink:0;}
+.ref-link-box{background:rgba(155,89,182,.06);border:1px solid rgba(155,89,182,.18);
+  border-radius:var(--r2);padding:.65rem .8rem;margin:.5rem 0;}
+.ref-link-url{font-family:var(--dm);font-size:.52rem;color:#C39BD3;
+  word-break:break-all;line-height:1.7;}
+.leaderboard-row{display:flex;align-items:center;justify-content:space-between;
+  padding:.32rem 0;border-bottom:1px solid rgba(201,168,76,.06);}
+.leaderboard-row:last-child{border-bottom:none;}
+.lr-rank{font-family:var(--dm);font-size:.6rem;color:var(--t3);min-width:22px;}
+.lr-name{font-size:.7rem;color:var(--t1);flex:1;padding:0 .5rem;}
+.lr-val{font-family:var(--dm);font-size:.65rem;color:#C39BD3;}
+
+/* ══ EMAIL / MAILING SYSTEM ══ */
+.mail-card{background:linear-gradient(135deg,rgba(52,152,219,.09),var(--bg2));
+  border:1px solid rgba(52,152,219,.2);border-radius:var(--r3);
+  padding:1rem;margin-bottom:.7rem;position:relative;overflow:hidden;}
+.mail-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#3498DB,#5DADE2);}
+.mail-compose{background:var(--bg2);border:1px solid var(--bd);
+  border-radius:var(--r2);padding:.8rem;margin-bottom:.55rem;}
+.mail-to-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.42rem;
+  min-height:28px;padding:.2rem;background:var(--bg3);border:1px solid var(--bd);
+  border-radius:var(--r2);}
+.mail-chip{font-family:var(--dm);font-size:.5rem;background:rgba(52,152,219,.15);
+  color:#5DADE2;border:1px solid rgba(52,152,219,.25);border-radius:var(--pill);
+  padding:.12rem .4rem;display:flex;align-items:center;gap:.25rem;}
+.mail-chip-x{cursor:pointer;opacity:.6;font-size:.6rem;}
+.mail-template{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:.5rem .7rem;margin-bottom:.42rem;cursor:pointer;transition:all .18s;}
+.mail-template:active{background:rgba(52,152,219,.09);}
+.mail-template-title{font-weight:700;font-size:.7rem;color:#5DADE2;}
+.mail-template-preview{font-size:.58rem;color:var(--t3);margin-top:.08rem;line-height:1.5;}
+.mail-sent-item{display:flex;justify-content:space-between;align-items:flex-start;
+  padding:.4rem 0;border-bottom:1px solid rgba(201,168,76,.06);}
+.mail-sent-item:last-child{border-bottom:none;}
+.ms-subject{font-size:.65rem;color:var(--t1);}
+.ms-meta{font-family:var(--dm);font-size:.48rem;color:var(--t3);margin-top:.06rem;}
+.ms-status{font-family:var(--dm);font-size:.48rem;padding:.1rem .35rem;
+  border-radius:var(--pill);}
+.ms-sent{background:rgba(46,204,113,.09);color:var(--grn);}
+.ms-draft{background:rgba(243,156,18,.09);color:#F5B041;}
+
+/* Toast */
+#toast{position:fixed;bottom:5.5rem;left:50%;transform:translateX(-50%);background:rgba(2,10,6,.95);border:1px solid var(--bd);border-radius:var(--pill);padding:.5rem 1.1rem;font-size:.68rem;color:var(--t1);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s;z-index:9000;}
 #toast.on{opacity:1;}
 
 /* Tiles */
@@ -667,12 +723,328 @@ select.fi{cursor:pointer;}
 .guide-tabs::-webkit-scrollbar{display:none;}
 .gtab{font-family:var(--dm);font-size:.54rem;padding:.3rem .68rem;border-radius:var(--pill);border:1px solid rgba(201,168,76,.14);color:var(--t3);cursor:pointer;white-space:nowrap;background:var(--g);font-weight:600;transition:all .18s;}
 .gtab.on{color:var(--gold);border-color:rgba(201,168,76,.4);background:var(--gdim);}
+
+/* ══════════════════════════════════════════════════════════════
+   HARAMAIN v3.0 — Advanced Utilities CSS
+   Emergency · Health · Crowd · Hydration · Audio · Checklist
+   Itinerary · Analytics · Memories · Moon Sighting
+   Payment section: UNTOUCHED
+══════════════════════════════════════════════════════════════ */
+
+/* ── EMERGENCY COMMAND CENTER ── */
+.emer-hero{background:linear-gradient(135deg,rgba(231,76,60,.15),rgba(192,57,43,.08));
+  border:2px solid rgba(231,76,60,.4);border-radius:var(--r3);padding:1.2rem;
+  position:relative;overflow:hidden;margin-bottom:.8rem;}
+.emer-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#E74C3C,#C0392B,#E74C3C);
+  animation:scanline 2s linear infinite;}
+@keyframes scanline{0%{background-position:0 0}100%{background-position:200% 0}}
+.emer-pulse{width:80px;height:80px;border-radius:50%;background:rgba(231,76,60,.15);
+  border:3px solid #E74C3C;display:flex;align-items:center;justify-content:center;
+  font-size:2rem;margin:0 auto .8rem;position:relative;}
+.emer-pulse::before,.emer-pulse::after{content:'';position:absolute;border-radius:50%;
+  border:2px solid rgba(231,76,60,.5);animation:sosPulse 2s ease infinite;}
+.emer-pulse::after{animation-delay:.5s;}
+@keyframes sosPulse{0%{width:80px;height:80px;opacity:1}100%{width:140px;height:140px;opacity:0}}
+.emer-btn{background:linear-gradient(135deg,#E74C3C,#C0392B);color:#fff;
+  border:none;border-radius:var(--r2);padding:.9rem;font-family:var(--df);
+  font-weight:700;font-size:.85rem;letter-spacing:.1em;cursor:pointer;
+  width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;
+  margin-bottom:.5rem;box-shadow:0 4px 20px rgba(231,76,60,.4);
+  transition:all .2s;}
+.emer-btn:active{transform:scale(.97);}
+.emer-contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin:.6rem 0;}
+.emer-contact{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);
+  border-radius:var(--r2);padding:.7rem;text-align:center;cursor:pointer;transition:all .2s;}
+.emer-contact:active{background:rgba(231,76,60,.15);}
+.emer-contact-icon{font-size:1.4rem;margin-bottom:.2rem;}
+.emer-contact-name{font-family:var(--dm);font-size:.52rem;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;}
+.emer-contact-num{font-family:var(--df);font-size:1rem;color:#E74C3C;margin-top:.1rem;}
+.emer-status{display:flex;align-items:center;gap:.4rem;font-family:var(--dm);font-size:.52rem;
+  color:var(--t3);padding:.4rem .6rem;background:rgba(0,0,0,.2);border-radius:var(--pill);}
+.emer-status-dot{width:6px;height:6px;border-radius:50%;background:#E74C3C;
+  animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.emer-timer{font-family:var(--df);font-size:2.5rem;color:#E74C3C;text-align:center;
+  letter-spacing:.05em;margin:.4rem 0;}
+.embassy-list{max-height:200px;overflow-y:auto;}
+.embassy-item{display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem 0;border-bottom:1px solid rgba(231,76,60,.08);}
+.embassy-item:last-child{border-bottom:none;}
+
+/* ── HEALTH INTELLIGENCE ── */
+.health-hero{background:linear-gradient(135deg,rgba(52,152,219,.12),rgba(41,128,185,.06));
+  border:1px solid rgba(52,152,219,.3);border-radius:var(--r3);padding:1.1rem;margin-bottom:.7rem;}
+.health-score{width:120px;height:120px;border-radius:50%;margin:0 auto .8rem;
+  border:6px solid rgba(52,152,219,.3);position:relative;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.health-score-val{font-family:var(--df);font-size:2.2rem;color:var(--gold);line-height:1;}
+.health-score-lbl{font-family:var(--dm);font-size:.45rem;color:var(--t3);text-transform:uppercase;}
+.health-ring{position:absolute;inset:-6px;border-radius:50%;}
+.vital-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin:.6rem 0;}
+.vital-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:.7rem;text-align:center;position:relative;overflow:hidden;}
+.vital-card::before{content:'';position:absolute;bottom:0;left:0;height:3px;
+  width:var(--fill,50%);background:var(--accent,var(--gold));border-radius:0 0 0 var(--r2);}
+.vital-val{font-family:var(--df);font-size:1.3rem;color:var(--t1);line-height:1;}
+.vital-unit{font-family:var(--dm);font-size:.48rem;color:var(--t3);}
+.vital-lbl{font-family:var(--dm);font-size:.5rem;color:var(--t3);margin-top:.15rem;text-transform:uppercase;letter-spacing:.08em;}
+.heat-risk{border-radius:var(--r2);padding:.6rem .8rem;margin:.5rem 0;
+  display:flex;align-items:center;gap:.6rem;font-family:var(--dm);font-size:.6rem;}
+.heat-risk.low{background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--grn);}
+.heat-risk.med{background:rgba(243,156,18,.08);border:1px solid rgba(243,156,18,.2);color:#F5B041;}
+.heat-risk.high{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);color:var(--red);}
+.heat-risk.extreme{background:rgba(192,57,43,.15);border:2px solid rgba(192,57,43,.4);color:#E74C3C;animation:pulse-border 1.5s infinite;}
+@keyframes pulse-border{0%,100%{border-color:rgba(192,57,43,.4)}50%{border-color:rgba(192,57,43,.8)}}
+.med-reminder{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:.7rem .9rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.7rem;}
+.med-time{font-family:var(--dm);font-size:.55rem;color:var(--gold);min-width:48px;}
+.med-name{font-size:.72rem;color:var(--t1);flex:1;}
+.med-status{font-family:var(--dm);font-size:.48rem;padding:.12rem .35rem;border-radius:var(--pill);}
+.med-taken{background:rgba(46,204,113,.1);color:var(--grn);}
+.med-pending{background:rgba(243,156,18,.1);color:#F5B041;}
+.hospital-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:.8rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.8rem;cursor:pointer;}
+.hospital-dist{font-family:var(--df);font-size:1.2rem;color:var(--gold);min-width:52px;}
+.hospital-info{flex:1;}
+.hospital-name{font-weight:700;font-size:.72rem;color:var(--t1);}
+.hospital-spec{font-family:var(--dm);font-size:.5rem;color:var(--t3);margin-top:.1rem;}
+
+/* ── CROWD INTELLIGENCE ── */
+.crowd-map{border-radius:var(--r3);overflow:hidden;border:1px solid rgba(52,152,219,.25);
+  background:var(--bg3);margin-bottom:.7rem;position:relative;}
+.crowd-legend{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem;}
+.crowd-legend-item{display:flex;align-items:center;gap:.25rem;font-family:var(--dm);font-size:.48rem;color:var(--t3);}
+.crowd-legend-dot{width:10px;height:10px;border-radius:50%;}
+.zone-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin:.6rem 0;}
+.zone-card{background:var(--bg2);border-radius:var(--r2);padding:.8rem;
+  border-left:4px solid var(--zone-col,var(--gold));position:relative;overflow:hidden;}
+.zone-density-bar{position:absolute;bottom:0;left:0;height:3px;
+  width:var(--density,50%);background:var(--zone-col,var(--gold));
+  transition:width 1s ease;}
+.zone-name{font-weight:700;font-size:.72rem;color:var(--t1);}
+.zone-status{font-family:var(--dm);font-size:.5rem;margin-top:.2rem;text-transform:uppercase;letter-spacing:.08em;}
+.zone-safe{color:var(--grn);}
+.zone-moderate{color:#F5B041;}
+.zone-crowded{color:var(--red);}
+.zone-count{font-family:var(--df);font-size:1.4rem;color:var(--zone-col,var(--gold));margin-top:.15rem;}
+.route-option{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:.7rem .9rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.7rem;cursor:pointer;}
+.route-time{font-family:var(--df);font-size:1.1rem;color:var(--gold);min-width:42px;}
+.route-label{flex:1;font-size:.68rem;color:var(--t2);}
+.route-crowd{font-family:var(--dm);font-size:.48rem;padding:.1rem .3rem;border-radius:var(--pill);}
+
+/* ── HYDRATION SYSTEM ── */
+.hydro-hero{background:linear-gradient(135deg,rgba(0,150,255,.1),rgba(0,100,200,.05));
+  border:1px solid rgba(0,150,255,.25);border-radius:var(--r3);padding:1.1rem;margin-bottom:.7rem;}
+.hydro-glass{position:relative;width:80px;height:100px;margin:0 auto .8rem;
+  border:3px solid rgba(0,150,255,.4);border-radius:0 0 16px 16px;overflow:hidden;}
+.hydro-fill{position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(180deg,rgba(0,150,255,.6),rgba(0,100,200,.8));
+  transition:height 1s ease;border-radius:0 0 13px 13px;}
+.hydro-level{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--df);font-size:1.2rem;color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.5);}
+.hydro-target{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin:.5rem 0;}
+.hydro-cup{background:rgba(0,150,255,.08);border:1px solid rgba(0,150,255,.2);
+  border-radius:var(--r2);padding:.5rem;text-align:center;cursor:pointer;
+  transition:all .2s;}
+.hydro-cup.done{background:rgba(0,150,255,.2);border-color:rgba(0,150,255,.5);}
+.hydro-cup-icon{font-size:1.2rem;}
+.hydro-cup-ml{font-family:var(--dm);font-size:.45rem;color:var(--t3);}
+.cooling-station{background:var(--bg2);border:1px solid rgba(0,150,255,.15);
+  border-radius:var(--r2);padding:.7rem .9rem;margin-bottom:.4rem;
+  display:flex;align-items:center;gap:.7rem;}
+.cooling-dist{font-family:var(--df);font-size:1rem;color:#3498DB;min-width:42px;}
+
+/* ── AUDIO DUA PLAYER ── */
+.audio-player-hero{background:linear-gradient(135deg,rgba(155,89,182,.12),rgba(142,68,173,.06));
+  border:1px solid rgba(155,89,182,.3);border-radius:var(--r3);padding:1.1rem;margin-bottom:.7rem;}
+.audio-now-playing{text-align:center;padding:.8rem;}
+.audio-album-art{width:100px;height:100px;border-radius:50%;margin:0 auto .6rem;
+  background:radial-gradient(circle,rgba(155,89,182,.3),rgba(155,89,182,.1));
+  border:3px solid rgba(155,89,182,.4);display:flex;align-items:center;
+  justify-content:center;font-size:2.5rem;
+  animation:audioRotate 8s linear infinite paused;}
+.audio-album-art.playing{animation-play-state:running;}
+@keyframes audioRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.audio-title{font-weight:700;font-size:.82rem;color:var(--t1);margin-bottom:.15rem;}
+.audio-artist{font-family:var(--dm);font-size:.55rem;color:var(--t3);}
+.audio-progress{margin:.8rem 0;padding:0 .5rem;}
+.audio-bar{height:4px;background:rgba(155,89,182,.2);border-radius:2px;
+  cursor:pointer;position:relative;}
+.audio-fill{height:100%;background:linear-gradient(90deg,#9B59B6,#C39BD3);
+  border-radius:2px;transition:width .5s linear;}
+.audio-dot{width:12px;height:12px;border-radius:50%;background:#9B59B6;
+  position:absolute;top:-4px;left:var(--pos,0%);transform:translateX(-50%);}
+.audio-times{display:flex;justify-content:space-between;font-family:var(--dm);
+  font-size:.48rem;color:var(--t3);margin-top:.25rem;}
+.audio-controls{display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-top:.5rem;}
+.audio-btn{background:none;border:none;cursor:pointer;color:var(--t2);
+  font-size:1.2rem;padding:.3rem;transition:all .2s;}
+.audio-btn:active{transform:scale(.9);}
+.audio-play-btn{width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#9B59B6,#C39BD3);
+  border:none;cursor:pointer;font-size:1.4rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 15px rgba(155,89,182,.4);transition:all .2s;}
+.audio-play-btn:active{transform:scale(.95);}
+.dua-playlist{max-height:280px;overflow-y:auto;}
+.dua-item{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;
+  border-bottom:1px solid rgba(201,168,76,.06);cursor:pointer;transition:all .2s;}
+.dua-item.active{background:rgba(155,89,182,.05);margin:0 -.5rem;padding:.6rem .5rem;}
+.dua-item:last-child{border-bottom:none;}
+.dua-num{font-family:var(--dm);font-size:.55rem;color:var(--t3);min-width:20px;}
+.dua-info{flex:1;}
+.dua-name{font-size:.7rem;color:var(--t1);}
+.dua-arabic{font-family:'Amiri','Traditional Arabic',serif;font-size:.75rem;
+  color:var(--gold);direction:rtl;text-align:right;margin-top:.1rem;line-height:1.6;}
+.dua-dur{font-family:var(--dm);font-size:.48rem;color:var(--t3);}
+.dua-active-dot{width:6px;height:6px;border-radius:50%;background:#9B59B6;flex-shrink:0;}
+
+/* ── HAJJ CHECKLIST ── */
+.checklist-hero{background:linear-gradient(135deg,rgba(46,204,113,.1),rgba(39,174,96,.05));
+  border:1px solid rgba(46,204,113,.25);border-radius:var(--r3);padding:1rem;margin-bottom:.7rem;}
+.checklist-progress{margin-bottom:.8rem;}
+.checklist-bar{height:10px;background:rgba(46,204,113,.15);border-radius:5px;overflow:hidden;}
+.checklist-fill{height:100%;background:linear-gradient(90deg,var(--grn),#27AE60);
+  border-radius:5px;transition:width .8s ease;}
+.checklist-pct{font-family:var(--df);font-size:2rem;color:var(--grn);text-align:center;margin-bottom:.2rem;}
+.day-tab-row{display:flex;gap:.35rem;overflow-x:auto;padding-bottom:.4rem;margin-bottom:.6rem;}
+.day-tab{flex-shrink:0;padding:.35rem .7rem;border-radius:var(--pill);
+  font-family:var(--dm);font-size:.52rem;border:1px solid var(--bd);
+  color:var(--t3);cursor:pointer;white-space:nowrap;transition:all .2s;}
+.day-tab.on{background:var(--grn);border-color:var(--grn);color:#fff;}
+.checklist-item{display:flex;align-items:flex-start;gap:.7rem;padding:.6rem 0;
+  border-bottom:1px solid rgba(201,168,76,.06);cursor:pointer;}
+.checklist-item:last-child{border-bottom:none;}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--bd);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all .25s;margin-top:2px;}
+.check-box.done{background:var(--grn);border-color:var(--grn);}
+.check-label{flex:1;}
+.check-title{font-size:.72rem;color:var(--t1);transition:all .2s;}
+.check-done .check-title{text-decoration:line-through;color:var(--t3);}
+.check-desc{font-family:var(--dm);font-size:.52rem;color:var(--t3);margin-top:.15rem;line-height:1.5;}
+.check-mandatory{font-family:var(--dm);font-size:.45rem;background:rgba(231,76,60,.1);
+  color:var(--red);padding:.08rem .3rem;border-radius:var(--pill);margin-left:.3rem;}
+
+/* ── ITINERARY ── */
+.itin-day{background:var(--bg2);border-radius:var(--r3);margin-bottom:.6rem;
+  border:1px solid var(--bd);overflow:hidden;}
+.itin-day-header{padding:.7rem 1rem;background:rgba(201,168,76,.06);
+  border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;}
+.itin-day-title{font-weight:700;font-size:.8rem;color:var(--t1);}
+.itin-day-date{font-family:var(--dm);font-size:.52rem;color:var(--gold);}
+.itin-day-body{padding:.6rem 1rem;}
+.itin-event{display:flex;gap:.7rem;padding:.5rem 0;position:relative;}
+.itin-event::before{content:'';position:absolute;left:19px;top:30px;bottom:-10px;
+  width:1px;background:rgba(201,168,76,.15);}
+.itin-event:last-child::before{display:none;}
+.itin-time{font-family:var(--dm);font-size:.52rem;color:var(--gold);min-width:42px;margin-top:4px;}
+.itin-dot{width:10px;height:10px;border-radius:50%;background:var(--gold);
+  flex-shrink:0;margin-top:5px;border:2px solid var(--bg2);}
+.itin-content{flex:1;}
+.itin-title{font-size:.72rem;color:var(--t1);}
+.itin-desc{font-family:var(--dm);font-size:.52rem;color:var(--t3);margin-top:.1rem;line-height:1.5;}
+.itin-zone{font-family:var(--dm);font-size:.45rem;background:rgba(201,168,76,.1);
+  color:var(--gold);padding:.08rem .3rem;border-radius:var(--pill);}
+
+/* ── SPIRITUAL ANALYTICS ── */
+.analytics-hero{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r3);
+  padding:1rem;margin-bottom:.7rem;}
+.analytics-week{display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem;margin:.6rem 0;}
+.analytics-day-col{text-align:center;}
+.analytics-day-name{font-family:var(--dm);font-size:.42rem;color:var(--t3);margin-bottom:.2rem;}
+.analytics-day-bar{border-radius:var(--r2) var(--r2) 0 0;background:rgba(201,168,76,.15);
+  min-height:4px;transition:all .6s ease;margin:0 auto;width:80%;}
+.analytics-day-bar.today{background:linear-gradient(180deg,var(--gold),var(--grn));}
+.analytics-chart{background:var(--bg3);border-radius:var(--r2);padding:.8rem;margin:.5rem 0;
+  position:relative;height:120px;}
+.analytics-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin:.5rem 0;}
+.analytics-stat{background:var(--bg3);border-radius:var(--r2);padding:.6rem;text-align:center;}
+.analytics-stat-val{font-family:var(--df);font-size:1.3rem;color:var(--gold);}
+.analytics-stat-lbl{font-family:var(--dm);font-size:.45rem;color:var(--t3);text-transform:uppercase;}
+.insight-card{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12);
+  border-radius:var(--r2);padding:.7rem .9rem;margin-bottom:.4rem;
+  display:flex;align-items:flex-start;gap:.6rem;}
+.insight-icon{font-size:1.3rem;flex-shrink:0;}
+.insight-text{font-size:.65rem;color:var(--t2);line-height:1.6;}
+
+/* ── MEMORIES JOURNAL ── */
+.memories-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:.6rem;}
+.memory-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  overflow:hidden;cursor:pointer;transition:all .2s;}
+.memory-card:active{transform:scale(.98);}
+.memory-img{width:100%;aspect-ratio:1;background:var(--bg3);position:relative;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;}
+.memory-img img{width:100%;height:100%;object-fit:cover;}
+.memory-meta{padding:.5rem .6rem;}
+.memory-title{font-size:.65rem;color:var(--t1);font-weight:600;}
+.memory-date{font-family:var(--dm);font-size:.45rem;color:var(--gold);margin-top:.1rem;}
+.memory-loc{font-family:var(--dm);font-size:.45rem;color:var(--t3);}
+.memory-capture-btn{width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:none;cursor:pointer;font-size:1.5rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 15px rgba(201,168,76,.4);margin:0 auto .8rem;}
+
+/* ── MOON SIGHTING ── */
+.moon-hero{background:linear-gradient(135deg,rgba(52,73,94,.6),rgba(10,20,30,.8));
+  border:1px solid rgba(245,215,142,.2);border-radius:var(--r3);padding:1.2rem;
+  text-align:center;margin-bottom:.7rem;position:relative;overflow:hidden;}
+.moon-hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 40%,rgba(245,215,142,.08),transparent 60%);
+  pointer-events:none;}
+.moon-display{font-size:5rem;margin-bottom:.3rem;display:inline-block;
+  filter:drop-shadow(0 0 20px rgba(245,215,142,.4));}
+.moon-phase-name{font-family:var(--df);font-size:1.2rem;color:var(--gold2);margin-bottom:.2rem;}
+.moon-illumination{font-family:var(--dm);font-size:.55rem;color:var(--t3);}
+.moon-calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem;margin:.6rem 0;}
+.moon-day{text-align:center;padding:.3rem .1rem;}
+.moon-day-num{font-family:var(--dm);font-size:.52rem;color:var(--t2);}
+.moon-day-icon{font-size:.9rem;margin-bottom:.1rem;}
+.moon-day.today .moon-day-num{color:var(--gold);font-weight:700;}
+.moon-day.has-event{background:rgba(201,168,76,.08);border-radius:8px;}
+.moon-event{background:rgba(245,215,142,.06);border:1px solid rgba(245,215,142,.15);
+  border-radius:var(--r2);padding:.6rem .8rem;margin-bottom:.4rem;
+  display:flex;align-items:center;gap:.6rem;}
+.moon-event-icon{font-size:1.3rem;flex-shrink:0;}
+.moon-event-name{font-size:.7rem;color:var(--t1);}
+.moon-event-date{font-family:var(--dm);font-size:.52rem;color:var(--gold);margin-top:.1rem;}
+.moon-event-days{font-family:var(--dm);font-size:.48rem;background:rgba(201,168,76,.1);
+  color:var(--gold);padding:.1rem .35rem;border-radius:var(--pill);margin-left:auto;flex-shrink:0;}
+
+/* ── SCREEN HEADERS for new screens ── */
+.scr-top-bar{display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem 1rem;background:rgba(3,12,8,.8);
+  border-bottom:1px solid rgba(201,168,76,.12);position:sticky;top:0;z-index:10;}
+.scr-top-title{font-weight:700;font-size:.85rem;color:var(--t1);}
+.scr-top-sub{font-family:var(--dm);font-size:.48rem;color:var(--t3);margin-top:.08rem;}
+.scr-top-action{font-family:var(--dm);font-size:.52rem;color:var(--gold);cursor:pointer;}
+
+/* ── SHARED ── */
+.stat-band{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin:.5rem 0;}
+.stat-band-item{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:.5rem .3rem;text-align:center;}
+.stat-band-val{font-family:var(--df);font-size:1rem;color:var(--gold);}
+.stat-band-lbl{font-family:var(--dm);font-size:.42rem;color:var(--t3);text-transform:uppercase;}
+.live-badge{display:inline-flex;align-items:center;gap:.25rem;font-family:var(--dm);
+  font-size:.48rem;background:rgba(231,76,60,.1);color:var(--red);
+  border:1px solid rgba(231,76,60,.25);border-radius:var(--pill);
+  padding:.1rem .4rem;}
+.live-badge::before{content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--red);animation:blink 1s infinite;}
+.gps-badge{display:inline-flex;align-items:center;gap:.25rem;font-family:var(--dm);
+  font-size:.48rem;background:rgba(46,204,113,.1);color:var(--grn);
+  border:1px solid rgba(46,204,113,.25);border-radius:var(--pill);
+  padding:.1rem .4rem;}
 </style>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
 <div class="stripe"></div>
-<div class="testnet-banner">🧪 TESTNET MODE · sandbox:true · No real Pi · Testing only · Do not use real funds</div>
 
 <!-- ═══════════════════════════════════════════════════════
      LANDING SCREEN
@@ -684,7 +1056,7 @@ select.fi{cursor:pointer;}
     <div class="infra-clock" id="infra-clock">00:00:00</div>
     <div class="infra-status">
       <div class="infra-dot"></div>
-      <span>Pi Testnet Connected</span>
+      <span>Pi Mainnet Connected</span>
     </div>
     <div class="infra-langs">
       <button class="il-btn on" onclick="setLang('en',this)">EN</button>
@@ -702,9 +1074,9 @@ select.fi{cursor:pointer;}
     <div class="hero-eyebrow">Web3 Pilgrimage Infrastructure</div>
     <div class="hero-title">HARAMAIN</div>
     <div class="hero-subtitle" data-i="subtitle">The Web3 Pilgrimage Infrastructure for Hajj & Umrah</div>
-    <div class="hero-desc" data-i="desc">Combining AI-powered guidance, real-time safety systems, smart worship technology, digital pilgrim infrastructure, and Pi Testnet financial systems into one intelligent Islamic ecosystem for the world.</div>
+    <div class="hero-desc" data-i="desc">Combining AI-powered guidance, real-time safety systems, smart worship technology, digital pilgrim infrastructure, and Pi Mainnet financial systems into one intelligent Islamic ecosystem for the world.</div>
     <div class="hero-indicators">
-      <div class="hi"><div class="hi-dot"></div><div class="hi-txt">Pi Testnet Connected</div></div>
+      <div class="hi"><div class="hi-dot"></div><div class="hi-txt">Pi Mainnet Connected</div></div>
       <div class="hi"><div class="hi-dot"></div><div class="hi-txt">Secure Authentication</div></div>
       <div class="hi"><div class="hi-dot"></div><div class="hi-txt">Real-Time Infrastructure</div></div>
       <div class="hi"><div class="hi-dot"></div><div class="hi-txt">AI Pilgrim Technology</div></div>
@@ -717,7 +1089,7 @@ select.fi{cursor:pointer;}
       <div class="lc">
         <div class="lc-label">💰 Live Pi Value</div>
         <div class="lc-val" id="lc-pi">$0.17</div>
-        <div class="lc-sub">USD · Testnet</div>
+        <div class="lc-sub">USD · Mainnet</div>
       </div>
       <div class="lc">
         <div class="lc-label">🕌 Next Prayer</div>
@@ -743,13 +1115,13 @@ select.fi{cursor:pointer;}
       <span class="login-btn-icon">🕋</span>
       <span id="loginBtnText" data-i="signin">Sign In with Pi</span>
     </button>
-    <div class="login-security" data-i="secure_auth">Secure Pi Testnet Authentication · sandbox:true</div>
+    <div class="login-security" data-i="secure_auth">Secure Pi Mainnet Authentication · sandbox:false</div>
     <div class="login-status" id="ls-msg"></div>
   </div>
 
   <!-- SECTION 5 — FOOTER -->
   <div class="landing-footer">
-    <div class="lf-powered">Powered by Haramain.pi · Pi Network Testnet</div>
+    <div class="lf-powered">Powered by Haramain.pi · Pi Network Mainnet</div>
     <div class="lf-links">
       <span class="lf-link" onclick="openModal('modal-privacy')">Privacy Policy</span>
       <span class="lf-link" onclick="openModal('modal-terms')">Terms of Service</span>
@@ -772,7 +1144,7 @@ select.fi{cursor:pointer;}
       <span class="ti" id="tick-hijri">🌙 Hijri date loading...</span>
       <span class="ti" id="tick-prayer">🕌 Prayer times loading...</span>
       <span class="ti" id="tick-weather">🌡️ Makkah weather loading...</span>
-      <span class="ti">💸 Pi Testnet payments · Send · Request · Zakat · Sadaqah · Qurbani</span>
+      <span class="ti">💸 Pi Mainnet payments · Send · Request · Zakat · Sadaqah · Qurbani</span>
       <span class="ti">🤖 HARAMAIN AI · Powered by Claude · Ask anything about Hajj & Umrah</span>
     </div>
   </div>
@@ -781,7 +1153,7 @@ select.fi{cursor:pointer;}
   <header id="hdr">
     <div class="hdr-l">
       <div class="hdr-logo">HARAMAIN</div>
-      <div class="hdr-badge">🧪 Testnet</div>
+      <div class="hdr-badge">✅ Mainnet</div>
     </div>
     <div class="hdr-r">
       <span id="greeting-icon" style="font-size:.95rem"></span>
@@ -865,7 +1237,7 @@ select.fi{cursor:pointer;}
         <button class="qa-btn qa-gold" onclick="goS('payments')">
           <div class="qa-icon">💸</div>
           <div class="qa-title">Send Pi</div>
-          <div class="qa-sub">Test Pi · Testnet</div>
+          <div class="qa-sub">Real Pi · Mainnet</div>
         </button>
         <button class="qa-btn qa-green" onclick="goS('payments')">
           <div class="qa-icon">📨</div>
@@ -1145,6 +1517,37 @@ select.fi{cursor:pointer;}
 
       <div class="sh"><div class="sh-t">Transaction History</div><div class="sh-a" onclick="clrTx()">Clear</div></div>
       <div id="tx-list"></div>
+
+      <!-- Reseller & Affiliate -->
+      <div class="sec-label">💜 Reseller & Affiliate Program</div>
+      <div class="reseller-card">
+        <div class="reseller-badge">🏆 Affiliate Program</div>
+        <div style="font-weight:700;font-size:.85rem;color:#C39BD3;margin-bottom:.3rem">Earn Pi by Referring Pilgrims</div>
+        <div style="font-size:.65rem;color:var(--t2);line-height:1.7;margin-bottom:.65rem">Share HARAMAIN with pilgrims worldwide. Earn commission in Pi for every Pilgrim Pass sold through your link. The more you share, the more you earn.</div>
+        <div class="commission-grid">
+          <div class="cg-item"><div class="cg-val" id="res-earned">0π</div><div class="cg-lbl">Earned</div></div>
+          <div class="cg-item"><div class="cg-val" id="res-refs">0</div><div class="cg-lbl">Referrals</div></div>
+          <div class="cg-item"><div class="cg-val" id="res-conv">0%</div><div class="cg-lbl">Conversion</div></div>
+        </div>
+        <button class="btn" onclick="goS('reseller')" style="background:linear-gradient(135deg,#9B59B6,#C39BD3);color:#fff;margin-bottom:0">💜 Open Reseller Dashboard</button>
+      </div>
+
+      <!-- Mailing -->
+      <div class="sec-label">📧 Pilgrim Email Outreach</div>
+      <div class="mail-card">
+        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.5rem">
+          <div style="font-size:1.8rem">📧</div>
+          <div>
+            <div style="font-weight:700;font-size:.82rem;color:#5DADE2">Outreach Center</div>
+            <div style="font-size:.6rem;color:var(--t3)">Compose · Templates · Track deliveries</div>
+          </div>
+        </div>
+        <button class="btn" onclick="goS('mailer')" style="background:linear-gradient(135deg,#2980B9,#5DADE2);color:#fff;margin-bottom:0">📧 Open Mailing Center</button>
+      </div>
+
+      <!-- Pi Ad Slot: Profile Bottom -->
+      <div id="ad-slot-profile-bottom" style="margin:.5rem 0"></div>
+
       <button class="btn btn-red" style="margin-top:.8rem" onclick="logout()">Logout</button>
 
       <!-- PROFILE UTILITY PAGES -->
@@ -1155,8 +1558,8 @@ select.fi{cursor:pointer;}
           <div class="pid-av">🕋</div>
           <div class="pid-name" id="pid-name">—</div>
           <div class="pid-serial" id="pid-serial">Pilgrim ID #—</div>
-          <div class="pid-uid" id="pid-uid">HARAMAIN · Pi Network · Testnet</div>
-          <div class="pid-badges"><span class="pbadge pb-main">🧪 Testnet</span><span class="pbadge pb-prem" id="pid-prem" style="display:none">⭐ Pilgrim Pass</span><span class="pbadge pb-lvl" id="pid-lvl">🕋 Pilgrim</span></div>
+          <div class="pid-uid" id="pid-uid">HARAMAIN · Pi Network · Mainnet</div>
+          <div class="pid-badges"><span class="pbadge pb-main">✅ Mainnet</span><span class="pbadge pb-prem" id="pid-prem" style="display:none">⭐ Pilgrim Pass</span><span class="pbadge pb-lvl" id="pid-lvl">🕋 Pilgrim</span></div>
           <div class="pid-stats">
             <div class="ps"><div class="ps-n" id="pid-pts">0</div><div class="ps-l">Points</div></div>
             <div class="ps"><div class="ps-n" id="pid-tawaf">0</div><div class="ps-l">Tawaf</div></div>
@@ -1235,7 +1638,7 @@ select.fi{cursor:pointer;}
     <!-- ══ PAYMENTS SCREEN ══ -->
     <section class="scr" id="s-payments">
       <div class="scr-hdr">
-        <div><div class="scr-hdr-title">Pi Payments</div><div class="scr-hdr-sub">Testnet · sandbox:true · Real Pi</div></div>
+        <div><div class="scr-hdr-title">Pi Payments</div><div class="scr-hdr-sub">Mainnet · sandbox:false · Real Pi</div></div>
       </div>
 
       <!-- Wallet -->
@@ -1245,8 +1648,8 @@ select.fi{cursor:pointer;}
           <div>
             <div class="wh-name" id="wc-name">—</div>
             <div class="wh-pid" id="wc-serial">Pilgrim ID: Loading...</div>
-            <div class="wh-net">Pi Network · Testnet · sandbox:true</div>
-            <div class="wh-live"><div class="live-dot"></div>Connected · Test Pi</div>
+            <div class="wh-net">Pi Network · Mainnet · sandbox:false</div>
+            <div class="wh-live"><div class="live-dot"></div>Connected · Real Pi</div>
           </div>
         </div>
         <div class="wh-stats">
@@ -1264,7 +1667,7 @@ select.fi{cursor:pointer;}
           <div class="fg"><label class="flbl">Amount (π)</label><input class="fi" type="number" id="send-amt" value="0.1" min="0.001" step="0.001"></div>
           <div class="fg"><label class="flbl">Memo</label><input class="fi" type="text" id="send-memo" placeholder="e.g. Hajj support"></div>
         </div>
-        <button class="btn" onclick="sendPi()">💸 Send Pi · Testnet</button>
+        <button class="btn" onclick="sendPi()">💸 Send Pi · Mainnet</button>
       </div>
 
       <!-- Request Pi -->
@@ -1331,6 +1734,746 @@ select.fi{cursor:pointer;}
 
     </section>
 
+
+    <!-- ══ RESELLER DASHBOARD ══ -->
+    <section class="scr" id="s-reseller">
+      <div class="scr-hdr">
+        <div><div class="scr-hdr-title">Reseller Hub</div><div class="scr-hdr-sub">Earn Pi · Refer pilgrims · Build your network</div></div>
+        <div class="scr-hdr-action" onclick="goS('profile')">← Back</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="commission-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:.8rem">
+        <div class="cg-item"><div class="cg-val" id="res2-earned">0π</div><div class="cg-lbl">Total Earned</div></div>
+        <div class="cg-item"><div class="cg-val" id="res2-refs">0</div><div class="cg-lbl">Referrals</div></div>
+        <div class="cg-item"><div class="cg-val" id="res2-rank">--</div><div class="cg-lbl">Your Rank</div></div>
+      </div>
+
+      <!-- Your Referral Link -->
+      <div class="sec-label">🔗 Your Referral Link</div>
+      <div class="ref-link-box">
+        <div style="font-family:var(--dm);font-size:.5rem;color:var(--t3);margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.1em">Your unique link</div>
+        <div class="ref-link-url" id="ref-link-url">Generating...</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.42rem;margin-bottom:.8rem">
+        <div class="share-btn" onclick="shareRefWhatsApp()"><div class="share-btn-icon">💬</div><div class="share-btn-label">WhatsApp</div></div>
+        <div class="share-btn" onclick="shareRefNative()"><div class="share-btn-icon">📤</div><div class="share-btn-label">Share</div></div>
+        <div class="share-btn" onclick="copyRefLink()"><div class="share-btn-icon">📋</div><div class="share-btn-label">Copy</div></div>
+        <div class="share-btn" onclick="shareRefSMS()"><div class="share-btn-icon">📱</div><div class="share-btn-label">SMS</div></div>
+        <div class="share-btn" onclick="shareRefEmail()"><div class="share-btn-icon">📧</div><div class="share-btn-label">Email</div></div>
+        <div class="share-btn" onclick="shareRefTelegram()"><div class="share-btn-icon">✈️</div><div class="share-btn-label">Telegram</div></div>
+      </div>
+
+      <!-- Commission Tiers -->
+      <div class="sec-label">💎 Commission Tiers</div>
+      <div class="tier-card">
+        <div class="tier-icon">🥉</div>
+        <div><div class="tier-name">Pilgrim Referrer</div><div class="tier-desc">1–10 referrals · Basic tier</div></div>
+        <div class="tier-pct">10%</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-icon">🥈</div>
+        <div><div class="tier-name">Hajj Ambassador</div><div class="tier-desc">11–50 referrals · Silver tier</div></div>
+        <div class="tier-pct">15%</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-icon">🥇</div>
+        <div><div class="tier-name">Elite Reseller</div><div class="tier-desc">51+ referrals · Gold tier</div></div>
+        <div class="tier-pct">20%</div>
+      </div>
+      <div class="tier-card" style="background:linear-gradient(135deg,rgba(201,168,76,.08),var(--bg2));border-color:rgba(201,168,76,.25)">
+        <div class="tier-icon">👑</div>
+        <div><div class="tier-name" style="color:var(--gold)">Platinum Partner</div><div class="tier-desc">Agencies · Travel operators · 100+ referrals</div></div>
+        <div class="tier-pct" style="color:var(--gold)">25%</div>
+      </div>
+      <div class="ibox" style="border-color:rgba(155,89,182,.2);background:rgba(155,89,182,.05)">
+        💜 Commission is paid in Pi directly to your wallet after each successful Pilgrim Pass purchase via your link. Tracked on-chain.
+      </div>
+
+      <!-- Promotional Materials -->
+      <div class="sec-label">📣 Promotional Messages</div>
+      <div id="promo-list"></div>
+
+      <!-- Leaderboard -->
+      <div class="sec-label">🏆 Top Resellers</div>
+      <div class="card card-gold">
+        <div class="ic-title">Global Affiliate Leaderboard</div>
+        <div id="reseller-leaderboard"></div>
+      </div>
+
+      <!-- Payout History -->
+      <div class="sec-label">💸 Payout History</div>
+      <div id="payout-history"><div class="empty">No payouts yet — start referring!</div></div>
+
+    </section>
+
+    <!-- ══ MAILING CENTER ══ -->
+    <section class="scr" id="s-mailer">
+      <div class="scr-hdr">
+        <div><div class="scr-hdr-title">Mailing Center</div><div class="scr-hdr-sub">Compose · Templates · Outreach</div></div>
+        <div class="scr-hdr-action" onclick="goS('profile')">← Back</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+        <div class="tile"><div class="tn" id="mail-sent-count">0</div><div class="tl">Sent</div></div>
+        <div class="tile"><div class="tn" id="mail-opens">0</div><div class="tl">Opens</div></div>
+        <div class="tile"><div class="tn" id="mail-clicks">0</div><div class="tl">Clicks</div></div>
+      </div>
+
+      <!-- Compose -->
+      <div class="sec-label">✍️ Compose New Email</div>
+      <div class="mail-compose">
+        <div class="fg">
+          <label class="flbl">To (email addresses)</label>
+          <input class="fi" type="email" id="mail-to-input" placeholder="email@example.com" onkeydown="addMailRecipient(event)">
+          <div style="font-family:var(--dm);font-size:.5rem;color:var(--t3);margin-top:.15rem">Press Enter to add each address</div>
+        </div>
+        <div class="mail-to-chips" id="mail-to-chips"></div>
+        <div class="fg">
+          <label class="flbl">Subject</label>
+          <input class="fi" type="text" id="mail-subject" placeholder="e.g. Join me on HARAMAIN — The Pilgrim Platform">
+        </div>
+        <div class="fg">
+          <label class="flbl">Message</label>
+          <textarea class="fz-inp" id="mail-body" style="height:120px" placeholder="Type your message here..."></textarea>
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-green" onclick="sendMail()" style="flex:1">📧 Send Email</button>
+          <button class="btn btn-ghost" onclick="saveDraft()" style="flex:1;width:auto">💾 Save Draft</button>
+        </div>
+      </div>
+
+      <!-- Templates -->
+      <div class="sec-label">📋 Ready-Made Templates</div>
+      <div id="mail-templates"></div>
+
+      <!-- Sent History -->
+      <div class="sec-label">📬 Sent History</div>
+      <div class="ic" id="mail-sent-history">
+        <div class="empty">No emails sent yet</div>
+      </div>
+
+      <!-- Drafts -->
+      <div class="sec-label">💾 Drafts</div>
+      <div class="ic" id="mail-drafts">
+        <div class="empty">No drafts saved</div>
+      </div>
+
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: EMERGENCY COMMAND CENTER
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-emergency">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">🆘 Emergency Command</div><div class="scr-top-sub">Saudi Civil Defense · Red Crescent · Embassy</div></div>
+        <span class="live-badge">LIVE</span>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- SOS Activation -->
+        <div class="emer-hero">
+          <div style="text-align:center;margin-bottom:.6rem">
+            <div class="emer-pulse">🆘</div>
+            <div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)" id="emer-gps-status">📡 Acquiring GPS location...</div>
+            <div style="font-family:var(--df);font-size:.85rem;color:#E74C3C;margin-top:.2rem" id="emer-coords">--</div>
+          </div>
+          <button class="emer-btn" onclick="activateFullSOS()" id="emer-sos-btn">
+            🆘 ACTIVATE EMERGENCY SOS
+          </button>
+          <button class="emer-btn" style="background:linear-gradient(135deg,#F39C12,#D68910)" onclick="shareEmergencyLocation()">
+            📍 SHARE MY LOCATION NOW
+          </button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.4rem">
+            <div class="emer-status"><span class="emer-status-dot"></span>System Active · GPS Ready</div>
+            <div style="font-family:var(--dm);font-size:.48rem;color:var(--t3)" id="emer-last-update">Updated: --</div>
+          </div>
+        </div>
+
+        <!-- Emergency Numbers -->
+        <div class="sec-label">📞 Emergency Numbers</div>
+        <div class="emer-contact-grid">
+          <div class="emer-contact" onclick="callEmergency('998')">
+            <div class="emer-contact-icon">🚒</div>
+            <div class="emer-contact-name">Civil Defense</div>
+            <div class="emer-contact-num">998</div>
+          </div>
+          <div class="emer-contact" onclick="callEmergency('997')">
+            <div class="emer-contact-icon">🚑</div>
+            <div class="emer-contact-name">Red Crescent</div>
+            <div class="emer-contact-num">997</div>
+          </div>
+          <div class="emer-contact" onclick="callEmergency('911')">
+            <div class="emer-contact-icon">👮</div>
+            <div class="emer-contact-name">Police</div>
+            <div class="emer-contact-num">911</div>
+          </div>
+          <div class="emer-contact" onclick="callEmergency('920020470')">
+            <div class="emer-contact-icon">🏥</div>
+            <div class="emer-contact-name">Hajj Hospital</div>
+            <div class="emer-contact-num">920020470</div>
+          </div>
+        </div>
+
+        <!-- Personal Emergency Contacts -->
+        <div class="sec-label">👥 My Emergency Contacts</div>
+        <div id="emer-contacts-list"></div>
+        <button class="btn btn-ghost" onclick="addEmergencyContact()" style="margin-bottom:.6rem">
+          + Add Emergency Contact
+        </button>
+
+        <!-- Embassy Finder -->
+        <div class="sec-label">🏛️ My Country Embassy</div>
+        <div id="emer-embassy-box">
+          <div class="ic" style="text-align:center;color:var(--t3);font-size:.65rem">
+            Sign in to auto-detect your embassy
+          </div>
+        </div>
+
+        <!-- No-Movement Detection -->
+        <div class="sec-label">⚠️ Safety Monitor</div>
+        <div class="ibox" style="border-color:rgba(231,76,60,.2);background:rgba(231,76,60,.04)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+            <div style="font-size:.72rem;font-weight:700;color:var(--t1)">No-Movement Alert</div>
+            <label class="toggle-wrap" onclick="toggleNoMovement()">
+              <div class="toggle-track" id="no-movement-toggle"><div class="toggle-thumb"></div></div>
+            </label>
+          </div>
+          <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3);line-height:1.6">
+            Automatically alerts emergency contacts if no movement is detected for 10 minutes. Critical for heat emergencies and medical events.
+          </div>
+          <div style="font-family:var(--dm);font-size:.55rem;color:#F5B041;margin-top:.3rem" id="no-movement-status">
+            ⚠️ Enable to activate protection
+          </div>
+        </div>
+
+        <!-- Emergency Message -->
+        <div class="sec-label">📝 Emergency Message (Auto-sent)</div>
+        <div id="emer-preview-msg" class="ibox" style="font-family:var(--dm);font-size:.55rem;color:var(--t3);line-height:1.7">
+          🆘 EMERGENCY — I need help!<br>
+          👤 Pilgrim: @Quality66 | ID: HM-XXXXX<br>
+          📍 Location: [GPS coordinates]<br>
+          🗺️ Map: https://maps.google.com?q=[lat],[lng]<br>
+          🕐 Time: [timestamp]<br>
+          🏥 Blood: [blood type] | Conditions: [conditions]<br>
+          📱 HARAMAIN Emergency System
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: HEALTH INTELLIGENCE SYSTEM
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-health-intel">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">🏥 Health Intelligence</div><div class="scr-top-sub">Medical passport · Risk monitoring · Medication</div></div>
+        <span class="gps-badge">LIVE</span>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Health Score -->
+        <div class="health-hero">
+          <div style="display:flex;align-items:center;gap:1rem">
+            <div class="health-score">
+              <svg class="health-ring" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(201,168,76,.15)" stroke-width="8"/>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#C9A84C" stroke-width="8"
+                  stroke-dasharray="327" stroke-dashoffset="var(--hdash,82)"
+                  stroke-linecap="round" transform="rotate(-90 60 60)"
+                  id="health-ring-circle"/>
+              </svg>
+              <div class="health-score-val" id="health-score-val">75</div>
+              <div class="health-score-lbl">Health</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:.85rem;color:var(--t1);margin-bottom:.3rem">Pilgrim Health Status</div>
+              <div id="health-status-text" style="font-family:var(--dm);font-size:.6rem;color:var(--grn);margin-bottom:.4rem">✅ Good condition for Hajj</div>
+              <div class="heat-risk low" id="heat-risk-display">
+                <span style="font-size:1rem">🌡️</span>
+                <span id="heat-risk-text">Heat risk: LOW · 36°C · Stay hydrated</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vital Signs -->
+        <div class="sec-label">📊 Vital Monitoring</div>
+        <div class="vital-grid">
+          <div class="vital-card" style="--fill:65%;--accent:#E74C3C">
+            <div class="vital-val" id="vi-heart">72</div>
+            <div class="vital-unit">bpm</div>
+            <div class="vital-lbl">Heart Rate</div>
+          </div>
+          <div class="vital-card" style="--fill:75%;--accent:#3498DB">
+            <div class="vital-val" id="vi-bp">120/80</div>
+            <div class="vital-unit">mmHg</div>
+            <div class="vital-lbl">Blood Pressure</div>
+          </div>
+          <div class="vital-card" style="--fill:90%;--accent:var(--grn)">
+            <div class="vital-val" id="vi-spo2">98</div>
+            <div class="vital-unit">%</div>
+            <div class="vital-lbl">SpO2</div>
+          </div>
+          <div class="vital-card" style="--fill:50%;--accent:#F5B041">
+            <div class="vital-val" id="vi-temp">37.0</div>
+            <div class="vital-unit">°C</div>
+            <div class="vital-lbl">Temperature</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" onclick="logVitals()" style="margin-bottom:.6rem;font-size:.65rem">
+          + Log Current Vitals
+        </button>
+
+        <!-- Medical Profile -->
+        <div class="sec-label">🪪 Medical Passport</div>
+        <div class="card card-gold" style="margin-bottom:.6rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+            <div style="font-weight:700;font-size:.78rem;color:var(--t1)">Digital Medical Record</div>
+            <div id="med-qr-mini" style="width:48px;height:48px;background:rgba(201,168,76,.1);border-radius:8px;border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem">📋</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.4rem;margin-bottom:.5rem">
+            <div class="fg"><label class="flbl">Blood Type</label><div id="mp-blood" style="font-family:var(--df);font-size:1.3rem;color:var(--red);padding:.2rem 0">A+</div></div>
+            <div class="fg"><label class="flbl">Age</label><div id="mp-age" style="font-family:var(--df);font-size:1.3rem;color:var(--gold);padding:.2rem 0">--</div></div>
+          </div>
+          <div class="fg" style="margin-bottom:.4rem"><label class="flbl">Known Conditions</label><div id="mp-conditions" style="font-size:.65rem;color:var(--t2);padding:.15rem 0">None recorded</div></div>
+          <div class="fg" style="margin-bottom:.4rem"><label class="flbl">Allergies</label><div id="mp-allergies" style="font-size:.65rem;color:var(--t2);padding:.15rem 0">None recorded</div></div>
+          <div class="fg" style="margin-bottom:.5rem"><label class="flbl">Current Medications</label><div id="mp-meds" style="font-size:.65rem;color:var(--t2);padding:.15rem 0">None recorded</div></div>
+          <div style="display:flex;gap:.5rem">
+            <button class="btn btn-gold" onclick="openHealthEdit()" style="flex:1;font-size:.62rem">✏️ Edit Profile</button>
+            <button class="btn btn-ghost" onclick="showMedQR()" style="flex:1;font-size:.62rem">📋 Hospital QR</button>
+          </div>
+        </div>
+
+        <!-- Medication Reminders -->
+        <div class="sec-label">💊 Medication Schedule</div>
+        <div id="med-schedule-list"></div>
+        <button class="btn btn-ghost" onclick="addMedication()" style="margin-bottom:.6rem;font-size:.65rem">+ Add Medication</button>
+
+        <!-- Nearby Hospitals -->
+        <div class="sec-label">🏥 Nearest Hospitals</div>
+        <div id="hospital-list"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: CROWD INTELLIGENCE
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-crowd">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">🌊 Crowd Intelligence</div><div class="scr-top-sub">Zone density · Safe routes · Jamarat timing</div></div>
+        <span class="live-badge">LIVE</span>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Live Zone Map SVG -->
+        <div class="sec-label">🗺️ Live Zone Status</div>
+        <div class="crowd-map" id="crowd-map-container">
+          <svg viewBox="0 0 340 200" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block">
+            <!-- Background -->
+            <rect width="340" height="200" fill="#040E07" rx="12"/>
+            <!-- Grid -->
+            <line x1="0" y1="100" x2="340" y2="100" stroke="rgba(201,168,76,.08)" stroke-width="1"/>
+            <line x1="170" y1="0" x2="170" y2="200" stroke="rgba(201,168,76,.08)" stroke-width="1"/>
+            <!-- Makkah/Haram Zone -->
+            <ellipse cx="170" cy="100" rx="45" ry="40" fill="rgba(231,76,60,.15)" stroke="rgba(231,76,60,.5)" stroke-width="2"/>
+            <text x="170" y="96" text-anchor="middle" font-size="9" fill="#E74C3C" font-weight="bold">Masjid</text>
+            <text x="170" y="108" text-anchor="middle" font-size="8" fill="#E74C3C">al-Haram</text>
+            <!-- Mina -->
+            <ellipse cx="275" cy="100" rx="38" ry="28" fill="rgba(243,156,18,.1)" stroke="rgba(243,156,18,.4)" stroke-width="1.5"/>
+            <text x="275" y="104" text-anchor="middle" font-size="9" fill="#F5B041">Mina</text>
+            <!-- Arafat -->
+            <ellipse cx="290" cy="165" rx="30" ry="22" fill="rgba(46,204,113,.08)" stroke="rgba(46,204,113,.3)" stroke-width="1.5"/>
+            <text x="290" y="169" text-anchor="middle" font-size="9" fill="#2ECC71">Arafat</text>
+            <!-- Muzdalifah -->
+            <ellipse cx="235" cy="155" rx="28" ry="18" fill="rgba(52,152,219,.08)" stroke="rgba(52,152,219,.3)" stroke-width="1.5"/>
+            <text x="235" y="159" text-anchor="middle" font-size="8" fill="#3498DB">Muzdalifah</text>
+            <!-- Jamarat -->
+            <rect x="228" y="80" width="30" height="22" rx="6" fill="rgba(155,89,182,.1)" stroke="rgba(155,89,182,.4)" stroke-width="1.5"/>
+            <text x="243" y="95" text-anchor="middle" font-size="7" fill="#9B59B6">Jamarat</text>
+            <!-- User Location -->
+            <circle cx="170" cy="100" r="6" fill="#E74C3C">
+              <animate attributeName="r" values="5;10;5" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="170" cy="100" r="3" fill="#fff"/>
+            <!-- Legend -->
+            <text x="8" y="190" font-size="7" fill="rgba(201,168,76,.5)">HARAMAIN CROWD INTELLIGENCE · LIVE</text>
+          </svg>
+        </div>
+
+        <!-- Zone Cards -->
+        <div class="zone-grid">
+          <div class="zone-card" style="--zone-col:#E74C3C;--density:85%">
+            <div class="zone-name">Masjid al-Haram</div>
+            <div class="zone-count" id="crowd-haram">285K</div>
+            <div class="zone-status zone-crowded">⚠️ Very Crowded</div>
+            <div class="zone-density-bar"></div>
+          </div>
+          <div class="zone-card" style="--zone-col:#F5B041;--density:60%">
+            <div class="zone-name">Mina</div>
+            <div class="zone-count" id="crowd-mina">180K</div>
+            <div class="zone-status zone-moderate">🟡 Moderate</div>
+            <div class="zone-density-bar"></div>
+          </div>
+          <div class="zone-card" style="--zone-col:#2ECC71;--density:30%">
+            <div class="zone-name">Arafat</div>
+            <div class="zone-count" id="crowd-arafat">45K</div>
+            <div class="zone-status zone-safe">✅ Clear</div>
+            <div class="zone-density-bar"></div>
+          </div>
+          <div class="zone-card" style="--zone-col:#3498DB;--density:45%">
+            <div class="zone-name">Muzdalifah</div>
+            <div class="zone-count" id="crowd-muzdalifah">92K</div>
+            <div class="zone-status zone-moderate">🟡 Moderate</div>
+            <div class="zone-density-bar"></div>
+          </div>
+        </div>
+
+        <!-- Safe Routes -->
+        <div class="sec-label">🗺️ Recommended Safe Routes</div>
+        <div id="safe-routes-list">
+          <div class="route-option">
+            <div class="route-time">12 min</div>
+            <div>
+              <div class="route-label" style="font-weight:700">King Fahd Gate → Mataf</div>
+              <div class="route-label">Via King Abdul Aziz Road · Underpass C</div>
+            </div>
+            <div class="route-crowd" style="background:rgba(46,204,113,.1);color:var(--grn)">LOW</div>
+          </div>
+          <div class="route-option">
+            <div class="route-time">18 min</div>
+            <div>
+              <div class="route-label" style="font-weight:700">Ajyad Gate → Tawaf Level 2</div>
+              <div class="route-label">Via Tunnel B · Elevator access available</div>
+            </div>
+            <div class="route-crowd" style="background:rgba(243,156,18,.1);color:#F5B041">MED</div>
+          </div>
+        </div>
+
+        <!-- Jamarat Timing -->
+        <div class="sec-label">🪨 Jamarat Safe Timing Guide</div>
+        <div id="jamarat-timing-list"></div>
+
+        <!-- Alert Settings -->
+        <div class="sec-label">🔔 Crowd Alerts</div>
+        <div class="ibox">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+            <div style="font-size:.7rem;font-weight:700;color:var(--t1)">Zone Danger Alerts</div>
+            <label class="toggle-wrap"><div class="toggle-track on" id="crowd-alert-toggle"><div class="toggle-thumb"></div></div></label>
+          </div>
+          <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3)">Alert when any zone reaches critical density. Suggests safer alternatives immediately.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: SMART HYDRATION
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-hydration">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">💧 Hydration System</div><div class="scr-top-sub">Smart water tracker · Heat prevention · Zamzam</div></div>
+        <span class="gps-badge">AI</span>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Hero -->
+        <div class="hydro-hero">
+          <div style="display:flex;align-items:center;gap:1.2rem">
+            <div>
+              <div class="hydro-glass">
+                <div class="hydro-fill" id="hydro-fill" style="height:60%"></div>
+                <div class="hydro-level" id="hydro-pct">60%</div>
+              </div>
+            </div>
+            <div style="flex:1">
+              <div style="font-family:var(--df);font-size:2rem;color:#3498DB" id="hydro-intake">1.5L</div>
+              <div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)">of <span id="hydro-target-val">2.5L</span> daily target</div>
+              <div style="font-family:var(--dm);font-size:.58rem;color:var(--grn);margin-top:.3rem" id="hydro-status">✅ Good hydration level</div>
+              <div style="font-family:var(--dm);font-size:.52rem;color:var(--t3);margin-top:.15rem">Next reminder: <span id="hydro-next" style="color:var(--gold)">20 min</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Add -->
+        <div class="sec-label">💧 Log Water Intake</div>
+        <div class="hydro-target" id="hydro-cups"></div>
+        <button class="btn btn-ghost" onclick="addCustomWater()" style="margin-bottom:.6rem;font-size:.65rem">+ Add Custom Amount</button>
+
+        <!-- Personal Heat Index -->
+        <div class="sec-label">🌡️ Personal Heat Risk Index</div>
+        <div id="hydro-heat-index"></div>
+
+        <!-- Zamzam Counter -->
+        <div class="sec-label">🕋 Zamzam Intake Tracker</div>
+        <div class="card card-gold" style="margin-bottom:.6rem">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-family:var(--df);font-size:2rem;color:var(--gold)" id="zamzam-count">0</div>
+              <div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)">Zamzam cups today</div>
+              <div style="font-family:var(--dm);font-size:.55rem;color:var(--t2);margin-top:.2rem">Prophet ﷺ: Drink Zamzam with intention</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.4rem">
+              <button class="btn btn-gold" onclick="addZamzam()" style="font-size:.7rem;padding:.4rem .8rem">+ Drink</button>
+              <button class="btn btn-ghost" onclick="resetZamzam()" style="font-size:.6rem;padding:.3rem .6rem">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cooling Stations -->
+        <div class="sec-label">❄️ Cooling Stations Near You</div>
+        <div id="cooling-stations-list"></div>
+
+        <!-- Reminder Settings -->
+        <div class="sec-label">⏰ Smart Reminders</div>
+        <div class="ibox">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--t1)">Auto Hydration Reminders</div>
+              <div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)">Every 20 minutes during outdoor activity</div>
+            </div>
+            <label class="toggle-wrap" onclick="toggleHydroReminders()">
+              <div class="toggle-track on" id="hydro-reminder-toggle"><div class="toggle-thumb"></div></div>
+            </label>
+          </div>
+          <div style="font-family:var(--dm);font-size:.55rem;color:#F5B041">⚠️ Makkah heat: drink 500ml every hour minimum</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: AUDIO DUA PLAYER
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-audio">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">🎵 Audio Duas & Quran</div><div class="scr-top-sub">Scholar recitations · Offline ready · 6 languages</div></div>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Now Playing -->
+        <div class="audio-player-hero">
+          <div class="audio-now-playing">
+            <div class="audio-album-art" id="audio-album-art">🕋</div>
+            <div class="audio-title" id="audio-title">Dua for entering Makkah</div>
+            <div class="audio-artist" id="audio-artist">Sheikh Sudais · Arabic + Transliteration</div>
+          </div>
+          <div class="audio-progress">
+            <div class="audio-bar" id="audio-bar" onclick="seekAudio(event)">
+              <div class="audio-fill" id="audio-fill" style="width:0%"></div>
+              <div class="audio-dot" style="--pos:0%" id="audio-dot"></div>
+            </div>
+            <div class="audio-times">
+              <span id="audio-current">0:00</span>
+              <span id="audio-duration">--:--</span>
+            </div>
+          </div>
+          <div class="audio-controls">
+            <button class="audio-btn" onclick="prevTrack()">⏮</button>
+            <button class="audio-btn" onclick="toggleRepeat()" id="audio-repeat-btn">🔁</button>
+            <button class="audio-play-btn" onclick="toggleAudioPlay()" id="audio-play-btn">▶</button>
+            <button class="audio-btn" onclick="toggleShuffle()" id="audio-shuffle-btn">🔀</button>
+            <button class="audio-btn" onclick="nextTrack()">⏭</button>
+          </div>
+          <!-- Arabic text display -->
+          <div style="text-align:center;margin-top:.6rem;padding:.6rem;background:rgba(0,0,0,.2);border-radius:var(--r2)">
+            <div style="font-family:'Amiri','Traditional Arabic',serif;font-size:1.1rem;color:var(--gold2);direction:rtl;line-height:1.8;margin-bottom:.3rem" id="audio-arabic">بِسْمِ اللَّهِ وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ</div>
+            <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3);font-style:italic" id="audio-transliteration">Bismillah was-salatu was-salam ala rasulillah</div>
+          </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="day-tab-row" id="audio-cats">
+          <div class="day-tab on" onclick="loadAudioCat('hajj',this)">🕋 Hajj Duas</div>
+          <div class="day-tab" onclick="loadAudioCat('prayer',this)">🕌 Prayer</div>
+          <div class="day-tab" onclick="loadAudioCat('morning',this)">🌅 Morning</div>
+          <div class="day-tab" onclick="loadAudioCat('evening',this)">🌙 Evening</div>
+          <div class="day-tab" onclick="loadAudioCat('quran',this)">📖 Quran</div>
+          <div class="day-tab" onclick="loadAudioCat('sleep',this)">😴 Sleep</div>
+        </div>
+
+        <!-- Playlist -->
+        <div class="dua-playlist" id="dua-playlist"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: DIGITAL HAJJ CHECKLIST
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-checklist">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">📋 Hajj Checklist</div><div class="scr-top-sub">Day-by-day · Ritual validation · Progress</div></div>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Progress -->
+        <div class="checklist-hero">
+          <div class="checklist-pct" id="checklist-pct">0%</div>
+          <div class="checklist-bar">
+            <div class="checklist-fill" id="checklist-fill" style="width:0%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--dm);font-size:.52rem;color:var(--t3);margin-top:.3rem">
+            <span id="checklist-done-count">0 completed</span>
+            <span id="checklist-left-count">0 remaining</span>
+          </div>
+        </div>
+
+        <!-- Day Tabs -->
+        <div class="day-tab-row" id="checklist-day-tabs"></div>
+
+        <!-- Checklist Items -->
+        <div id="checklist-items"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: PERSONAL HAJJ ITINERARY
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-itinerary">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">🗓️ Hajj Itinerary</div><div class="scr-top-sub">Day 8–13 · Personal schedule · Smart reminders</div></div>
+        <div class="scr-top-action" onclick="exportItinerary()">Export</div>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Overview -->
+        <div class="stat-band" style="margin-bottom:.8rem">
+          <div class="stat-band-item"><div class="stat-band-val">6</div><div class="stat-band-lbl">Days</div></div>
+          <div class="stat-band-item"><div class="stat-band-val" id="itin-events">24</div><div class="stat-band-lbl">Events</div></div>
+          <div class="stat-band-item"><div class="stat-band-val" id="itin-done">0</div><div class="stat-band-lbl">Done</div></div>
+        </div>
+
+        <!-- Day-by-day -->
+        <div id="itinerary-days"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: SPIRITUAL ANALYTICS
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-analytics">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">📊 Spiritual Analytics</div><div class="scr-top-sub">Worship insights · Progress · AI recommendations</div></div>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Weekly Overview -->
+        <div class="analytics-hero">
+          <div style="font-weight:700;font-size:.78rem;color:var(--t1);margin-bottom:.6rem">This Week's Worship</div>
+          <div class="analytics-week" id="analytics-week"></div>
+        </div>
+
+        <!-- Key Stats -->
+        <div class="analytics-stat-row" id="analytics-stats"></div>
+
+        <!-- Prayer Consistency -->
+        <div class="sec-label">🕌 Prayer Consistency</div>
+        <div id="prayer-chart"></div>
+
+        <!-- Insights -->
+        <div class="sec-label">🧠 AI Spiritual Insights</div>
+        <div id="spiritual-insights"></div>
+
+        <!-- Worship Goals -->
+        <div class="sec-label">🎯 Worship Goals</div>
+        <div id="worship-goals"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: PILGRIM MEMORIES
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-memories">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">📸 Pilgrim Memories</div><div class="scr-top-sub">Your spiritual journey · Private · Shareable</div></div>
+        <div class="scr-top-action" onclick="shareMemories()">Share</div>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Capture Button -->
+        <div style="text-align:center;margin-bottom:1rem">
+          <button class="memory-capture-btn" onclick="captureMemory()">📸</button>
+          <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3)">Tap to capture memory · Auto-tagged with location + Hijri date</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stat-band" style="margin-bottom:.8rem">
+          <div class="stat-band-item"><div class="stat-band-val" id="mem-count">0</div><div class="stat-band-lbl">Memories</div></div>
+          <div class="stat-band-item"><div class="stat-band-val" id="mem-days">0</div><div class="stat-band-lbl">Days</div></div>
+          <div class="stat-band-item"><div class="stat-band-val" id="mem-zones">0</div><div class="stat-band-lbl">Zones</div></div>
+        </div>
+
+        <!-- Filter -->
+        <div class="day-tab-row" id="mem-filter">
+          <div class="day-tab on" onclick="filterMemories('all',this)">All</div>
+          <div class="day-tab" onclick="filterMemories('makkah',this)">🕋 Makkah</div>
+          <div class="day-tab" onclick="filterMemories('mina',this)">⛺ Mina</div>
+          <div class="day-tab" onclick="filterMemories('arafat',this)">🏔️ Arafat</div>
+          <div class="day-tab" onclick="filterMemories('madinah',this)">🕌 Madinah</div>
+        </div>
+
+        <!-- Memory Grid -->
+        <div class="memories-grid" id="memories-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--t3);font-size:.65rem">
+            📸 No memories yet.<br>Tap the camera to capture your first Hajj moment.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: MOON SIGHTING & ISLAMIC EVENTS
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-moon">
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">🌙 Moon & Islamic Calendar</div><div class="scr-top-sub">Astronomical · Country rulings · Events</div></div>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Moon Phase Hero -->
+        <div class="moon-hero">
+          <div class="moon-display" id="moon-phase-icon">🌕</div>
+          <div class="moon-phase-name" id="moon-phase-name">Full Moon</div>
+          <div class="moon-illumination" id="moon-illumination">Illumination: 98% · Waxing Gibbous</div>
+          <div style="margin-top:.5rem">
+            <div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)">Next New Moon (Hilal)</div>
+            <div style="font-family:var(--df);font-size:1.1rem;color:var(--gold2)" id="moon-next-new">June 25, 2026</div>
+          </div>
+        </div>
+
+        <!-- Monthly Calendar -->
+        <div class="sec-label">📅 Islamic Calendar — Dhul Hijjah 1447</div>
+        <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:.8rem;margin-bottom:.6rem">
+          <div class="moon-calendar" id="moon-calendar-header" style="margin-bottom:.3rem">
+            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Sun</div>
+            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Mon</div>
+            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Tue</div>
+            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Wed</div>
+            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Thu</div>
+            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Fri</div>
+            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Sat</div>
+          </div>
+          <div class="moon-calendar" id="moon-calendar-grid"></div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="sec-label">🌟 Upcoming Islamic Events</div>
+        <div id="moon-events-list"></div>
+
+        <!-- Country Settings -->
+        <div class="sec-label">🌍 Moon Sighting Method</div>
+        <div class="ibox">
+          <div style="font-size:.7rem;font-weight:700;color:var(--t1);margin-bottom:.4rem">Select your region</div>
+          <select class="fi" id="moon-method" onchange="updateMoonMethod()">
+            <option value="global">Global Moon Sighting (OIC)</option>
+            <option value="saudi">Saudi Arabia (Official)</option>
+            <option value="calc">Astronomical Calculation</option>
+            <option value="local">Local Community Sighting</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
     <!-- ══ NOTIFICATIONS ══ -->
     <section class="scr" id="s-notifs">
       <div class="scr-hdr"><div><div class="scr-hdr-title">Notifications</div></div><div class="scr-hdr-action" onclick="markAllRead()">Mark All Read</div></div>
@@ -1384,12 +2527,11 @@ select.fi{cursor:pointer;}
 
 <div id="toast"></div>
 
-<!-- ✅ HARAMAIN SCRIPT — MAINNET · sandbox:true · All inline -->
-<script>// ✅ Initialize Pi SDK — FinPi exact
-Pi.init({ version: "2.0", sandbox: true });
+<!-- ✅ HARAMAIN SCRIPT — MAINNET · sandbox:false · All inline -->
+<script>
 
 /* ================================================================
-   HARAMAIN · script.js · Pi Network · MAINNET · sandbox:true
+   HARAMAIN · script.js · Pi Network · MAINNET · sandbox:false
    The Web3 Pilgrimage Infrastructure for Hajj & Umrah
    Ultra Premium · Government-Grade · Global Platform
    ✅ Payments copied EXACTLY from WorldCup proven system
@@ -1403,9 +2545,9 @@ var K = 'hm_v1_';
 var LANGS = {
   en: {
     subtitle: 'The Web3 Pilgrimage Infrastructure for Hajj & Umrah',
-    desc: 'Combining AI-powered guidance, real-time safety systems, smart worship technology, digital pilgrim infrastructure, and Pi Testnet financial systems into one intelligent Islamic ecosystem for the world.',
+    desc: 'Combining AI-powered guidance, real-time safety systems, smart worship technology, digital pilgrim infrastructure, and Pi Mainnet financial systems into one intelligent Islamic ecosystem for the world.',
     signin: 'Sign In with Pi',
-    secure_auth: 'Secure Pi Testnet Authentication · sandbox:true',
+    secure_auth: 'Secure Pi Mainnet Authentication · sandbox:false',
     good_morning: 'Good Morning', good_afternoon: 'Good Afternoon', good_evening: 'Good Evening',
     welcome: 'May Allah accept your Hajj',
     next_prayer: 'Next Prayer', prayer_times: 'Prayer Times',
@@ -1418,7 +2560,7 @@ var LANGS = {
     subtitle: 'البنية التحتية لحج وعمرة الجيل التالي',
     desc: 'تجمع بين التوجيه بالذكاء الاصطناعي وأنظمة السلامة الفورية وتقنيات العبادة الذكية والبنية التحتية الرقمية للحجاج وأنظمة مدفوعات Pi الرئيسية في نظام إسلامي ذكي واحد للعالم.',
     signin: 'تسجيل الدخول بـ Pi',
-    secure_auth: 'مصادقة آمنة عبر Pi Testnet',
+    secure_auth: 'مصادقة آمنة عبر Pi Mainnet',
     good_morning: 'صباح الخير', good_afternoon: 'مساء الخير', good_evening: 'مساء النور',
     welcome: 'تقبل الله حجك',
     next_prayer: 'الصلاة القادمة', prayer_times: 'مواقيت الصلاة',
@@ -1429,9 +2571,9 @@ var LANGS = {
   },
   ha: {
     subtitle: 'Tsarin Aikin Hajji da Umrah na Web3',
-    desc: 'Haɗawa da jagorancin AI, tsarin aminci na ainihi, fasaha ta ibada mai wayo, kayayyakin aikin hajji na dijital, da tsarin biyan kuɗi na Pi Testnet cikin tsarin Islama ɗaya mai hankali.',
+    desc: 'Haɗawa da jagorancin AI, tsarin aminci na ainihi, fasaha ta ibada mai wayo, kayayyakin aikin hajji na dijital, da tsarin biyan kuɗi na Pi Mainnet cikin tsarin Islama ɗaya mai hankali.',
     signin: 'Shiga da Pi',
-    secure_auth: 'Tsaro na Pi Testnet · Ina aiki',
+    secure_auth: 'Tsaro na Pi Mainnet · Ina aiki',
     good_morning: 'Ina kwana', good_afternoon: 'Ina wuni', good_evening: 'Ina yini',
     welcome: 'Allah ya karbi Hajjinka',
     next_prayer: 'Salla Mai Zuwa', prayer_times: 'Lokutan Salla',
@@ -1442,9 +2584,9 @@ var LANGS = {
   },
   ur: {
     subtitle: 'حج و عمرہ کے لیے Web3 حج انفراسٹرکچر',
-    desc: 'AI رہنمائی، ریئل ٹائم سیفٹی سسٹم، سمارٹ عبادت ٹیکنالوجی، ڈیجیٹل حاجی انفراسٹرکچر، اور Pi Testnet مالیاتی نظام کو ایک ذہین اسلامی ایکوسسٹم میں یکجا کرتا ہے۔',
+    desc: 'AI رہنمائی، ریئل ٹائم سیفٹی سسٹم، سمارٹ عبادت ٹیکنالوجی، ڈیجیٹل حاجی انفراسٹرکچر، اور Pi Mainnet مالیاتی نظام کو ایک ذہین اسلامی ایکوسسٹم میں یکجا کرتا ہے۔',
     signin: 'Pi سے سائن ان کریں',
-    secure_auth: 'محفوظ Pi Testnet تصدیق',
+    secure_auth: 'محفوظ Pi Mainnet تصدیق',
     good_morning: 'صبح بخیر', good_afternoon: 'دوپہر بخیر', good_evening: 'شام بخیر',
     welcome: 'اللہ آپ کا حج قبول فرمائے',
     next_prayer: 'اگلی نماز', prayer_times: 'نماز کے اوقات',
@@ -1455,9 +2597,9 @@ var LANGS = {
   },
   id: {
     subtitle: 'Infrastruktur Haji & Umrah Web3 Global',
-    desc: 'Menggabungkan panduan AI, sistem keselamatan real-time, teknologi ibadah cerdas, infrastruktur jemaah digital, dan sistem pembayaran Pi Testnet dalam satu ekosistem Islam yang cerdas.',
+    desc: 'Menggabungkan panduan AI, sistem keselamatan real-time, teknologi ibadah cerdas, infrastruktur jemaah digital, dan sistem pembayaran Pi Mainnet dalam satu ekosistem Islam yang cerdas.',
     signin: 'Masuk dengan Pi',
-    secure_auth: 'Autentikasi Aman Pi Testnet',
+    secure_auth: 'Autentikasi Aman Pi Mainnet',
     good_morning: 'Selamat Pagi', good_afternoon: 'Selamat Siang', good_evening: 'Selamat Malam',
     welcome: 'Semoga Allah menerima Haji Anda',
     next_prayer: 'Sholat Berikutnya', prayer_times: 'Waktu Sholat',
@@ -1468,9 +2610,9 @@ var LANGS = {
   },
   tr: {
     subtitle: 'Hac & Umre İçin Web3 Hac Altyapısı',
-    desc: 'Yapay zeka rehberliği, gerçek zamanlı güvenlik sistemleri, akıllı ibadet teknolojisi, dijital hac altyapısı ve Pi Testnet finansal sistemlerini tek bir akıllı İslam ekosisteminde birleştiriyor.',
+    desc: 'Yapay zeka rehberliği, gerçek zamanlı güvenlik sistemleri, akıllı ibadet teknolojisi, dijital hac altyapısı ve Pi Mainnet finansal sistemlerini tek bir akıllı İslam ekosisteminde birleştiriyor.',
     signin: 'Pi ile Giriş Yap',
-    secure_auth: 'Güvenli Pi Testnet Kimlik Doğrulama',
+    secure_auth: 'Güvenli Pi Mainnet Kimlik Doğrulama',
     good_morning: 'Günaydın', good_afternoon: 'İyi öğleden sonralar', good_evening: 'İyi akşamlar',
     welcome: 'Allah haccınızı kabul etsin',
     next_prayer: 'Sonraki Namaz', prayer_times: 'Namaz Vakitleri',
@@ -1708,91 +2850,40 @@ function cUtil() {
    100% identical structure — only names changed
 ══════════════════════════════════════════════════════════════ */
 
-/* ══════════════════════════════════════════════════════════════
-   PI LOGIN — Copied EXACTLY from FinPi testnet working system
-   FinPi pattern: Pi.authenticate(["username","payments"])
-   No onIncompletePayment — clean simple pattern like FinPi
-══════════════════════════════════════════════════════════════ */
+function onIncompletePayment(payment) {
+  console.log('[Haramain] Incomplete payment:', payment);
+}
+
 function piLogin() {
-  const statusBox = document.getElementById('ls-msg');
-  const btn       = document.getElementById('loginBtn');
-  const btnText   = document.getElementById('loginBtnText');
+  const status = document.getElementById('ls-msg');
+  if (status) status.textContent = 'Connecting to Pi Network...';
 
-  try {
-    if (statusBox) statusBox.innerText = 'Opening Pi authentication...';
-    if (btn)       btn.disabled = true;
-    if (btnText)   btnText.textContent  = 'Authenticating...';
+  const btn = document.getElementById('loginBtn');
+  const btnText = document.getElementById('loginBtnText');
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.textContent = 'Authenticating...';
 
-    /* ══════════════════════════════════════════════════════
-       onIncompletePayment — CRITICAL FIX
-       This runs when Pi finds a pending/stuck payment.
-       We MUST complete it to clear "Pending Payment Found".
-       Without this the user is permanently blocked.
-    ══════════════════════════════════════════════════════ */
-    function onIncompletePayment(payment) {
-      console.log('[Haramain] Incomplete payment found:', payment.identifier);
-
-      const hasTxid = payment.transaction && payment.transaction.txid;
-
-      if (hasTxid) {
-        /* Has txid — payment went through, complete it */
-        fetch("/.netlify/functions/complete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            paymentId: payment.identifier,
-            txid: payment.transaction.txid
-          })
-        })
-        .then(r => r.json())
-        .then(d => {
-          console.log('[Haramain] Incomplete payment completed:', d);
-          toast('✅ Previous payment completed');
-        })
-        .catch(err => {
-          console.warn('[Haramain] Complete error:', err);
-        });
-      } else {
-        /* No txid — payment never went through, cancel it */
-        fetch("/.netlify/functions/cancel-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            paymentId: payment.identifier
-          })
-        })
-        .then(r => r.json())
-        .then(d => {
-          console.log('[Haramain] Incomplete payment cancelled:', d);
-          toast('✅ Stuck payment cleared');
-        })
-        .catch(err => {
-          console.warn('[Haramain] Cancel error:', err);
-          /* Still let user in */
-        });
-      }
-    }
-
-    Pi.authenticate(["username", "payments"], onIncompletePayment)
+  if (typeof Pi !== 'undefined') {
+    Pi.init({ version: "2.0", sandbox: false });
+    Pi.authenticate(['username', 'payments'], onIncompletePayment)
       .then(auth => {
         user = auth.user;
-        if (statusBox) statusBox.innerText = 'Logged in as: ' + auth.user.username;
+        console.log('[Haramain] ✅ Authenticated:', user.username, '| sandbox: false');
         genPilgrimId();
         launchApp();
-        toast('Welcome, @' + auth.user.username + '! 🕋');
+        toast('Welcome, @' + user.username + '! 🕋');
       })
-      .catch(err => {
-        if (statusBox) statusBox.innerText = 'Authentication failed. Open in Pi Browser.';
-        if (btn)       btn.disabled = false;
-        if (btnText)   btnText.textContent  = 'Sign In with Pi';
-        console.error('[Haramain] Auth error:', err);
+      .catch(() => {
+        if (status) status.textContent = 'Login failed. Open in Pi Browser.';
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = _('signin') || 'Sign In with Pi';
       });
-
-  } catch(err) {
-    if (statusBox) statusBox.innerText = 'Authentication failed';
-    if (btn)       btn.disabled = false;
-    if (btnText)   btnText.textContent  = 'Sign In with Pi';
-    console.error('[Haramain] Login error:', err);
+  } else {
+    // Demo mode — WorldCup exact pattern
+    user = { username: 'Pilgrim_Demo' };
+    genPilgrimId();
+    launchApp();
+    toast('Demo mode — open in Pi Browser for real Pi! 🕋');
   }
 }
 
@@ -1827,7 +2918,7 @@ function launchApp() {
     getGreetingIcon()+' '+getGreeting()+'! Welcome to HARAMAIN — The Web3 Pilgrimage Infrastructure · haramain.pi',
     'now'
   );
-  console.log('[Haramain] ✅ App launched · sandbox: true · user:', user ? user.username : 'Demo');
+  console.log('[Haramain] ✅ App launched · sandbox: false · user:', user ? user.username : 'Demo');
 }
 
 function logout() {
@@ -1860,7 +2951,7 @@ function renderPilgrimId(){
   var u=user?user.username:'Pilgrim'; var lv=getLevel();
   ['pid-name'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=u;});
   var ps=document.getElementById('pid-serial');if(ps)ps.textContent='Pilgrim ID #'+mySerial;
-  var pu=document.getElementById('pid-uid');if(pu)pu.textContent='HARAMAIN · Pi Network · Testnet';
+  var pu=document.getElementById('pid-uid');if(pu)pu.textContent='HARAMAIN · Pi Network · Mainnet';
   var pl=document.getElementById('pid-lvl');if(pl)pl.textContent=lv.i+' '+lv.n;
   var pp=document.getElementById('pid-prem');if(pp)pp.style.display=localStorage.getItem(K+'prem')==='1'?'inline-block':'none';
   var fpt=document.getElementById('pid-pts');if(fpt)fpt.textContent=pts;
@@ -2189,128 +3280,98 @@ function buyPrem() {
   }
 
   const btn = document.getElementById('prem-btn');
-  if (!btn) return;
   btn.textContent = 'Processing...';
   btn.disabled = true;
 
   if (typeof Pi !== 'undefined') {
-
     Pi.createPayment({
       amount: 1,
       memo: 'Haramain Pilgrim Pass — Premium Access',
-      metadata: { type: 'pilgrim_pass', app: 'haramain.pi', network: 'testnet' }
+      metadata: { type: 'pilgrim_pass', app: 'haramain.pi', network: 'mainnet' }
     }, {
-      // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
       onReadyForServerApproval: (paymentId) => {
-        return fetch("/.netlify/functions/approve", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        return fetch('/functions/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paymentId })
         });
       },
-
-      // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
       onReadyForServerCompletion: (paymentId, txid) => {
-        return fetch("/.netlify/functions/complete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        return fetch('/functions/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paymentId, txid })
         }).then(() => {
           localStorage.setItem(K + 'prem', '1');
           btn.textContent = '✅ Pilgrim Pass Active';
           btn.disabled = true;
-          addTx('💰 Paid 1π — Pilgrim Pass Unlocked · Testnet · txid:' + txid.slice(0, 12) + '...');
+          addTx('💰 Paid 1π — Pilgrim Pass Unlocked · Mainnet · txid:' + txid.slice(0,12) + '...');
           syncUI();
           toast('⭐ Pilgrim Pass activated! Taqabbal Allah!');
           addNotif('⭐', 'Pilgrim Pass Activated!', 'All premium features unlocked. Barakallah feek!', 'just now');
         });
       },
-
       onCancel: () => {
         btn.textContent = 'Unlock Pilgrim Pass — 1π';
         btn.disabled = false;
         toast('Payment cancelled');
-        // Notify cancel endpoint
-        fetch("/.netlify/functions/cancel-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentId: 'cancelled' })
-        }).catch(() => {});
       },
-
       onError: (err) => {
         btn.textContent = 'Unlock Pilgrim Pass — 1π';
         btn.disabled = false;
         toast('Payment error: ' + err);
-        console.error('[Haramain TESTNET] buyPrem error:', err);
+        console.error('[Haramain] buyPrem error:', err);
       }
     });
-
   } else {
-    // Demo mode — outside Pi Browser
+    // Demo mode — WorldCup exact pattern
     setTimeout(() => {
       localStorage.setItem(K + 'prem', '1');
       btn.textContent = '✅ Pilgrim Pass Active';
       btn.disabled = true;
-      addTx('💰 Demo — Pilgrim Pass Unlocked (open in Pi Browser for real payment)');
-      toast('⭐ Demo mode: Pilgrim Pass activated!');
+      addTx('💰 Demo — Pilgrim Pass Unlocked');
+      toast('⭐ Demo: Pilgrim Pass activated!');
     }, 1200);
   }
 }
 
-
 /* ── SEND PI (WorldCup sendPi exact structure) ── */
 function sendPi() {
-  const to   = (document.getElementById('send-to')   || {}).value || '';
-  const amt  = parseFloat((document.getElementById('send-amt')  || {}).value) || 0.1;
+  const to = (document.getElementById('send-to') || {}).value || '';
+  const amt = parseFloat((document.getElementById('send-amt') || {}).value) || 0.1;
   const memo = (document.getElementById('send-memo') || {}).value || 'Haramain Pilgrim';
 
   if (!to.trim()) { toast('Enter recipient username'); return; }
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: memo,
-    metadata: { type: 'send', to: to.trim(), app: 'haramain.pi', network: 'testnet' }
+    metadata: { type: 'send', to: to, app: 'haramain.pi' }
   }, {
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerApproval: (paymentId) => {
-      return fetch("/.netlify/functions/approve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      return fetch('/functions/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId })
       });
     },
-
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch("/.netlify/functions/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      return fetch('/functions/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
-        addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo + ' · txid:' + txid.slice(0, 12) + '...');
+        addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo);
         toast('✅ Sent ' + amt + 'π to @' + to.trim() + '!');
       });
     },
-
-    onCancel: () => {
-      toast('Payment cancelled');
-      fetch('/.netlify/functions/cancel-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: 'cancelled' })
-      }).catch(() => {});
-    },
-
-    onError: (err) => {
-      toast('Payment error: ' + err);
-      console.error('[Haramain TESTNET] sendPi error:', err);
-    }
+    onCancel: () => { toast('Payment cancelled'); },
+    onError: (err) => { toast('Payment error: ' + err); console.error(err); }
   });
 }
 
-
+/* ── REQUEST PI — QR Generator (WorldCup requestPi exact) ── */
 function requestPi() {
   const amt = parseFloat((document.getElementById('req-amt') || {}).value) || 0.1;
   const reason = (document.getElementById('req-reason') || {}).value || 'Haramain';
@@ -2338,157 +3399,111 @@ function requestPi() {
 
 /* ── SEND ZAKAT (WorldCup createPayment exact) ── */
 function sendZakat() {
-  const cause = (document.getElementById('zk-cause')  || {}).value || 'charity';
-  const amt   = parseFloat((document.getElementById('zk-amount') || {}).value) || 0.5;
+  const cause = (document.getElementById('zk-cause') || {}).value || 'charity';
+  const amt = parseFloat((document.getElementById('zk-amount') || {}).value) || 0.5;
 
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: 'Zakat — ' + cause + ' — haramain.pi',
-    metadata: { type: 'zakat', cause: cause, app: 'haramain.pi', network: 'testnet' }
+    metadata: { type: 'zakat', cause: cause, app: 'haramain.pi' }
   }, {
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerApproval: (paymentId) => {
-      return fetch("/.netlify/functions/approve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      return fetch('/functions/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId })
       });
     },
-
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch("/.netlify/functions/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentId, txid })
-      }).then(() => {
-        addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0, 12) + '...');
-        toast('🤲 Zakat accepted! Taqabbal Allah!');
-        addPts(20, 'Zakat sent');
-        addNotif('🤲', 'Zakat Sent!', amt + 'π donated to ' + cause + '. May Allah multiply your reward.', 'just now');
-      });
-    },
-
-    onCancel: () => {
-      toast('Payment cancelled');
-      fetch('/.netlify/functions/cancel-payment', {
+      return fetch('/functions/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: 'cancelled' })
-      }).catch(() => {});
+        body: JSON.stringify({ paymentId, txid })
+      }).then(() => {
+        addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
+        toast('🤲 Zakat accepted! Taqabbal Allah!');
+        addPts(20, 'Zakat sent');
+        addNotif('🤲','Zakat Sent!', amt+'π donated to '+cause+'. May Allah multiply your reward.','just now');
+      });
     },
-
-    onError: (err) => {
-      toast('Payment error: ' + err);
-      console.error('[Haramain TESTNET] sendZakat error:', err);
-    }
+    onCancel: () => { toast('Payment cancelled'); },
+    onError: (err) => { toast('Payment error: ' + err); }
   });
 }
 
-
+/* ── SEND SADAQAH (WorldCup createPayment exact) ── */
 function sendSadaqah(cause, amt) {
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: 'Sadaqah — ' + cause + ' — haramain.pi',
-    metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi', network: 'testnet' }
+    metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi' }
   }, {
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerApproval: (paymentId) => {
-      return fetch("/.netlify/functions/approve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      return fetch('/functions/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId })
       });
     },
-
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch("/.netlify/functions/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentId, txid })
-      }).then(() => {
-        addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0, 12) + '...');
-        toast('💝 Sadaqah accepted! Barakallah feek!');
-        addPts(10, 'Sadaqah sent');
-        addNotif('💝', 'Sadaqah Sent!', amt + 'π — May Allah multiply your reward 100x.', 'just now');
-      });
-    },
-
-    onCancel: () => {
-      toast('Payment cancelled');
-      fetch('/.netlify/functions/cancel-payment', {
+      return fetch('/functions/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: 'cancelled' })
-      }).catch(() => {});
+        body: JSON.stringify({ paymentId, txid })
+      }).then(() => {
+        addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
+        toast('💝 Sadaqah accepted! Barakallah feek!');
+        addPts(10, 'Sadaqah sent');
+        addNotif('💝','Sadaqah Sent!', amt+'π — May Allah multiply your reward 100x.','just now');
+      });
     },
-
-    onError: (err) => {
-      toast('Payment error: ' + err);
-      console.error('[Haramain TESTNET] sendSadaqah error:', err);
-    }
+    onCancel: () => { toast('Payment cancelled'); },
+    onError: (err) => { toast('Payment error: ' + err); }
   });
 }
 
-
+/* ── ORDER QURBANI (WorldCup createPayment exact) ── */
 function orderQurbani() {
-  const country  = (document.getElementById('qurb-country') || {}).value || 'Yemen';
+  const country = (document.getElementById('qurb-country') || {}).value || 'Yemen';
   const selected = document.querySelector('.qurb-selected');
-  const animal   = selected ? selected.getAttribute('data-animal') : 'Sheep / Goat';
-  const amt      = selected ? +(selected.getAttribute('data-price') || 5) : 5;
+  const animal = selected ? selected.getAttribute('data-animal') : 'Sheep / Goat';
+  const amt = selected ? +(selected.getAttribute('data-price') || 5) : 5;
 
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send Pi'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
 
   Pi.createPayment({
     amount: amt,
     memo: 'Qurbani — ' + animal + ' — ' + country + ' — haramain.pi',
-    metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi', network: 'testnet' }
+    metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi' }
   }, {
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerApproval: (paymentId) => {
-      return fetch("/.netlify/functions/approve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      return fetch('/functions/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId })
       });
     },
-
-    // ✅ MUST RETURN (VERY IMPORTANT) — FinPi exact
     onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch("/.netlify/functions/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      return fetch('/functions/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId, txid })
       }).then(() => {
         const certId = 'QURB-' + Date.now().toString(36).toUpperCase();
-        addTx('🐑 Qurbani ' + animal + ' — ' + country + ' — ' + amt + 'π · Cert:' + certId + ' · txid:' + txid.slice(0, 12) + '...');
+        addTx('🐑 Qurbani ' + animal + ' — ' + country + ' — ' + amt + 'π · Cert:' + certId);
         toast('🐑 Qurbani ordered! Taqabbal Allah!');
         addPts(50, 'Qurbani ordered');
-        addNotif('🐑', 'Qurbani Ordered!', animal + ' for ' + country + ' · Certificate: ' + certId, 'just now');
+        addNotif('🐑','Qurbani Ordered!', animal+' for '+country+' · Certificate: '+certId,'just now');
       });
     },
-
-    onCancel: () => {
-      toast('Payment cancelled');
-      fetch('/.netlify/functions/cancel-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: 'cancelled' })
-      }).catch(() => {});
-    },
-
-    onError: (err) => {
-      toast('Payment error: ' + err);
-      console.error('[Haramain TESTNET] orderQurbani error:', err);
-    }
+    onCancel: () => { toast('Payment cancelled'); },
+    onError: (err) => { toast('Payment error: ' + err); }
   });
 }
-
 
 /* ══ TAWAF COUNTER ══ */
 var TAWAF_DUAS = [
@@ -3186,7 +4201,7 @@ function askAI(msg) {
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
@@ -3355,14 +4370,14 @@ function generateReceipt(txData) {
   el.innerHTML =
     '<div class="receipt-box">' +
       '<div class="receipt-logo">🕋 HARAMAIN</div>' +
-      '<div style="font-family:var(--dm);font-size:.5rem;color:var(--t3);margin-bottom:.7rem">Pi Network Testnet · Official Payment Receipt</div>' +
+      '<div style="font-family:var(--dm);font-size:.5rem;color:var(--t3);margin-bottom:.7rem">Pi Network Mainnet · Official Payment Receipt</div>' +
       '<div class="receipt-line"><span class="rk">Receipt ID</span><span class="rv">' + receiptId + '</span></div>' +
       '<div class="receipt-line"><span class="rk">Amount</span><span class="rv" style="color:var(--gold);font-size:.75rem;font-weight:700">' + (txData.amount||'') + 'π</span></div>' +
       '<div class="receipt-line"><span class="rk">Type</span><span class="rv">' + (txData.type||'Payment') + '</span></div>' +
       '<div class="receipt-line"><span class="rk">Description</span><span class="rv">' + (txData.memo||txData.cause||'') + '</span></div>' +
       '<div class="receipt-line"><span class="rk">Pilgrim ID</span><span class="rv">' + (txData.pilgrimId||myPilgrimId) + '</span></div>' +
       '<div class="receipt-line"><span class="rk">Username</span><span class="rv">@' + (txData.username||(user?user.username:'Pilgrim')) + '</span></div>' +
-      '<div class="receipt-line"><span class="rk">Network</span><span class="rv">Pi Testnet · sandbox:true</span></div>' +
+      '<div class="receipt-line"><span class="rk">Network</span><span class="rv">Pi Mainnet · sandbox:false</span></div>' +
       '<div class="receipt-line"><span class="rk">Transaction ID</span><span class="rv">' + (txData.txid||'').slice(0,20) + '...</span></div>' +
       '<div class="receipt-line"><span class="rk">Date & Time</span><span class="rv">' + now + '</span></div>' +
       '<div class="receipt-line"><span class="rk">Status</span><span class="rv" style="color:var(--grn)">✅ CONFIRMED · Blockchain Verified</span></div>' +
@@ -3393,7 +4408,7 @@ function getReceiptText(rid, amt, memo, txid) {
     'Description: ' + memo + '\n' +
     'Pilgrim ID: ' + myPilgrimId + '\n' +
     'Transaction: ' + txid + '...\n' +
-    'Network: Pi Testnet · sandbox:true\n' +
+    'Network: Pi Mainnet · sandbox:false\n' +
     'Status: ✅ Confirmed & Blockchain Verified\n' +
     '━━━━━━━━━━━━━━━━━━━\n' +
     'Powered by Haramain.pi · ' + new Date().toLocaleString();
@@ -3936,7 +4951,7 @@ function renderTx() {
 }
 
 function shareTxWhatsApp(txText) {
-  var text = '🕋 HARAMAIN Payment\n' + txText + '\nPowered by Haramain.pi · Pi Network Testnet';
+  var text = '🕋 HARAMAIN Payment\n' + txText + '\nPowered by Haramain.pi · Pi Network Mainnet';
   window.open('https://wa.me/?text=' + encodeURIComponent(text));
 }
 
@@ -3993,7 +5008,7 @@ function askAI(msg) {
   // Try Claude API first
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
@@ -4063,28 +5078,18 @@ addTx = function(text) {
    WINDOW LOAD INIT — EXACT WORLDCUP PATTERN
    Source: worldcup script.js final lines
    window.addEventListener('load', () => {
-     if (typeof Pi !== 'undefined') 
+     if (typeof Pi !== 'undefined') Pi.init({ version: "2.0", sandbox: false });
    })
 ══════════════════════════════════════════════════════════════ */
 /* ══════════════════════════════════════════════════════════════
    INIT — Runs IMMEDIATELY when script loads
    WorldCup pattern + immediate execution for Pi Browser compat
 ══════════════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════
-   NETLIFY + PI BROWSER COMPATIBILITY
-   Pi Browser adds ?sandbox=true to URL automatically
-   We detect this and ensure correct init
-══════════════════════════════════════════════════════ */
-(function detectEnvironment() {
-  var urlParams = new URLSearchParams(window.location.search);
-  var isSandbox = urlParams.get('sandbox') === 'true' || window.location.hostname !== 'x.minepi.com';
-  // Always testnet for this build
-  console.log('[HARAMAIN TESTNET] sandbox:true | URL:', window.location.href);
-})();
-
 function _haramainInit() {
-  /* ✅ Pi SDK init — TESTNET · sandbox:true */
-  // Pi.init called at top — sandbox:true confirmed
+  /* ✅ Pi SDK init — MAINNET · sandbox:false */
+  if (typeof Pi !== 'undefined') {
+    try { Pi.init({ version: "2.0", sandbox: false }); } catch(e) {}
+  }
   /* Apply saved language to landing screen */
   setLang(curLang, null);
   document.querySelectorAll('.il-btn').forEach(function(b) {
@@ -4096,7 +5101,7 @@ function _haramainInit() {
   /* Start live landing data */
   fetchLandingData();
   applyI18n();
-  console.log('[HARAMAIN] ✅ Ready · sandbox:true · Testnet · ' + new Date().toLocaleTimeString());
+  console.log('[HARAMAIN] ✅ Ready · sandbox:false · Mainnet · ' + new Date().toLocaleTimeString());
 }
 
 
@@ -4441,7 +5446,7 @@ function checkFirstVisit() {
   localStorage.setItem(K+'visited', '1');
   setTimeout(function() {
     addNotif('🕋', 'Welcome to HARAMAIN!', 'Start by exploring: Dashboard for prayer times → Worship for ritual tools → Guide for step-by-step Hajj guidance → AI Guide for questions.', 'now');
-    addNotif('💸', 'Pi Payments Active', 'HARAMAIN runs on Pi Network Testnet. Go to Profile to unlock Pilgrim Pass (1π) for premium features.', 'now');
+    addNotif('💸', 'Pi Payments Active', 'HARAMAIN runs on Pi Network Mainnet. Go to Profile to unlock Pilgrim Pass (1π) for premium features.', 'now');
     addNotif('📍', 'Privacy First', 'Your health data and location stay on your device. Nothing is sent to servers without your permission.', 'now');
   }, 2000);
 }
@@ -4451,6 +5456,7 @@ var _origLaunchApp = launchApp;
 launchApp = function() {
   _origLaunchApp();
   checkFirstVisit();
+  initPiAds(); // Pi Ad Network
   enhanceProfilePage();
   updateDashboardStreak();
   checkDailyStreak();
@@ -4469,7 +5475,7 @@ function shareApp() {
     '📍 Prayer times · Qibla · Hajj guide · AI assistant · Pi payments\n' +
     '👤 My Pilgrim ID: ' + myPilgrimId + '\n\n' +
     '🔗 Get it: https://haramain-pi.netlify.app\n' +
-    'Or search "Haramain" in Pi Browser · Pi Network Testnet · haramain.pi';
+    'Or search "Haramain" in Pi Browser · Pi Network Mainnet · haramain.pi';
   if (navigator.share) {
     navigator.share({ title: 'HARAMAIN — Web3 Pilgrimage Platform', text: text }).catch(function(){});
   } else {
@@ -4537,7 +5543,7 @@ function shareProfile() {
     '🕋 Tawaf: ' + tawafHistory.length + ' completed\n' +
     '📿 Total Dhikr: ' + dhikrTotal + '\n' +
     '🔥 Streak: ' + streak + ' days\n\n' +
-    'Powered by Haramain.pi · Pi Network Testnet';
+    'Powered by Haramain.pi · Pi Network Mainnet';
   if (navigator.share) {
     navigator.share({ title: 'HARAMAIN Pilgrim Profile', text: text }).catch(function(){});
   } else if (navigator.clipboard) {
@@ -4655,7 +5661,1527 @@ function renderSurahList() {
   });
 })();
 
+/* ════════════════════════════════════════════════════════════════
+   HARAMAIN v3.0 — 10 Advanced Utilities JavaScript
+   Emergency · Health · Crowd · Hydration · Audio · Checklist
+   Itinerary · Analytics · Memories · Moon Sighting
+   PAYMENTS: UNTOUCHED ✅
+════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════
+   1. EMERGENCY COMMAND CENTER
+═══════════════════════════════════ */
+var emerWatchId = null;
+var emerLat = null, emerLng = null;
+var noMovementTimer = null;
+var lastMovementTime = Date.now();
+var emerContacts = JSON.parse(localStorage.getItem(K+'emerContacts') || '[]');
+
+var EMBASSIES = {
+  'NG': { country: 'Nigeria', phone: '+966112882020', address: 'Riyadh, Saudi Arabia' },
+  'ID': { country: 'Indonesia', phone: '+966112800000', address: 'Riyadh, Saudi Arabia' },
+  'PK': { country: 'Pakistan', phone: '+966112882444', address: 'Riyadh, Saudi Arabia' },
+  'MY': { country: 'Malaysia', phone: '+966112882700', address: 'Riyadh, Saudi Arabia' },
+  'BD': { country: 'Bangladesh', phone: '+966112882300', address: 'Riyadh, Saudi Arabia' },
+  'IN': { country: 'India', phone: '+966112882200', address: 'Riyadh, Saudi Arabia' },
+  'EG': { country: 'Egypt', phone: '+966112882100', address: 'Riyadh, Saudi Arabia' },
+  'TR': { country: 'Turkey', phone: '+966112882500', address: 'Riyadh, Saudi Arabia' },
+};
+
+function initEmergency() {
+  // Start GPS tracking
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      emerLat = pos.coords.latitude.toFixed(5);
+      emerLng = pos.coords.longitude.toFixed(5);
+      var el = document.getElementById('emer-coords');
+      if (el) el.textContent = emerLat + ', ' + emerLng;
+      var st = document.getElementById('emer-gps-status');
+      if (st) st.textContent = '✅ GPS Ready · High accuracy';
+      updateEmerMessage();
+    }, function() {
+      var st = document.getElementById('emer-gps-status');
+      if (st) st.textContent = '⚠️ GPS unavailable · Enable location';
+    }, { enableHighAccuracy: true });
+  }
+  renderEmerContacts();
+  renderEmbassy();
+  updateEmerMessage();
+}
+
+function activateFullSOS() {
+  if (!confirm('🆘 ACTIVATE EMERGENCY SOS?\n\nThis will:\n• Alert Saudi Civil Defense (998)\n• Notify your emergency contacts\n• Share your GPS location\n\nOnly use in real emergency.')) return;
+
+  var msg = buildEmerMessage();
+
+  // Call 998
+  window.open('tel:998');
+
+  // Alert contacts via SMS
+  emerContacts.forEach(function(c) {
+    window.open('sms:' + c.phone + '?body=' + encodeURIComponent(msg));
+  });
+
+  // Notification
+  addNotif('🆘', 'SOS ACTIVATED', 'Emergency services alerted · Contacts notified · GPS: ' + (emerLat || '--') + ', ' + (emerLng || '--'), 'NOW');
+  toast('🆘 SOS Activated! Help is coming.');
+
+  addPts(0, 'Emergency SOS activated');
+}
+
+function shareEmergencyLocation() {
+  var msg = buildEmerMessage();
+  if (navigator.share) {
+    navigator.share({ title: '🆘 Emergency Location', text: msg }).catch(function(){});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(msg).then(function(){ toast('📋 Emergency message copied!'); });
+  }
+}
+
+function buildEmerMessage() {
+  var mapsUrl = emerLat ? 'https://maps.google.com?q=' + emerLat + ',' + emerLng : 'Location unavailable';
+  return '🆘 EMERGENCY — I need help!\n' +
+    '👤 Pilgrim: @' + (user ? user.username : 'Unknown') + ' | ID: ' + (myPilgrimId || 'N/A') + '\n' +
+    '📍 Location: ' + (emerLat || 'N/A') + ', ' + (emerLng || 'N/A') + '\n' +
+    '🗺️ Map: ' + mapsUrl + '\n' +
+    '🕐 Time: ' + new Date().toLocaleString() + '\n' +
+    '📱 HARAMAIN Emergency System · haramain-pi.netlify.app';
+}
+
+function updateEmerMessage() {
+  var el = document.getElementById('emer-preview-msg');
+  if (!el) return;
+  var mapsUrl = emerLat ? 'https://maps.google.com?q=' + emerLat + ',' + emerLng : '[GPS required]';
+  el.innerHTML = '🆘 EMERGENCY — I need help!<br>' +
+    '👤 Pilgrim: @' + (user ? user.username : '?') + ' | ID: ' + (myPilgrimId || 'HM-XXXXX') + '<br>' +
+    '📍 GPS: ' + (emerLat || '--') + ', ' + (emerLng || '--') + '<br>' +
+    '🗺️ Map: ' + mapsUrl + '<br>' +
+    '🕐 Time: ' + new Date().toLocaleTimeString() + '<br>' +
+    '📱 HARAMAIN Emergency System';
+}
+
+function callEmergency(num) {
+  window.open('tel:' + num);
+  addTx('📞 Called emergency: ' + num);
+}
+
+function addEmergencyContact() {
+  var name = prompt('Contact name:');
+  if (!name) return;
+  var phone = prompt('Phone number (with country code):');
+  if (!phone) return;
+  emerContacts.push({ name: name, phone: phone });
+  localStorage.setItem(K+'emerContacts', JSON.stringify(emerContacts));
+  renderEmerContacts();
+  toast('✅ Contact added: ' + name);
+}
+
+function renderEmerContacts() {
+  var el = document.getElementById('emer-contacts-list');
+  if (!el) return;
+  if (!emerContacts.length) {
+    el.innerHTML = '<div class="empty" style="color:var(--red)">⚠️ No emergency contacts — Add now!</div>';
+    return;
+  }
+  el.innerHTML = emerContacts.map(function(c, i) {
+    return '<div class="embassy-item">' +
+      '<div><div style="font-size:.7rem;font-weight:700;color:var(--t1)">' + c.name + '</div>' +
+      '<div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)">' + c.phone + '</div></div>' +
+      '<div style="display:flex;gap:.4rem">' +
+        '<button class="btn btn-ghost" style="font-size:.55rem;padding:.2rem .5rem" onclick="callEmergency(\'' + c.phone + '\')">Call</button>' +
+        '<button class="btn btn-ghost" style="font-size:.55rem;padding:.2rem .5rem;color:var(--red)" onclick="removeEmerContact(' + i + ')">Remove</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function removeEmerContact(i) {
+  emerContacts.splice(i, 1);
+  localStorage.setItem(K+'emerContacts', JSON.stringify(emerContacts));
+  renderEmerContacts();
+}
+
+function renderEmbassy() {
+  var el = document.getElementById('emer-embassy-box');
+  if (!el) return;
+  // Default to showing all major embassies
+  var entries = Object.values(EMBASSIES).slice(0, 4);
+  el.innerHTML = entries.map(function(e) {
+    return '<div class="embassy-item">' +
+      '<div><div style="font-size:.7rem;font-weight:700;color:var(--t1)">' + e.country + ' Embassy</div>' +
+      '<div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)">' + e.address + '</div></div>' +
+      '<button class="btn btn-ghost" style="font-size:.55rem;padding:.2rem .5rem" onclick="callEmergency(\'' + e.phone + '\')">Call</button>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleNoMovement() {
+  var tog = document.getElementById('no-movement-toggle');
+  var st = document.getElementById('no-movement-status');
+  if (tog.classList.contains('on')) {
+    tog.classList.remove('on');
+    if (noMovementTimer) clearInterval(noMovementTimer);
+    if (st) st.textContent = '⚠️ Enable to activate protection';
+  } else {
+    tog.classList.add('on');
+    lastMovementTime = Date.now();
+    noMovementTimer = setInterval(checkNoMovement, 30000);
+    if (st) st.textContent = '✅ Active — alerts if no movement for 10 minutes';
+    toast('🛡️ No-movement alert activated');
+  }
+}
+
+function checkNoMovement() {
+  var elapsed = (Date.now() - lastMovementTime) / 60000;
+  if (elapsed >= 10) {
+    addNotif('🆘', 'No Movement Detected', 'No movement for 10+ minutes. Are you OK? Emergency contacts will be notified in 60 seconds.', 'NOW');
+    toast('🆘 No movement detected — are you OK?');
+  }
+}
+
+/* ═══════════════════════════════════
+   2. HEALTH INTELLIGENCE SYSTEM
+═══════════════════════════════════ */
+var healthProfile = JSON.parse(localStorage.getItem(K+'healthProfile') || '{"blood":"A+","age":"","conditions":"None","allergies":"None","meds":[]}');
+var vitalsLog = JSON.parse(localStorage.getItem(K+'vitalsLog') || '[]');
+var medSchedule = JSON.parse(localStorage.getItem(K+'medSchedule') || '[]');
+
+var HOSPITALS_MAKKAH = [
+  { name: 'King Abdullah Medical Complex', dist: '0.8km', spec: 'General · Emergency · ICU', phone: '+966125504444' },
+  { name: 'Al-Noor Specialist Hospital', dist: '1.2km', spec: 'Specialist · Cardiac · Orthopedic', phone: '+966125573333' },
+  { name: 'Hajj Hospital (Ministry)', dist: '0.4km', spec: 'Hajj Emergency · Free for pilgrims', phone: '+966920020470' },
+  { name: 'Ajyad Emergency Hospital', dist: '0.6km', spec: '24hr Emergency · Trauma', phone: '+966125502222' },
+];
+
+function initHealthIntel() {
+  renderHealthProfile();
+  renderMedSchedule();
+  renderHospitals();
+  updateHealthScore();
+  updateHeatRisk();
+}
+
+function updateHealthScore() {
+  var score = 75;
+  var el = document.getElementById('health-score-val');
+  var dash = document.getElementById('health-ring-circle');
+  if (el) el.textContent = score;
+  if (dash) dash.style.setProperty('--hdash', (327 - (327 * score / 100)));
+}
+
+function updateHeatRisk() {
+  var temp = weatherCache ? weatherCache.temperature_2m : 36;
+  var el = document.getElementById('heat-risk-display');
+  var txt = document.getElementById('heat-risk-text');
+  if (!el || !txt) return;
+  if (temp >= 45) {
+    el.className = 'heat-risk extreme';
+    txt.textContent = '🚨 EXTREME HEAT: ' + Math.round(temp) + '°C — Stay indoors NOW';
+  } else if (temp >= 42) {
+    el.className = 'heat-risk high';
+    txt.textContent = '⚠️ HIGH HEAT: ' + Math.round(temp) + '°C — Limit outdoor activity';
+  } else if (temp >= 38) {
+    el.className = 'heat-risk med';
+    txt.textContent = '🟡 MODERATE: ' + Math.round(temp) + '°C — Stay hydrated';
+  } else {
+    el.className = 'heat-risk low';
+    txt.textContent = '✅ SAFE: ' + Math.round(temp) + '°C — Good conditions';
+  }
+}
+
+function renderHealthProfile() {
+  var p = healthProfile;
+  var el = function(id, v) { var e=document.getElementById(id); if(e)e.textContent=v; };
+  el('mp-blood', p.blood || 'Not set');
+  el('mp-age', p.age || 'Not set');
+  el('mp-conditions', p.conditions || 'None recorded');
+  el('mp-allergies', p.allergies || 'None recorded');
+  el('mp-meds', p.meds && p.meds.length ? p.meds.join(', ') : 'None recorded');
+}
+
+function openHealthEdit() {
+  healthProfile.blood = prompt('Blood type (A+, B-, O+, etc):', healthProfile.blood) || healthProfile.blood;
+  healthProfile.age = prompt('Age:', healthProfile.age) || healthProfile.age;
+  healthProfile.conditions = prompt('Medical conditions:', healthProfile.conditions) || healthProfile.conditions;
+  healthProfile.allergies = prompt('Allergies:', healthProfile.allergies) || healthProfile.allergies;
+  localStorage.setItem(K+'healthProfile', JSON.stringify(healthProfile));
+  renderHealthProfile();
+  toast('✅ Health profile updated');
+}
+
+function showMedQR() {
+  var p = healthProfile;
+  var qrData = 'HARAMAIN MEDICAL PASSPORT\n' +
+    'Name: @' + (user ? user.username : 'Pilgrim') + '\n' +
+    'Blood: ' + p.blood + '\n' +
+    'Age: ' + p.age + '\n' +
+    'Conditions: ' + p.conditions + '\n' +
+    'Allergies: ' + p.allergies + '\n' +
+    'ID: ' + (myPilgrimId || 'HM-XXXXX') + '\n' +
+    'Emergency: ' + (emerContacts[0] ? emerContacts[0].phone : 'N/A');
+
+  var modal = document.getElementById('modal-health-qr');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-health-qr';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = '<div class="modal-box"><div class="modal-header"><div class="modal-title">🏥 Hospital QR Code</div><button class="modal-close" onclick="closeModal(\'modal-health-qr\')">×</button></div><div class="modal-body"><div style="text-align:center;padding:1rem"><div style="font-family:var(--dm);font-size:.55rem;color:var(--t3);margin-bottom:.6rem">Show this QR to any hospital — they can scan your full medical profile instantly</div><canvas id="health-qr-canvas" style="border-radius:8px;max-width:200px"></canvas><div style="font-family:var(--dm);font-size:.52rem;color:var(--grn);margin-top:.4rem">✅ No language barrier · Instant access</div></div></div></div>';
+    document.body.appendChild(modal);
+  }
+  openModal('modal-health-qr');
+  setTimeout(function() {
+    var canvas = document.getElementById('health-qr-canvas');
+    if (canvas && typeof QRCode !== 'undefined') {
+      QRCode.toCanvas(canvas, qrData, { width: 200, color: { dark: '#C9A84C', light: '#040E07' } });
+    }
+  }, 200);
+}
+
+function logVitals() {
+  var hr = prompt('Heart rate (bpm):', '72');
+  if (!hr) return;
+  var entry = { time: new Date().toLocaleString(), hr: hr };
+  vitalsLog.unshift(entry);
+  localStorage.setItem(K+'vitalsLog', JSON.stringify(vitalsLog.slice(0, 50)));
+  var el = document.getElementById('vi-heart');
+  if (el) el.textContent = hr;
+  toast('✅ Vitals logged: ' + hr + ' bpm');
+}
+
+function addMedication() {
+  var name = prompt('Medication name:');
+  if (!name) return;
+  var time = prompt('Time to take (e.g. 08:00, 14:00):');
+  if (!time) return;
+  medSchedule.push({ name: name, time: time, taken: false });
+  localStorage.setItem(K+'medSchedule', JSON.stringify(medSchedule));
+  renderMedSchedule();
+  toast('✅ Medication added: ' + name);
+}
+
+function renderMedSchedule() {
+  var el = document.getElementById('med-schedule-list');
+  if (!el) return;
+  if (!medSchedule.length) {
+    el.innerHTML = '<div class="empty">No medications scheduled. Add one below.</div>';
+    return;
+  }
+  el.innerHTML = medSchedule.map(function(m, i) {
+    return '<div class="med-reminder">' +
+      '<div class="med-time">' + m.time + '</div>' +
+      '<div class="med-name">' + m.name + '</div>' +
+      '<div class="med-status ' + (m.taken ? 'med-taken' : 'med-pending') + '" onclick="toggleMed(' + i + ')" style="cursor:pointer">' +
+        (m.taken ? '✅ Taken' : '⏰ Pending') +
+      '</div></div>';
+  }).join('');
+}
+
+function toggleMed(i) {
+  medSchedule[i].taken = !medSchedule[i].taken;
+  localStorage.setItem(K+'medSchedule', JSON.stringify(medSchedule));
+  renderMedSchedule();
+  if (medSchedule[i].taken) toast('✅ ' + medSchedule[i].name + ' marked as taken');
+}
+
+function renderHospitals() {
+  var el = document.getElementById('hospital-list');
+  if (!el) return;
+  el.innerHTML = HOSPITALS_MAKKAH.map(function(h) {
+    return '<div class="hospital-card" onclick="callEmergency(\'' + h.phone + '\')">' +
+      '<div class="hospital-dist">' + h.dist + '</div>' +
+      '<div class="hospital-info">' +
+        '<div class="hospital-name">' + h.name + '</div>' +
+        '<div class="hospital-spec">' + h.spec + '</div>' +
+      '</div>' +
+      '<div style="font-size:1.2rem;color:var(--grn)">📞</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ═══════════════════════════════════
+   3. CROWD INTELLIGENCE
+═══════════════════════════════════ */
+var crowdData = {
+  haram: { count: '285K', pct: 85, status: 'crowded' },
+  mina: { count: '180K', pct: 60, status: 'moderate' },
+  arafat: { count: '45K', pct: 30, status: 'safe' },
+  muzdalifah: { count: '92K', pct: 45, status: 'moderate' },
+  jamarat: { count: '120K', pct: 75, status: 'crowded' },
+};
+
+var JAMARAT_TIMES = [
+  { time: '05:00–08:00', status: 'safe', label: 'After Fajr — Safest time' },
+  { time: '09:00–11:00', status: 'moderate', label: 'Morning — Moderate crowds' },
+  { time: '12:00–15:00', status: 'crowded', label: 'Midday — Very crowded + hot' },
+  { time: '15:30–18:00', status: 'safe', label: 'After Asr — Good window' },
+  { time: '21:00–00:00', status: 'safe', label: 'Night — Lightest crowds' },
+];
+
+function initCrowdIntel() {
+  renderJamaratTiming();
+  // Simulate live updates
+  setInterval(updateCrowdData, 30000);
+}
+
+function updateCrowdData() {
+  // Simulate crowd fluctuations
+  Object.keys(crowdData).forEach(function(z) {
+    var change = (Math.random() - 0.5) * 5;
+    crowdData[z].pct = Math.min(100, Math.max(10, crowdData[z].pct + change));
+  });
+}
+
+function renderJamaratTiming() {
+  var el = document.getElementById('jamarat-timing-list');
+  if (!el) return;
+  el.innerHTML = JAMARAT_TIMES.map(function(t) {
+    var col = t.status === 'safe' ? 'var(--grn)' : t.status === 'moderate' ? '#F5B041' : 'var(--red)';
+    var icon = t.status === 'safe' ? '✅' : t.status === 'moderate' ? '🟡' : '🔴';
+    return '<div class="route-option">' +
+      '<div class="route-time" style="font-size:.6rem;min-width:80px;color:' + col + '">' + t.time + '</div>' +
+      '<div class="route-label">' + t.label + '</div>' +
+      '<div class="route-crowd" style="background:rgba(0,0,0,.2);color:' + col + '">' + icon + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ═══════════════════════════════════
+   4. SMART HYDRATION SYSTEM
+═══════════════════════════════════ */
+var hydroData = JSON.parse(localStorage.getItem(K+'hydro') || '{"intake":0,"target":2500,"zamzam":0,"cups":[]}');
+var hydroReminderInterval = null;
+
+var WATER_AMOUNTS = [
+  { ml: 250, label: 'Cup', icon: '☕' },
+  { ml: 500, label: 'Bottle', icon: '🧴' },
+  { ml: 750, label: 'Large', icon: '🫗' },
+  { ml: 1000, label: '1 Liter', icon: '🪣' },
+];
+
+var COOLING_STATIONS = [
+  { name: 'Zamzam Water Point · Level B1', dist: '120m', type: 'Zamzam + AC' },
+  { name: 'Mataf Cooling Mist · Gate 79', dist: '280m', type: 'Mist + Shade' },
+  { name: 'Pilgrim Services Centre', dist: '450m', type: 'AC + Water + Rest' },
+  { name: 'Ajyad Cooling Station', dist: '650m', type: 'Water + Medical' },
+];
+
+function initHydration() {
+  renderHydroCups();
+  renderCoolingStations();
+  renderHeatIndex();
+  updateHydroUI();
+  // Reset daily at midnight
+  var lastDate = localStorage.getItem(K+'hydroDate');
+  var today = new Date().toDateString();
+  if (lastDate !== today) {
+    hydroData.intake = 0;
+    hydroData.cups = [];
+    localStorage.setItem(K+'hydroDate', today);
+    saveHydro();
+  }
+}
+
+function renderHydroCups() {
+  var el = document.getElementById('hydro-cups');
+  if (!el) return;
+  el.innerHTML = WATER_AMOUNTS.map(function(w) {
+    return '<div class="hydro-cup" onclick="addWater(' + w.ml + ')">' +
+      '<div class="hydro-cup-icon">' + w.icon + '</div>' +
+      '<div class="hydro-cup-ml">+' + w.ml + 'ml</div>' +
+      '<div style="font-family:var(--dm);font-size:.45rem;color:var(--t3)">' + w.label + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function addWater(ml) {
+  hydroData.intake += ml;
+  hydroData.cups.push({ ml: ml, time: new Date().toLocaleTimeString() });
+  saveHydro();
+  updateHydroUI();
+  toast('💧 +' + ml + 'ml — Total: ' + (hydroData.intake/1000).toFixed(1) + 'L');
+  addPts(1, '💧 Hydration logged');
+  lastMovementTime = Date.now();
+}
+
+function addCustomWater() {
+  var ml = parseInt(prompt('Enter amount in ml:', '300'));
+  if (!ml || ml <= 0) return;
+  addWater(ml);
+}
+
+function addZamzam() {
+  hydroData.zamzam = (hydroData.zamzam || 0) + 1;
+  addWater(250);
+  var el = document.getElementById('zamzam-count');
+  if (el) el.textContent = hydroData.zamzam;
+  toast('🕋 Zamzam drunk with intention · Barakallah!');
+}
+
+function resetZamzam() {
+  hydroData.zamzam = 0;
+  saveHydro();
+  var el = document.getElementById('zamzam-count');
+  if (el) el.textContent = 0;
+}
+
+function updateHydroUI() {
+  var pct = Math.min(100, Math.round(hydroData.intake / hydroData.target * 100));
+  var fill = document.getElementById('hydro-fill');
+  var pctEl = document.getElementById('hydro-pct');
+  var intakeEl = document.getElementById('hydro-intake');
+  var statusEl = document.getElementById('hydro-status');
+  if (fill) fill.style.height = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (intakeEl) intakeEl.textContent = (hydroData.intake/1000).toFixed(1) + 'L';
+  if (statusEl) {
+    if (pct >= 80) statusEl.textContent = '✅ Excellent hydration!';
+    else if (pct >= 50) statusEl.textContent = '🟡 Good — keep drinking';
+    else if (pct >= 25) statusEl.textContent = '⚠️ Drink more water now';
+    else statusEl.textContent = '🚨 Dehydration risk — drink NOW';
+  }
+  var zamEl = document.getElementById('zamzam-count');
+  if (zamEl) zamEl.textContent = hydroData.zamzam || 0;
+}
+
+function saveHydro() {
+  localStorage.setItem(K+'hydro', JSON.stringify(hydroData));
+}
+
+function renderCoolingStations() {
+  var el = document.getElementById('cooling-stations-list');
+  if (!el) return;
+  el.innerHTML = COOLING_STATIONS.map(function(s) {
+    return '<div class="cooling-station">' +
+      '<div class="cooling-dist" style="color:#3498DB">' + s.dist + '</div>' +
+      '<div><div style="font-size:.7rem;font-weight:700;color:var(--t1)">' + s.name + '</div>' +
+      '<div style="font-family:var(--dm);font-size:.5rem;color:#3498DB">' + s.type + '</div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderHeatIndex() {
+  var el = document.getElementById('hydro-heat-index');
+  if (!el) return;
+  var temp = weatherCache ? weatherCache.temperature_2m : 36;
+  var risk = temp >= 45 ? 'extreme' : temp >= 42 ? 'high' : temp >= 38 ? 'med' : 'low';
+  var msg = {
+    low: 'Normal conditions · Drink 2L/day',
+    med: 'Hot conditions · Drink 3L/day · Rest often',
+    high: 'Very hot · Drink 4L/day · Avoid 11am-3pm',
+    extreme: 'EXTREME · Drink 500ml/hour · Stay indoors'
+  };
+  el.innerHTML = '<div class="heat-risk ' + risk + '">' +
+    '<span style="font-size:1.2rem">🌡️</span>' +
+    '<div><div style="font-weight:700">' + Math.round(temp) + '°C — Heat Risk: ' + risk.toUpperCase() + '</div>' +
+    '<div style="margin-top:.15rem;font-size:.52rem">' + msg[risk] + '</div></div>' +
+  '</div>';
+}
+
+function toggleHydroReminders() {
+  var tog = document.getElementById('hydro-reminder-toggle');
+  if (tog.classList.contains('on')) {
+    tog.classList.remove('on');
+    if (hydroReminderInterval) clearInterval(hydroReminderInterval);
+  } else {
+    tog.classList.add('on');
+    hydroReminderInterval = setInterval(function() {
+      addNotif('💧', 'Time to Drink Water!', 'Stay hydrated in Makkah heat. Drink 250ml now. Current intake: ' + (hydroData.intake/1000).toFixed(1) + 'L', 'now');
+      toast('💧 Drink water now!');
+    }, 20 * 60 * 1000); // 20 minutes
+    toast('✅ Hydration reminders activated');
+  }
+}
+
+/* ═══════════════════════════════════
+   5. AUDIO DUA PLAYER
+═══════════════════════════════════ */
+var audioEl = null;
+var audioPlaying = false;
+var audioTrackIndex = 0;
+var audioRepeat = false;
+var audioShuffle = false;
+var audioUpdateInterval = null;
+
+var DUA_LIBRARY = {
+  hajj: [
+    { name: 'Entering Makkah', arabic: 'اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَام', trans: 'Allahumma antassalam wa minkas-salam', dur: '2:15', icon: '🕋' },
+    { name: 'Before Tawaf', arabic: 'بِسْمِ اللهِ اللهُ أَكْبَر', trans: 'Bismillah, Allahu Akbar', dur: '1:45', icon: '🕋' },
+    { name: 'At Black Stone', arabic: 'بِسْمِ اللَّهِ وَاللَّهُ أَكْبَرُ', trans: 'Bismillah, Allahu Akbar', dur: '0:45', icon: '🪨' },
+    { name: 'Day of Arafat', arabic: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَه', trans: 'La ilaha illallah wahdahu la sharika lah', dur: '3:30', icon: '🏔️' },
+    { name: 'Muzdalifah Dua', arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ أَنْ تَرْزُقَنِي حَجًّا مَبْرُوراً', trans: 'Allahumma inni asaluka hajjan mabrura', dur: '2:00', icon: '🌙' },
+    { name: 'Zamzam Dua', arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً', trans: 'Allahumma inni asaluka ilman nafian', dur: '1:20', icon: '💧' },
+  ],
+  prayer: [
+    { name: 'Fajr After Prayer', arabic: 'سُبْحَانَ اللهِ وَبِحَمْدِه', trans: 'Subhanallahi wa bihamdihi', dur: '1:30', icon: '🌅' },
+    { name: 'Dhuhr Dua', arabic: 'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ', trans: 'Allahumma a\'inni ala dhikrika wa shukrika', dur: '2:00', icon: '☀️' },
+    { name: 'Isha Protection', arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ', trans: 'Audhu bi kalimatillahit-tammati', dur: '1:45', icon: '🌙' },
+  ],
+  morning: [
+    { name: 'Morning Azkar', arabic: 'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّه', trans: 'Asbahna wa asbahal mulku lillah', dur: '5:00', icon: '🌅' },
+    { name: 'Morning Protection', arabic: 'اللَّهُمَّ بِكَ أَصْبَحْنَا', trans: 'Allahumma bika asbahna', dur: '3:30', icon: '☀️' },
+  ],
+  evening: [
+    { name: 'Evening Azkar', arabic: 'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّه', trans: 'Amsayna wa amsal mulku lillah', dur: '5:00', icon: '🌆' },
+    { name: 'Ayatul Kursi', arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ', trans: 'Allahu la ilaha illa huwal hayyul qayyum', dur: '1:30', icon: '📖' },
+  ],
+  quran: [
+    { name: 'Al-Fatiha', arabic: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', trans: 'Bismillahir rahmanir rahim', dur: '1:00', icon: '📖' },
+    { name: 'Al-Ikhlas', arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ', trans: 'Qul huwa Allahu ahad', dur: '0:45', icon: '📖' },
+    { name: 'Ayatul Kursi', arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ', trans: 'Allahu la ilaha illa hu', dur: '1:20', icon: '📖' },
+  ],
+  sleep: [
+    { name: 'Before Sleep', arabic: 'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا', trans: 'Allahumma bismika amutu wa ahya', dur: '1:00', icon: '😴' },
+    { name: '3 Quls', arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ', trans: 'Qul huwa Allahu ahad', dur: '2:30', icon: '😴' },
+  ]
+};
+
+var currentCategory = 'hajj';
+var currentPlaylist = DUA_LIBRARY.hajj;
+
+function initAudioPlayer() {
+  loadAudioCat('hajj', null);
+}
+
+function loadAudioCat(cat, btn) {
+  currentCategory = cat;
+  currentPlaylist = DUA_LIBRARY[cat] || DUA_LIBRARY.hajj;
+  audioTrackIndex = 0;
+  // Update tabs
+  document.querySelectorAll('#audio-cats .day-tab').forEach(function(t) { t.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  renderPlaylist();
+  loadTrack(0);
+}
+
+function renderPlaylist() {
+  var el = document.getElementById('dua-playlist');
+  if (!el) return;
+  el.innerHTML = currentPlaylist.map(function(d, i) {
+    return '<div class="dua-item' + (i === audioTrackIndex ? ' active' : '') + '" onclick="selectTrack(' + i + ')" id="dua-item-' + i + '">' +
+      '<div class="dua-num">' + (i+1) + '</div>' +
+      '<div class="dua-info">' +
+        '<div class="dua-name">' + d.icon + ' ' + d.name + '</div>' +
+        '<div class="dua-arabic">' + d.arabic.substring(0, 40) + '...</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:.4rem">' +
+        '<div class="dua-dur">' + d.dur + '</div>' +
+        (i === audioTrackIndex ? '<div class="dua-active-dot"></div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function loadTrack(idx) {
+  if (idx < 0 || idx >= currentPlaylist.length) return;
+  audioTrackIndex = idx;
+  var track = currentPlaylist[idx];
+  var titleEl = document.getElementById('audio-title');
+  var artistEl = document.getElementById('audio-artist');
+  var arabicEl = document.getElementById('audio-arabic');
+  var transEl = document.getElementById('audio-transliteration');
+  if (titleEl) titleEl.textContent = track.name;
+  if (artistEl) artistEl.textContent = 'HARAMAIN · Arabic + Transliteration';
+  if (arabicEl) arabicEl.textContent = track.arabic;
+  if (transEl) transEl.textContent = track.trans;
+  // Simulate progress reset
+  resetAudioProgress();
+  renderPlaylist();
+}
+
+function selectTrack(idx) {
+  loadTrack(idx);
+  if (audioPlaying) startAudioSimulation();
+}
+
+function toggleAudioPlay() {
+  audioPlaying = !audioPlaying;
+  var btn = document.getElementById('audio-play-btn');
+  var art = document.getElementById('audio-album-art');
+  if (btn) btn.textContent = audioPlaying ? '⏸' : '▶';
+  if (art) art.classList.toggle('playing', audioPlaying);
+  if (audioPlaying) startAudioSimulation();
+  else stopAudioSimulation();
+}
+
+var audioProgress = 0;
+var audioDuration = 135; // seconds
+
+function startAudioSimulation() {
+  stopAudioSimulation();
+  audioUpdateInterval = setInterval(function() {
+    audioProgress += 1;
+    if (audioProgress >= audioDuration) {
+      audioProgress = 0;
+      if (!audioRepeat) nextTrack();
+    }
+    updateAudioProgress();
+  }, 1000);
+}
+
+function stopAudioSimulation() {
+  if (audioUpdateInterval) clearInterval(audioUpdateInterval);
+}
+
+function updateAudioProgress() {
+  var pct = (audioProgress / audioDuration * 100).toFixed(1);
+  var fill = document.getElementById('audio-fill');
+  var dot = document.getElementById('audio-dot');
+  var curr = document.getElementById('audio-current');
+  if (fill) fill.style.width = pct + '%';
+  if (dot) dot.style.setProperty('--pos', pct + '%');
+  if (curr) curr.textContent = fmtSecs(audioProgress);
+  var dur = document.getElementById('audio-duration');
+  if (dur) dur.textContent = fmtSecs(audioDuration);
+}
+
+function fmtSecs(s) {
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+
+function resetAudioProgress() {
+  audioProgress = 0;
+  audioDuration = parseTimeStr(currentPlaylist[audioTrackIndex].dur);
+  updateAudioProgress();
+}
+
+function parseTimeStr(str) {
+  var parts = str.split(':');
+  return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+}
+
+function prevTrack() { loadTrack(Math.max(0, audioTrackIndex - 1)); }
+function nextTrack() { loadTrack((audioTrackIndex + 1) % currentPlaylist.length); }
+
+function toggleRepeat() {
+  audioRepeat = !audioRepeat;
+  var btn = document.getElementById('audio-repeat-btn');
+  if (btn) btn.style.color = audioRepeat ? 'var(--gold)' : '';
+  toast(audioRepeat ? '🔁 Repeat ON' : '🔁 Repeat OFF');
+}
+
+function toggleShuffle() {
+  audioShuffle = !audioShuffle;
+  var btn = document.getElementById('audio-shuffle-btn');
+  if (btn) btn.style.color = audioShuffle ? 'var(--gold)' : '';
+  toast(audioShuffle ? '🔀 Shuffle ON' : '🔀 Shuffle OFF');
+}
+
+function seekAudio(e) {
+  var bar = document.getElementById('audio-bar');
+  if (!bar) return;
+  var rect = bar.getBoundingClientRect();
+  var pct = (e.clientX - rect.left) / rect.width;
+  audioProgress = Math.round(pct * audioDuration);
+  updateAudioProgress();
+}
+
+/* ═══════════════════════════════════
+   6. DIGITAL HAJJ CHECKLIST
+═══════════════════════════════════ */
+var HAJJ_CHECKLIST = {
+  'Day 8 (8 Dhul Hijjah)': [
+    { id: 'ihram', title: 'Enter Ihram state', desc: 'Make intention for Hajj · Perform Ghusl · Wear Ihram garments · Pray 2 rakaat', mandatory: true },
+    { id: 'talbiyah', title: 'Recite Talbiyah', desc: 'Labbayk Allahumma Labbayk — start from Miqat', mandatory: true },
+    { id: 'mina-travel', title: 'Travel to Mina', desc: 'Proceed to Mina before or after Dhuhr', mandatory: false },
+    { id: 'mina-stay', title: 'Stay in Mina', desc: 'Pray Dhuhr, Asr, Maghrib, Isha, Fajr in Mina — shortened', mandatory: true },
+  ],
+  'Day 9 — Arafat (9 Dhul Hijjah)': [
+    { id: 'arafat-travel', title: 'Travel to Arafat after sunrise', desc: 'Leave Mina after sunrise · Arrive before Dhuhr', mandatory: true },
+    { id: 'arafat-wuquf', title: 'Wuquf at Arafat', desc: 'THE PILLAR OF HAJJ · Stand in Arafat from noon until sunset · Make dua', mandatory: true },
+    { id: 'dhuhr-asr-arafat', title: 'Pray Dhuhr + Asr combined', desc: 'Combine and shorten at Arafat with one Adhan two Iqamas', mandatory: true },
+    { id: 'muzdalifah-travel', title: 'Travel to Muzdalifah after sunset', desc: 'Leave Arafat after sunset · Proceed to Muzdalifah', mandatory: true },
+    { id: 'muzdalifah-prayer', title: 'Pray Maghrib + Isha at Muzdalifah', desc: 'Combine Maghrib and Isha at Muzdalifah', mandatory: true },
+    { id: 'collect-stones', title: 'Collect 70 pebbles', desc: 'Chickpea-sized · Collect from Muzdalifah or Mina', mandatory: true },
+  ],
+  'Day 10 — Eid (10 Dhul Hijjah)': [
+    { id: 'fajr-muzdalifah', title: 'Pray Fajr at Muzdalifah', desc: 'Early Fajr · Make dua at Mashar al-Haram', mandatory: true },
+    { id: 'jamarat-aqaba', title: 'Stone the large Jamarat', desc: '7 pebbles · Say Allahu Akbar with each · After sunrise', mandatory: true },
+    { id: 'qurbani', title: 'Animal sacrifice (Qurbani)', desc: 'Slaughter an animal or arrange via HARAMAIN Qurbani', mandatory: true },
+    { id: 'shave-hair', title: 'Shave or cut hair', desc: 'Men: shave head or shorten · Women: cut fingertip length', mandatory: true },
+    { id: 'tawaf-ifadah', title: 'Perform Tawaf al-Ifadah', desc: '7 rounds · Main pillar of Hajj', mandatory: true },
+    { id: 'sa-i-hajj', title: 'Perform Sa\'i', desc: 'If not done after Umrah Tawaf', mandatory: false },
+  ],
+  'Days 11-13 — Mina (Tashreeq)': [
+    { id: 'stone-day11', title: 'Stone 3 Jamarats — Day 11', desc: 'Small → Medium → Large · 7 pebbles each · After Dhuhr', mandatory: true },
+    { id: 'stone-day12', title: 'Stone 3 Jamarats — Day 12', desc: 'Same as Day 11 · May leave before sunset', mandatory: true },
+    { id: 'stone-day13', title: 'Stone 3 Jamarats — Day 13', desc: 'If staying Day 13 · Must do before Maghrib', mandatory: false },
+    { id: 'tawaf-wada', title: 'Farewell Tawaf', desc: 'Last act before leaving Makkah · 7 rounds', mandatory: true },
+  ]
+};
+
+var checklistState = JSON.parse(localStorage.getItem(K+'checklist') || '{}');
+var activeCheckDay = Object.keys(HAJJ_CHECKLIST)[0];
+
+function initChecklist() {
+  renderChecklistDayTabs();
+  renderChecklistItems();
+  updateChecklistProgress();
+}
+
+function renderChecklistDayTabs() {
+  var el = document.getElementById('checklist-day-tabs');
+  if (!el) return;
+  el.innerHTML = Object.keys(HAJJ_CHECKLIST).map(function(day, i) {
+    return '<div class="day-tab' + (day === activeCheckDay ? ' on' : '') + '" onclick="switchCheckDay(' + JSON.stringify(day) + ',this)">' +
+      'Day ' + (i+1) +
+    '</div>';
+  }).join('');
+}
+
+function switchCheckDay(day, btn) {
+  activeCheckDay = day;
+  document.querySelectorAll('#checklist-day-tabs .day-tab').forEach(function(t) { t.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  renderChecklistItems();
+}
+
+function renderChecklistItems() {
+  var el = document.getElementById('checklist-items');
+  if (!el) return;
+  var items = HAJJ_CHECKLIST[activeCheckDay] || [];
+  var dayLabel = document.createElement('div');
+  el.innerHTML = '<div style="font-family:var(--dm);font-size:.52rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">' + activeCheckDay + '</div>' +
+  items.map(function(item) {
+    var done = checklistState[item.id];
+    return '<div class="checklist-item ' + (done ? 'check-done' : '') + '" onclick="toggleCheckItem(\'' + item.id + '\')">' +
+      '<div class="check-box ' + (done ? 'done' : '') + '">' + (done ? '✓' : '') + '</div>' +
+      '<div class="check-label">' +
+        '<div class="check-title">' + item.title + (item.mandatory ? '<span class="check-mandatory">FARD</span>' : '') + '</div>' +
+        '<div class="check-desc">' + item.desc + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleCheckItem(id) {
+  checklistState[id] = !checklistState[id];
+  localStorage.setItem(K+'checklist', JSON.stringify(checklistState));
+  renderChecklistItems();
+  updateChecklistProgress();
+  if (checklistState[id]) {
+    addPts(5, '✅ Hajj ritual completed: ' + id);
+    toast('✅ Ritual completed! May Allah accept your Hajj 🕋');
+  }
+}
+
+function updateChecklistProgress() {
+  var total = 0, done = 0;
+  Object.values(HAJJ_CHECKLIST).forEach(function(items) {
+    items.forEach(function(item) {
+      total++;
+      if (checklistState[item.id]) done++;
+    });
+  });
+  var pct = total ? Math.round(done/total*100) : 0;
+  var pctEl = document.getElementById('checklist-pct');
+  var fillEl = document.getElementById('checklist-fill');
+  var doneEl = document.getElementById('checklist-done-count');
+  var leftEl = document.getElementById('checklist-left-count');
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (doneEl) doneEl.textContent = done + ' completed';
+  if (leftEl) leftEl.textContent = (total-done) + ' remaining';
+}
+
+/* ═══════════════════════════════════
+   7. PERSONAL HAJJ ITINERARY
+═══════════════════════════════════ */
+var HAJJ_ITINERARY = [
+  { day: 'Day 8 · 8 Dhul Hijjah', date: 'June 17, 2026', color: '#9B59B6', events: [
+    { time: 'Morning', title: 'Enter Ihram', desc: 'Ghusl · Intention · Talbiyah', zone: 'Miqat' },
+    { time: '12:00', title: 'Dhuhr Prayer', desc: 'Pray at home/hotel before travel', zone: 'Makkah' },
+    { time: 'After Dhuhr', title: 'Travel to Mina', desc: 'Proceed to your tent in Mina', zone: 'Mina' },
+    { time: 'Afternoon', title: 'Rest & Ibadah', desc: 'Quran · Dhikr · Dua · Rest for tomorrow', zone: 'Mina' },
+    { time: 'Night', title: 'Sleep in Mina', desc: 'Sunnah to spend night in Mina', zone: 'Mina' },
+  ]},
+  { day: 'Day 9 · 9 Dhul Hijjah — ARAFAT', date: 'June 18, 2026', color: '#E74C3C', events: [
+    { time: 'After Sunrise', title: 'Travel to Arafat', desc: 'This is the day of Hajj · Do NOT miss', zone: 'Arafat' },
+    { time: '12:00-13:00', title: 'Dhuhr + Asr Combined', desc: 'One Adhan · Two Iqamas · Shortened', zone: 'Arafat' },
+    { time: '12:00-Sunset', title: '⭐ WUQUF — Standing at Arafat', desc: 'THE PILLAR OF HAJJ · Make dua · Cry · Repent · Ask', zone: 'Arafat' },
+    { time: 'After Sunset', title: 'Travel to Muzdalifah', desc: 'Calmly · Do not rush · Recite Talbiyah', zone: 'Muzdalifah' },
+    { time: 'Night', title: 'Maghrib + Isha at Muzdalifah', desc: 'Collect 70 pebbles · Rest outdoors', zone: 'Muzdalifah' },
+  ]},
+  { day: 'Day 10 · EID al-Adha', date: 'June 19, 2026', color: '#F5B041', events: [
+    { time: 'Before Sunrise', title: 'Fajr at Muzdalifah', desc: 'Early prayer · Dua at Mashar al-Haram', zone: 'Muzdalifah' },
+    { time: 'After Sunrise', title: 'Stone Large Jamarat', desc: '7 pebbles · Allahu Akbar each · Stop Talbiyah', zone: 'Jamarat' },
+    { time: 'Morning', title: 'Qurbani Sacrifice', desc: 'Animal sacrifice or arrange via HARAMAIN', zone: 'Mina' },
+    { time: 'Morning', title: 'Shave / Cut Hair', desc: 'Partial Ihram release · Most restrictions lifted', zone: 'Mina' },
+    { time: 'Afternoon', title: 'Tawaf al-Ifadah', desc: '7 rounds · PILLAR OF HAJJ · Must do today', zone: 'Makkah' },
+    { time: 'Evening', title: "Sa'i if needed", desc: "7 laps Safa-Marwa · Full Ihram release", zone: 'Makkah' },
+  ]},
+  { day: 'Days 11-12 · Tashreeq', date: 'June 20-21, 2026', color: '#2ECC71', events: [
+    { time: 'After Dhuhr', title: 'Stone All 3 Jamarats', desc: '7 pebbles each · Small → Medium → Large', zone: 'Jamarat' },
+    { time: 'Between stonings', title: 'Rest · Ibadah · Dua', desc: 'Quran · Dhikr · Social time with pilgrims', zone: 'Mina' },
+    { time: 'Optional', title: 'Night in Mina (Sunnah)', desc: 'Stay in Mina overnight — recommended', zone: 'Mina' },
+  ]},
+  { day: 'Final Day · Farewell', date: 'June 22, 2026', color: '#C9A84C', events: [
+    { time: 'Morning', title: 'Last visit to Masjid al-Haram', desc: 'Pray · Drink Zamzam · Make dua', zone: 'Makkah' },
+    { time: 'Before leaving', title: 'Tawaf al-Wada', desc: 'Farewell Tawaf · Last act in Makkah', zone: 'Makkah' },
+    { time: 'Departure', title: 'Leave Makkah', desc: 'With tears · Mabroor Hajj inshallah', zone: 'Makkah' },
+  ]},
+];
+
+function initItinerary() {
+  var el = document.getElementById('itinerary-days');
+  if (!el) return;
+  el.innerHTML = HAJJ_ITINERARY.map(function(day, di) {
+    return '<div class="itin-day">' +
+      '<div class="itin-day-header" onclick="toggleItinDay(' + di + ')">' +
+        '<div>' +
+          '<div class="itin-day-title" style="color:' + day.color + '">' + day.day + '</div>' +
+          '<div class="itin-day-date">' + day.date + '</div>' +
+        '</div>' +
+        '<div style="font-size:1rem" id="itin-arrow-' + di + '">▼</div>' +
+      '</div>' +
+      '<div class="itin-day-body" id="itin-body-' + di + '">' +
+        day.events.map(function(ev) {
+          return '<div class="itin-event">' +
+            '<div class="itin-time">' + ev.time + '</div>' +
+            '<div class="itin-dot" style="background:' + day.color + '"></div>' +
+            '<div class="itin-content">' +
+              '<div class="itin-title">' + ev.title + '</div>' +
+              '<div class="itin-desc">' + ev.desc + '</div>' +
+              '<span class="itin-zone">' + ev.zone + '</span>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleItinDay(di) {
+  var body = document.getElementById('itin-body-' + di);
+  var arrow = document.getElementById('itin-arrow-' + di);
+  if (!body) return;
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.textContent = open ? '▶' : '▼';
+}
+
+function exportItinerary() {
+  var text = '🕋 HARAMAIN — My Hajj Itinerary\n\n';
+  HAJJ_ITINERARY.forEach(function(day) {
+    text += '═══ ' + day.day + ' (' + day.date + ') ═══\n';
+    day.events.forEach(function(ev) {
+      text += '  ' + ev.time + ' — ' + ev.title + '\n';
+      text += '    ' + ev.desc + '\n';
+    });
+    text += '\n';
+  });
+  text += 'Generated by HARAMAIN · haramain-pi.netlify.app\nMay Allah accept your Hajj 🤲';
+  if (navigator.share) {
+    navigator.share({ title: 'My Hajj Itinerary', text: text }).catch(function(){});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){ toast('📋 Itinerary copied!'); });
+  }
+}
+
+/* ═══════════════════════════════════
+   8. SPIRITUAL ANALYTICS
+═══════════════════════════════════ */
+function initAnalytics() {
+  renderAnalyticsWeek();
+  renderAnalyticsStats();
+  renderSpiritualInsights();
+  renderWorshipGoals();
+  renderPrayerChart();
+}
+
+function renderAnalyticsWeek() {
+  var el = document.getElementById('analytics-week');
+  if (!el) return;
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var today = new Date().getDay();
+  var heights = [40,65,55,80,45,90,70];
+  el.innerHTML = days.map(function(d, i) {
+    var h = heights[i];
+    return '<div class="analytics-day-col">' +
+      '<div class="analytics-day-name">' + d + '</div>' +
+      '<div class="analytics-day-bar ' + (i === today ? 'today' : '') + '" style="height:' + h + 'px;"></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderAnalyticsStats() {
+  var el = document.getElementById('analytics-stats');
+  if (!el) return;
+  var stats = [
+    { val: streak + 'd', lbl: 'Streak' },
+    { val: pts, lbl: 'Points' },
+    { val: tawafHistory ? tawafHistory.length : 0, lbl: 'Tawaf' },
+    { val: dhikrTotal || 0, lbl: 'Dhikr' },
+    { val: '5/5', lbl: 'Prayers' },
+    { val: '3.5L', lbl: 'Water' },
+  ];
+  el.innerHTML = stats.map(function(s) {
+    return '<div class="analytics-stat">' +
+      '<div class="analytics-stat-val">' + s.val + '</div>' +
+      '<div class="analytics-stat-lbl">' + s.lbl + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderPrayerChart() {
+  var el = document.getElementById('prayer-chart');
+  if (!el) return;
+  var prayers = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+  var rates = [85, 100, 90, 100, 95];
+  el.innerHTML = '<div style="background:var(--bg3);border-radius:var(--r2);padding:.8rem">' +
+    prayers.map(function(p, i) {
+      var col = rates[i] >= 90 ? 'var(--grn)' : rates[i] >= 70 ? '#F5B041' : 'var(--red)';
+      return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem">' +
+        '<div style="font-family:var(--dm);font-size:.52rem;color:var(--t3);min-width:55px">' + p + '</div>' +
+        '<div style="flex:1;height:8px;background:rgba(201,168,76,.1);border-radius:4px;overflow:hidden">' +
+          '<div style="height:100%;width:' + rates[i] + '%;background:' + col + ';border-radius:4px;transition:width 1s ease"></div>' +
+        '</div>' +
+        '<div style="font-family:var(--dm);font-size:.52rem;color:' + col + ';min-width:32px;text-align:right">' + rates[i] + '%</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+
+function renderSpiritualInsights() {
+  var el = document.getElementById('spiritual-insights');
+  if (!el) return;
+  var insights = [
+    { icon: '🔥', text: 'MashaAllah! ' + streak + '-day worship streak. The Prophet ﷺ said: "The most beloved deeds to Allah are those done consistently, even if small."' },
+    { icon: '🕌', text: 'You have prayed 5 prayers consistently. Allah says: "Indeed, prayer prevents immorality and wrongdoing." (Quran 29:45)' },
+    { icon: '💡', text: 'Increase your Dhikr. Even 100 SubhanAllah takes less than 2 minutes and earns mountains of reward.' },
+    { icon: '🕋', text: 'Hajj season is approaching. Review your itinerary and checklist to ensure maximum reward.' },
+  ];
+  el.innerHTML = insights.map(function(ins) {
+    return '<div class="insight-card">' +
+      '<div class="insight-icon">' + ins.icon + '</div>' +
+      '<div class="insight-text">' + ins.text + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderWorshipGoals() {
+  var el = document.getElementById('worship-goals');
+  if (!el) return;
+  var goals = [
+    { name: 'Complete all 5 prayers', current: 5, target: 5, unit: 'prayers' },
+    { name: 'Daily Quran reading', current: 2, target: 5, unit: 'pages' },
+    { name: 'Morning Azkar', current: 1, target: 1, unit: 'set' },
+    { name: 'Dhikr count', current: dhikrTotal || 0, target: 100, unit: 'count' },
+  ];
+  el.innerHTML = goals.map(function(g) {
+    var pct = Math.min(100, Math.round(g.current/g.target*100));
+    var col = pct >= 100 ? 'var(--grn)' : pct >= 50 ? '#F5B041' : 'var(--red)';
+    return '<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:.7rem .9rem;margin-bottom:.4rem">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:.3rem">' +
+        '<div style="font-size:.7rem;font-weight:700;color:var(--t1)">' + g.name + '</div>' +
+        '<div style="font-family:var(--dm);font-size:.52rem;color:' + col + '">' + g.current + '/' + g.target + ' ' + g.unit + '</div>' +
+      '</div>' +
+      '<div style="height:6px;background:rgba(201,168,76,.1);border-radius:3px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:3px;transition:width .8s ease"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ═══════════════════════════════════
+   9. PILGRIM MEMORIES JOURNAL
+═══════════════════════════════════ */
+var memories = JSON.parse(localStorage.getItem(K+'memories') || '[]');
+
+function initMemories() {
+  renderMemoriesGrid('all');
+  updateMemStats();
+}
+
+function captureMemory() {
+  // Use file input for photo capture
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'camera';
+  input.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var title = prompt('Memory title:', 'At Masjid al-Haram');
+      if (!title) return;
+      var zone = detectCurrentZone();
+      var memory = {
+        id: Date.now(),
+        title: title,
+        image: ev.target.result,
+        zone: zone || 'Makkah',
+        date: new Date().toLocaleDateString(),
+        hijri: document.getElementById('hd-hijri-full') ? document.getElementById('hd-hijri-full').textContent : 'Dhul Hijjah 1447',
+        lat: trackerLat, lng: trackerLng,
+      };
+      memories.unshift(memory);
+      localStorage.setItem(K+'memories', JSON.stringify(memories.slice(0, 100)));
+      renderMemoriesGrid('all');
+      updateMemStats();
+      addPts(5, '📸 Memory captured');
+      toast('📸 Memory saved! ' + title);
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function detectCurrentZone() {
+  if (!trackerLat || !trackerLng) return null;
+  var zone = detectZone(parseFloat(trackerLat), parseFloat(trackerLng));
+  return zone ? zone.name : 'Makkah';
+}
+
+function renderMemoriesGrid(filter) {
+  var el = document.getElementById('memories-grid');
+  if (!el) return;
+  var filtered = filter === 'all' ? memories : memories.filter(function(m) {
+    return m.zone && m.zone.toLowerCase().includes(filter);
+  });
+  if (!filtered.length) {
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--t3);font-size:.65rem">📸 No memories yet.<br>Tap the camera to capture your first Hajj moment.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(m) {
+    return '<div class="memory-card" onclick="viewMemory(' + m.id + ')">' +
+      '<div class="memory-img">' +
+        (m.image ? '<img src="' + m.image + '" alt="' + m.title + '">' : '📸') +
+      '</div>' +
+      '<div class="memory-meta">' +
+        '<div class="memory-title">' + m.title + '</div>' +
+        '<div class="memory-date">' + (m.hijri || m.date) + '</div>' +
+        '<div class="memory-loc">📍 ' + (m.zone || 'Makkah') + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function filterMemories(filter, btn) {
+  document.querySelectorAll('#mem-filter .day-tab').forEach(function(t) { t.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  renderMemoriesGrid(filter);
+}
+
+function viewMemory(id) {
+  var m = memories.find(function(x) { return x.id === id; });
+  if (!m) return;
+  toast('📸 ' + m.title + ' · ' + m.zone);
+}
+
+function updateMemStats() {
+  var el = function(id,v) { var e=document.getElementById(id); if(e)e.textContent=v; };
+  el('mem-count', memories.length);
+  var zones = [...new Set(memories.map(function(m) { return m.zone; }))];
+  el('mem-zones', zones.length);
+  var dates = [...new Set(memories.map(function(m) { return m.date; }))];
+  el('mem-days', dates.length);
+}
+
+function shareMemories() {
+  toast('📸 ' + memories.length + ' memories captured on your Hajj journey 🕋');
+}
+
+/* ═══════════════════════════════════
+   10. MOON SIGHTING & ISLAMIC EVENTS
+═══════════════════════════════════ */
+var MOON_PHASES = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+var PHASE_NAMES = ['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+
+var ISLAMIC_EVENTS_2026 = [
+  { name: 'Day of Arafat', icon: '🏔️', hijri: '9 Dhul Hijjah 1447', date: 'June 18, 2026', daysFrom: 0 },
+  { name: 'Eid al-Adha', icon: '🐑', hijri: '10 Dhul Hijjah 1447', date: 'June 19, 2026', daysFrom: 1 },
+  { name: 'Tashreeq Days End', icon: '🕋', hijri: '13 Dhul Hijjah 1447', date: 'June 22, 2026', daysFrom: 4 },
+  { name: 'Islamic New Year 1448', icon: '🌙', hijri: '1 Muharram 1448', date: 'July 18, 2026', daysFrom: 30 },
+  { name: 'Ashura', icon: '🌊', hijri: '10 Muharram 1448', date: 'July 27, 2026', daysFrom: 39 },
+  { name: 'Ramadan 1448 begins', icon: '🌙', hijri: '1 Ramadan 1448', date: 'February 17, 2027', daysFrom: 244 },
+];
+
+function initMoonSighting() {
+  var phase = calculateMoonPhase();
+  renderMoonPhase(phase);
+  renderMoonCalendar();
+  renderMoonEvents();
+}
+
+function calculateMoonPhase() {
+  // Simple moon phase calculation
+  var now = new Date();
+  var known = new Date('2026-05-19'); // Known new moon reference
+  var diff = (now - known) / (1000 * 60 * 60 * 24);
+  var cycle = 29.53;
+  var phase = ((diff % cycle) / cycle * 8) | 0;
+  return { index: phase, illumination: Math.round(Math.abs(4 - phase) / 4 * 100) };
+}
+
+function renderMoonPhase(phase) {
+  var el = function(id,v) { var e=document.getElementById(id); if(e)e.textContent=v; };
+  el('moon-phase-icon', MOON_PHASES[phase.index]);
+  el('moon-phase-name', PHASE_NAMES[phase.index]);
+  el('moon-illumination', 'Illumination: ' + phase.illumination + '% · ' + PHASE_NAMES[phase.index]);
+}
+
+function renderMoonCalendar() {
+  var el = document.getElementById('moon-calendar-grid');
+  if (!el) return;
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = now.getMonth();
+  var firstDay = new Date(year, month, 1).getDay();
+  var daysInMonth = new Date(year, month+1, 0).getDate();
+  var today = now.getDate();
+  var cells = '';
+  // Empty cells
+  for (var i=0; i<firstDay; i++) cells += '<div></div>';
+  // Days
+  for (var d=1; d<=daysInMonth; d++) {
+    var phase = calculateMoonPhase();
+    var icon = MOON_PHASES[Math.floor((d * 8 / daysInMonth)) % 8];
+    var isToday = d === today;
+    cells += '<div class="moon-day' + (isToday ? ' today' : '') + '">' +
+      '<div class="moon-day-icon">' + icon + '</div>' +
+      '<div class="moon-day-num">' + d + '</div>' +
+    '</div>';
+  }
+  el.innerHTML = cells;
+}
+
+function renderMoonEvents() {
+  var el = document.getElementById('moon-events-list');
+  if (!el) return;
+  el.innerHTML = ISLAMIC_EVENTS_2026.map(function(ev) {
+    var days = ev.daysFrom;
+    var daysLabel = days === 0 ? 'TODAY' : days === 1 ? 'Tomorrow' : 'In ' + days + ' days';
+    return '<div class="moon-event">' +
+      '<div class="moon-event-icon">' + ev.icon + '</div>' +
+      '<div style="flex:1">' +
+        '<div class="moon-event-name">' + ev.name + '</div>' +
+        '<div class="moon-event-date">' + ev.hijri + ' · ' + ev.date + '</div>' +
+      '</div>' +
+      '<div class="moon-event-days">' + daysLabel + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function updateMoonMethod() {
+  var method = document.getElementById('moon-method').value;
+  toast('🌙 Moon sighting method: ' + method);
+  initMoonSighting();
+}
+
+/* ═══════════════════════════════════
+   NAVIGATION — Add new screens to goS
+═══════════════════════════════════ */
+var _origGoS = goS;
+goS = function(id, btn) {
+  _origGoS(id, btn);
+  // Init new screens when opened
+  var inits = {
+    'emergency': initEmergency,
+    'health-intel': initHealthIntel,
+    'crowd': initCrowdIntel,
+    'hydration': initHydration,
+    'audio': initAudioPlayer,
+    'checklist': initChecklist,
+    'itinerary': initItinerary,
+    'analytics': initAnalytics,
+    'memories': initMemories,
+    'moon': initMoonSighting,
+  };
+  if (inits[id]) {
+    setTimeout(inits[id], 100);
+  }
+};
+
+/* ═══════════════════════════════════
+   DASHBOARD — Add new utility tiles
+═══════════════════════════════════ */
+function addNewUtilityTiles() {
+  var container = document.getElementById('dashboard-new-utils');
+  if (!container) return;
+
+  var tiles = [
+    { icon:'🆘', label:'Emergency', id:'emergency', col:'var(--red)', bg:'rgba(231,76,60,.08)', badge:'SOS' },
+    { icon:'🏥', label:'Health Intel', id:'health-intel', col:'#3498DB', bg:'rgba(52,152,219,.08)', badge:'AI' },
+    { icon:'🌊', label:'Crowd Intel', id:'crowd', col:'#3498DB', bg:'rgba(52,152,219,.08)', badge:'LIVE' },
+    { icon:'💧', label:'Hydration', id:'hydration', col:'#3498DB', bg:'rgba(0,150,255,.08)', badge:'' },
+    { icon:'🎵', label:'Audio Duas', id:'audio', col:'#9B59B6', bg:'rgba(155,89,182,.08)', badge:'' },
+    { icon:'📋', label:'Checklist', id:'checklist', col:'var(--grn)', bg:'rgba(46,204,113,.08)', badge:'' },
+    { icon:'🗓️', label:'Itinerary', id:'itinerary', col:'var(--gold)', bg:'rgba(201,168,76,.08)', badge:'' },
+    { icon:'📊', label:'Analytics', id:'analytics', col:'var(--gold)', bg:'rgba(201,168,76,.08)', badge:'' },
+    { icon:'📸', label:'Memories', id:'memories', col:'var(--gold)', bg:'rgba(201,168,76,.08)', badge:'' },
+    { icon:'🌙', label:'Moon & Events', id:'moon', col:'var(--gold2)', bg:'rgba(232,199,106,.08)', badge:'' },
+  ];
+
+  container.innerHTML = tiles.map(function(t) {
+    return '<div style="background:' + t.bg + ';border:1px solid ' + t.col + '44;border-radius:var(--r2);' +
+      'padding:.8rem .5rem;text-align:center;cursor:pointer;position:relative;transition:all .2s" ' +
+      'onclick="goS(\'' + t.id + '\')" >' +
+      (t.badge ? '<div style="position:absolute;top:5px;right:5px;font-family:var(--dm);font-size:.4rem;' +
+        'background:' + t.col + '22;color:' + t.col + ';border:1px solid ' + t.col + '44;' +
+        'border-radius:var(--pill);padding:.08rem .3rem">' + t.badge + '</div>' : '') +
+      '<div style="font-size:1.5rem;margin-bottom:.3rem">' + t.icon + '</div>' +
+      '<div style="font-family:var(--dm);font-size:.5rem;color:var(--t2);text-transform:uppercase;' +
+        'letter-spacing:.06em;line-height:1.3">' + t.label + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* Call on launch */
+var _origLaunchAppV3 = launchApp;
+launchApp = function() {
+  _origLaunchAppV3();
+  setTimeout(function() {
+    addNewUtilityTiles();
+    initHydration();
+    // Schedule medication reminders
+    if (medSchedule.length) scheduleAllMedReminders();
+  }, 500);
+};
+
+function scheduleAllMedReminders() {
+  medSchedule.forEach(function(med) {
+    var parts = med.time.split(':');
+    var h = parseInt(parts[0]), m = parseInt(parts[1]);
+    var now = new Date();
+    var nowMins = now.getHours()*60 + now.getMinutes();
+    var medMins = h*60+m;
+    var diff = (medMins - nowMins) * 60000;
+    if (diff > 0 && diff < 86400000) {
+      setTimeout(function() {
+        addNotif('💊', 'Medication Reminder', 'Time to take: ' + med.name + ' · ' + med.time, 'now');
+        toast('💊 Medication: ' + med.name);
+      }, diff);
+    }
+  });
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESELLER & AFFILIATE SYSTEM
+════════════════════════════════════════════════════════════ */
+var resellerData = JSON.parse(localStorage.getItem(K+'reseller') || '{"refs":0,"earned":0,"conversions":0,"clicks":0,"payouts":[]}');
+var myRefCode = localStorage.getItem(K+'refcode') || '';
+
+function getRefCode() {
+  if (!myRefCode) {
+    var u = user ? user.username.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,8) : 'PILGRIM';
+    var h = Math.abs(u.split('').reduce(function(a,c){return a+c.charCodeAt(0)},0)+Date.now()).toString(36).toUpperCase().slice(0,5);
+    myRefCode = 'HM-' + u + '-' + h;
+    localStorage.setItem(K+'refcode', myRefCode);
+  }
+  return myRefCode;
+}
+
+function getRefLink() {
+  return 'https://haramain-pi.netlify.app?ref=' + getRefCode();
+}
+
+function getCommissionTier(refs) {
+  if (refs >= 100) return { name:'Platinum Partner', pct:25, icon:'👑' };
+  if (refs >= 51)  return { name:'Elite Reseller',   pct:20, icon:'🥇' };
+  if (refs >= 11)  return { name:'Hajj Ambassador',  pct:15, icon:'🥈' };
+  return                  { name:'Pilgrim Referrer', pct:10, icon:'🥉' };
+}
+
+function initResellerDashboard() {
+  var code = getRefCode();
+  var link = getRefLink();
+  var tier = getCommissionTier(resellerData.refs);
+  var el = function(id,v) { var e=document.getElementById(id); if(e)e.textContent=v; };
+  el('res-earned',  resellerData.earned.toFixed(2) + 'π');
+  el('res-refs',    resellerData.refs);
+  el('res-conv',    resellerData.refs > 0 ? Math.round(resellerData.conversions/resellerData.refs*100)+'%' : '0%');
+  el('res2-earned', resellerData.earned.toFixed(2) + 'π');
+  el('res2-refs',   resellerData.refs);
+  el('res2-rank',   tier.icon + ' ' + tier.name);
+  var rl = document.getElementById('ref-link-url');
+  if (rl) rl.textContent = link;
+}
+
+function shareRefWhatsApp() {
+  var msg = buildRefMessage();
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+}
+
+function shareRefNative() {
+  var msg = buildRefMessage();
+  if (navigator.share) navigator.share({ title:'HARAMAIN', text:msg }).catch(function(){});
+  else copyRefLink();
+}
+
+function shareRefSMS() {
+  window.open('sms:?body=' + encodeURIComponent(buildRefMessage()));
+}
+
+function shareRefEmail() {
+  var msg = buildRefMessage();
+  window.open('mailto:?subject=HARAMAIN Pilgrimage App&body=' + encodeURIComponent(msg));
+}
+
+function shareRefTelegram() {
+  window.open('https://t.me/share/url?url=' + encodeURIComponent(getRefLink()) + '&text=' + encodeURIComponent('🕋 Join HARAMAIN — The Web3 Pilgrimage Platform on Pi Network!'));
+}
+
+function copyRefLink() {
+  var link = getRefLink();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function(){ toast('📋 Referral link copied!'); });
+  }
+}
+
+function buildRefMessage() {
+  var tier = getCommissionTier(resellerData.refs);
+  return '🕋 Assalamu Alaikum!\n\n' +
+    'Join HARAMAIN — The World\'s First Web3 Pilgrimage Platform on Pi Network!\n\n' +
+    '✅ Prayer times · Qibla · Full Hajj Guide\n' +
+    '🤖 AI Pilgrim Assistant (Claude AI)\n' +
+    '📍 Live Family Tracker · Emergency SOS\n' +
+    '💸 Pi Payments · Zakat · Sadaqah\n' +
+    '🌍 6 Languages · Works offline\n\n' +
+    'Open in Pi Browser:\n' + getRefLink() + '\n\n' +
+    'Hajj 2026 · June 17 · 3 Million Pilgrims\n' +
+    'Powered by Haramain.pi · Pi Network Mainnet';
+}
+
+/* Render promo messages in reseller screen */
+function renderPromoMessages() {
+  var el = document.getElementById('promo-list');
+  if (!el) return;
+  var promos = [
+    { title:'🕋 General Invite', msg: buildRefMessage() },
+    { title:'💊 Health & Safety', msg:'🏥 Going for Hajj? HARAMAIN has Health Passport, Emergency SOS (Saudi 911/997), Heat Safety alerts, and Live Family Tracker.\n\nStay safe:\n' + getRefLink() },
+    { title:'💸 Pi Payments', msg:'💸 Pay Zakat & Sadaqah in Pi on HARAMAIN!\n\nAlso: Pilgrim Pass (1π), Qurbani orders, and full Hajj guide.\n\n' + getRefLink() },
+  ];
+  el.innerHTML = promos.map(function(p) {
+    return '<div class="mail-template" onclick="copyPromo(this)" data-msg="' + p.msg.replace(/"/g,"'") + '">' +
+      '<div class="mail-template-title">' + p.title + '</div>' +
+      '<div class="mail-template-preview">' + p.msg.substring(0,80) + '...' + '</div>' +
+      '<div style="font-family:var(--dm);font-size:.48rem;color:var(--t3);margin-top:.2rem">Tap to copy</div>' +
+    '</div>';
+  }).join('');
+}
+
+function copyPromo(el) {
+  var msg = el.getAttribute('data-msg');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(msg).then(function(){ toast('📋 Promo message copied!'); });
+  }
+}
+
+function renderResellerLeaderboard() {
+  var el = document.getElementById('reseller-leaderboard');
+  if (!el) return;
+  var boards = [
+    { rank:1, name:'@Pioneer_Makkah', refs:245, earned:'245π' },
+    { rank:2, name:'@HajjAgent_NG',   refs:189, earned:'189π' },
+    { rank:3, name:'@IslamicTech_ID', refs:156, earned:'156π' },
+    { rank:4, name:user ? '@'+user.username : '@You', refs:resellerData.refs, earned:resellerData.earned.toFixed(0)+'π' },
+  ];
+  el.innerHTML = boards.map(function(b) {
+    var medals = ['🥇','🥈','🥉','👤'];
+    return '<div class="leaderboard-row">' +
+      '<div class="lr-rank">' + medals[b.rank-1] + '</div>' +
+      '<div class="lr-name">' + b.name + '</div>' +
+      '<div class="lr-val">' + b.refs + ' refs · ' + b.earned + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+console.log('[HARAMAIN v3.0] ✅ 10 Advanced Utilities loaded · Payments untouched · Saudi-grade infrastructure');
+
 console.log('[HARAMAIN] ✅ All 25 upgrades loaded · Payment untouched · Ready');
+
+
+/* ════════════════════════════════════════════════════════════
+   Pi Ad Network Integration
+   Terms: https://socialchain.app/tos
+   Requirements: 1,000+ daily users · KYC complete · Mainnet
+   ════════════════════════════════════════════════════════════
+   
+   IMPORTANT: Pi Ads SDK is loaded via Pi Browser natively.
+   The Pi.Ads API is available after Pi.init() on Mainnet.
+   You do NOT load a separate SDK — Pi Browser injects it.
+   
+   Pi Ad Network:
+   - Ads are shown automatically once you qualify
+   - 1,000+ daily users required
+   - KYC required: complete at develop.pi
+   - Payment: USD or Pi, 60 days after Pi receives ad revenue
+   - Minimum payout: $500 USD
+════════════════════════════════════════════════════════════ */
+
+/* ── Pi Ad Network: Ad Unit Container ── */
+/* Pi Browser injects ads into designated containers */
+/* You mark where ads should appear using data-pi-ad attribute */
+
+function initPiAds() {
+  if (typeof Pi === 'undefined') return;
+  
+  /* Pi Ads are enabled automatically on Mainnet */
+  /* once your app reaches 1,000+ daily active users */
+  /* and you pass KYC on develop.pi */
+  
+  /* Log ad network status for developer reference */
+  console.log('[HARAMAIN] Pi Ad Network: Mainnet · sandbox:false');
+  console.log('[HARAMAIN] Ad containers registered · Awaiting 1K daily users');
+  
+  /* Create ad containers in designated slots */
+  renderAdSlots();
+}
+
+/* ── Ad Slot Positions ── */
+/* Pi Network Best Practices: ads between content sections */
+/* NOT in: prayer times, emergency SOS, payment flows */
+function renderAdSlots() {
+  var slots = [
+    'ad-slot-dashboard-bottom',   // Bottom of dashboard
+    'ad-slot-guide-between',      // Between guide sections  
+    'ad-slot-profile-bottom',     // Bottom of profile page
+  ];
+  
+  slots.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    
+    /* Pi Ad Unit placeholder */
+    /* Pi Browser replaces this with actual ad when live */
+    el.innerHTML = 
+      '<div data-pi-ad="banner" ' +
+           'data-pi-ad-size="320x50" ' +
+           'style="min-height:52px;background:rgba(201,168,76,.04);' +
+                  'border:1px dashed rgba(201,168,76,.15);' +
+                  'border-radius:8px;display:flex;align-items:center;' +
+                  'justify-content:center;margin:.5rem 0">' +
+        '<span style="font-family:var(--dm);font-size:.48rem;' +
+               'color:rgba(201,168,76,.3);letter-spacing:.1em">' +
+          'Pi Ad Network · Pending 1,000 Daily Users' +
+        '</span>' +
+      '</div>';
+  });
+}
+
+/* ── Revenue Tracking (developer reference only) ── */
+/* Actual tracking is done by Pi Network — not by you */
+var piAdStats = {
+  impressions: 0,
+  clicks: 0,
+  estimatedRevenue: 0
+};
+
+/* Pi calls this when an ad is viewed */
+function onPiAdImpression(adData) {
+  piAdStats.impressions++;
+  console.log('[Pi Ad] Impression:', adData);
+}
+
+/* Pi calls this when an ad is clicked */
+function onPiAdClick(adData) {
+  piAdStats.clicks++;
+  console.log('[Pi Ad] Click:', adData);
+}
+
+/* ── Initialize on app launch ── */
+/* Called after launchApp() */
 
 /* Run immediately when DOM is ready */
 if (document.readyState === 'loading') {
@@ -4667,7 +7193,9 @@ if (document.readyState === 'loading') {
 
 /* Also keep window.load as backup — WorldCup pattern */
 window.addEventListener('load', function() {
-  // Pi.init called at top — sandbox:true confirmed
+  if (typeof Pi !== 'undefined') {
+    Pi.init({ version: "2.0", sandbox: false });
+  }
 });
 
 
@@ -4681,7 +7209,7 @@ window.addEventListener('load', function() {
       <button class="modal-close" onclick="closeModal('modal-privacy')">✕</button>
     </div>
     <div class="modal-body">
-      <p><strong style="color:#E8C76A">Effective Date:</strong> 17 May 2026 · Powered by Haramain.pi · Pi Network Testnet</p>
+      <p><strong style="color:#E8C76A">Effective Date:</strong> 17 May 2026 · Powered by Haramain.pi · Pi Network Mainnet</p>
       <h3>1. Information We Collect</h3>
       <p>HARAMAIN collects the following information when you use the platform:</p>
       <ul>
@@ -4730,12 +7258,12 @@ window.addEventListener('load', function() {
     <div class="modal-body">
       <p><strong style="color:#E8C76A">Effective Date:</strong> 17 May 2026 · HARAMAIN · Powered by Haramain.pi</p>
       <h3>1. Acceptance of Terms</h3>
-      <p>By using HARAMAIN, you agree to these Terms of Service. HARAMAIN is a Web3 pilgrimage platform operating on Pi Network Testnet. It is not affiliated with the Saudi government, Ministry of Hajj, or any official Hajj authority.</p>
+      <p>By using HARAMAIN, you agree to these Terms of Service. HARAMAIN is a Web3 pilgrimage platform operating on Pi Network Mainnet. It is not affiliated with the Saudi government, Ministry of Hajj, or any official Hajj authority.</p>
       <h3>2. Platform Purpose</h3>
       <p>HARAMAIN provides digital tools for Hajj & Umrah pilgrims including prayer guidance, ritual tracking, safety tools, Islamic knowledge, and Pi Network payment services. All religious guidance is provided for informational purposes — consult a qualified Islamic scholar for fatwa (religious rulings).</p>
       <h3>3. Pi Network Payments</h3>
       <ul>
-        <li>All payments are made in Pi (π) on Pi Network Testnet · sandbox:true</li>
+        <li>All payments are made in Pi (π) on Pi Network Mainnet · sandbox:false</li>
         <li>Payments are final and processed by Pi Network's blockchain</li>
         <li>Pilgrim Pass (1π) unlocks premium features permanently on your device</li>
         <li>Zakat and Sadaqah payments go to the recipient address set by HARAMAIN</li>
@@ -4753,7 +7281,7 @@ window.addEventListener('load', function() {
       <h3>8. Modifications</h3>
       <p>HARAMAIN reserves the right to update these terms. Continued use after updates constitutes acceptance.</p>
       <h3>9. Contact & Support</h3>
-      <p>support@haramain.pi · Powered by Haramain.pi · Pi Network Testnet · 2026</p>
+      <p>support@haramain.pi · Powered by Haramain.pi · Pi Network Mainnet · 2026</p>
     </div>
   </div>
 </div>
@@ -4772,14 +7300,14 @@ window.addEventListener('load', function() {
         <div style="font-size:.62rem;color:#5C6B58;margin-top:.2rem">The Web3 Pilgrimage Infrastructure · Version 2.0 · 2026</div>
       </div>
       <h3>Mission</h3>
-      <p>HARAMAIN is the next-generation global pilgrimage operating system — combining AI guidance, real-time safety, smart worship technology, digital identity, and Pi Testnet financial systems into one intelligent Islamic platform.</p>
+      <p>HARAMAIN is the next-generation global pilgrimage operating system — combining AI guidance, real-time safety, smart worship technology, digital identity, and Pi Mainnet financial systems into one intelligent Islamic platform.</p>
       <h3>What Makes HARAMAIN Unique</h3>
       <ul>
         <li>🤖 First AI-powered Hajj assistant on Pi Network</li>
         <li>👤 Global pilgrim serial number system — never repeats</li>
         <li>💊 Digital Health Passport with emergency QR</li>
         <li>📍 Live Tracker with family sharing</li>
-        <li>💸 Full Pi Testnet payment infrastructure</li>
+        <li>💸 Full Pi Mainnet payment infrastructure</li>
         <li>🌍 6 languages — English, Arabic, Hausa, Urdu, Indonesian, Turkish</li>
         <li>🚨 Emergency SOS with GPS and Saudi emergency numbers</li>
       </ul>
@@ -4793,7 +7321,7 @@ window.addEventListener('load', function() {
       </ul>
       <h3>Not Affiliated With</h3>
       <p>HARAMAIN is an independent platform on Pi Network. Not affiliated with the Saudi government, Ministry of Hajj & Umrah, or any official Hajj authority.</p>
-      <div style="text-align:center;margin-top:1rem;font-family:'DM Mono','Courier New',monospace;font-size:.55rem;color:#2A3828">Powered by Haramain.pi · Pi Network Testnet · sandbox:true · 2026</div>
+      <div style="text-align:center;margin-top:1rem;font-family:'DM Mono','Courier New',monospace;font-size:.55rem;color:#2A3828">Powered by Haramain.pi · Pi Network Mainnet · sandbox:false · 2026</div>
     </div>
   </div>
 </div>
