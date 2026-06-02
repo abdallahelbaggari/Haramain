@@ -3257,6 +3257,13 @@ console.log('[HARAMAIN] Endpoint:', _APPROVE);
         launchApp();
         toast('Welcome, @' + user.username + '! 🕋');
       })
+      .catch(function(err) {
+        console.error('[Haramain] Auth error:', err);
+        var msg = document.getElementById('lmsg');
+        if (msg) msg.textContent = 'Please open in Pi Browser to sign in';
+        var btn = document.getElementById('loginBtn');
+        if (btn) btn.disabled = false;
+      })
       .catch(() => {
         if (status) status.textContent = 'Login failed. Open in Pi Browser.';
         if (btn) btn.disabled = false;
