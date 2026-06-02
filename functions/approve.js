@@ -1,18 +1,16 @@
 /* ═══════════════════════════════════════════════════════════════
    HARAMAIN · functions/approve.js · Cloudflare Pages Function
    Route: /functions/approve
-
-   STRATEGY: Return 200 INSTANTLY — no waiting
-   Pi SDK has a strict timeout. We return 200 first,
-   then call Pi API asynchronously.
-   
    Pi Network Mainnet · sandbox:false
-   Set PI_API_KEY in Cloudflare Dashboard → Settings → Environment Variables
+
+   CHECK LOGS IN:
+   dash.cloudflare.com → Pages → haramain → Functions → Logs
+   
+   Every step is logged so you can trace exactly where it fails.
 ═══════════════════════════════════════════════════════════════ */
 
 export async function onRequestPost(context) {
 
-  /* CORS headers — always included */
   const cors = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -20,9 +18,11 @@ export async function onRequestPost(context) {
     "Content-Type": "application/json",
   };
 
+  console.log("[Haramain] approve.js — request received");
+
   try {
 
-    /* Parse body safely */
+    /* Step 1: Parse body */
     let paymentId = null;
     let expectedAmount = null;
 
@@ -30,40 +30,43 @@ export async function onRequestPost(context) {
       const body = await context.request.json();
       paymentId = body.paymentId || null;
       expectedAmount = body.expectedAmount || null;
+      console.log("[Haramain] paymentId:", paymentId);
+      console.log("[Haramain] expectedAmount:", expectedAmount);
     } catch(e) {
-      /* Body parse failed — still return 200 */
+      console.error("[Haramain] Body parse error:", e.message);
       return new Response(
-        JSON.stringify({ approved: true, message: "body parse error" }),
+        JSON.stringify({ approved: true, step: "body_parse_error" }),
         { status: 200, headers: cors }
       );
     }
 
-    console.log("[Haramain] approve called — paymentId:", paymentId);
-
-    /* No paymentId — return 200 instantly */
+    /* Step 2: Check paymentId */
     if (!paymentId) {
+      console.log("[Haramain] No paymentId — returning 200");
       return new Response(
-        JSON.stringify({ approved: true, message: "no paymentId" }),
+        JSON.stringify({ approved: true, step: "no_payment_id" }),
         { status: 200, headers: cors }
       );
     }
 
-    /* No PI_API_KEY — return 200 instantly */
+    /* Step 3: Check PI_API_KEY */
     const PI_API_KEY = context.env.PI_API_KEY;
+    console.log("[Haramain] PI_API_KEY present:", !!PI_API_KEY);
+
     if (!PI_API_KEY) {
-      console.log("[Haramain] PI_API_KEY not set — returning instant approval");
+      console.log("[Haramain] PI_API_KEY missing — returning 200 fallback");
       return new Response(
         JSON.stringify({
           approved: true,
           identifier: paymentId,
-          message: "PI_API_KEY not configured — set in Cloudflare Dashboard"
+          step: "no_api_key"
         }),
         { status: 200, headers: cors }
       );
     }
 
-    /* ── Call Pi API to approve ── */
-    console.log("[Haramain] Calling Pi API to approve:", paymentId);
+    /* Step 4: Call Pi API */
+    console.log("[Haramain] Calling Pi API approve for:", paymentId);
 
     let piResponse;
     try {
@@ -78,57 +81,51 @@ export async function onRequestPost(context) {
           body: JSON.stringify({})
         }
       );
+      console.log("[Haramain] Pi API status:", piResponse.status);
     } catch(fetchErr) {
-      /* Pi API unreachable — still return 200 */
-      console.error("[Haramain] Pi API fetch failed:", fetchErr.message);
+      console.error("[Haramain] Pi API unreachable:", fetchErr.message);
       return new Response(
         JSON.stringify({
           approved: true,
           identifier: paymentId,
-          message: "Pi API unreachable — approved with fallback"
+          step: "pi_api_unreachable",
+          error: fetchErr.message
         }),
         { status: 200, headers: cors }
       );
     }
 
-    /* Parse Pi API response safely */
+    /* Step 5: Parse Pi API response */
     let data;
     try {
       data = await piResponse.json();
+      console.log("[Haramain] Pi API response:", JSON.stringify(data));
     } catch(e) {
-      data = { approved: true, identifier: paymentId };
+      console.log("[Haramain] Pi API response not JSON — using fallback");
+      data = { identifier: paymentId };
     }
 
-    console.log("[Haramain] Pi API response status:", piResponse.status);
-    console.log("[Haramain] Pi API response:", JSON.stringify(data));
-
-    /* ── ALWAYS return 200 — no matter what Pi API returned ── */
+    /* Step 6: Always return 200 */
+    console.log("[Haramain] Returning 200 success");
     return new Response(
       JSON.stringify({
         approved: true,
         identifier: data.identifier || paymentId,
         pi_status: piResponse.status,
-        data: data
+        step: "complete"
       }),
       { status: 200, headers: cors }
     );
 
   } catch(err) {
-
-    /* Catch-all — ALWAYS return 200 */
-    console.error("[Haramain] approve unexpected error:", err.message);
+    console.error("[Haramain] Unexpected error:", err.message);
     return new Response(
-      JSON.stringify({
-        approved: true,
-        error: err.message
-      }),
+      JSON.stringify({ approved: true, step: "unexpected_error", error: err.message }),
       { status: 200, headers: cors }
     );
-
   }
 }
 
-/* CORS preflight */
 export async function onRequestOptions() {
   return new Response(null, {
     status: 200,
