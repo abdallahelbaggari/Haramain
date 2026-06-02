@@ -1,12 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
    HARAMAIN · functions/complete.js · Cloudflare Pages Function
    Route: /functions/complete
-
-   STRATEGY: Return 200 INSTANTLY — no waiting
-   Handles: normal completion + empty txid (pending payments)
-   
    Pi Network Mainnet · sandbox:false
-   Set PI_API_KEY in Cloudflare Dashboard → Settings → Environment Variables
+
+   CHECK LOGS IN:
+   dash.cloudflare.com → Pages → haramain → Functions → Logs
 ═══════════════════════════════════════════════════════════════ */
 
 export async function onRequestPost(context) {
@@ -18,9 +16,11 @@ export async function onRequestPost(context) {
     "Content-Type": "application/json",
   };
 
+  console.log("[Haramain] complete.js — request received");
+
   try {
 
-    /* Parse body safely */
+    /* Step 1: Parse body */
     let paymentId = null;
     let txid = null;
 
@@ -28,52 +28,52 @@ export async function onRequestPost(context) {
       const body = await context.request.json();
       paymentId = body.paymentId || null;
       txid = body.txid || null;
+      console.log("[Haramain] paymentId:", paymentId);
+      console.log("[Haramain] txid:", txid);
     } catch(e) {
+      console.error("[Haramain] Body parse error:", e.message);
       return new Response(
-        JSON.stringify({ completed: true, message: "body parse error" }),
+        JSON.stringify({ completed: true, step: "body_parse_error" }),
         { status: 200, headers: cors }
       );
     }
 
-    console.log("[Haramain] complete called — paymentId:", paymentId, "txid:", txid);
-
-    /* No paymentId — return 200 instantly */
+    /* Step 2: Check paymentId */
     if (!paymentId) {
+      console.log("[Haramain] No paymentId — returning 200");
       return new Response(
-        JSON.stringify({ completed: true, message: "no paymentId" }),
+        JSON.stringify({ completed: true, step: "no_payment_id" }),
         { status: 200, headers: cors }
       );
     }
 
-    /* No txid = incomplete payment being resolved */
+    /* Step 3: Empty txid = resolve pending payment */
     if (!txid) {
-      console.log("[Haramain] empty txid — resolving pending payment");
+      console.log("[Haramain] No txid — resolving pending payment");
       return new Response(
-        JSON.stringify({
-          completed: true,
-          resolved: true,
-          message: "pending payment resolved"
-        }),
+        JSON.stringify({ completed: true, resolved: true, step: "no_txid" }),
         { status: 200, headers: cors }
       );
     }
 
-    /* No PI_API_KEY — return 200 instantly */
+    /* Step 4: Check PI_API_KEY */
     const PI_API_KEY = context.env.PI_API_KEY;
+    console.log("[Haramain] PI_API_KEY present:", !!PI_API_KEY);
+
     if (!PI_API_KEY) {
-      console.log("[Haramain] PI_API_KEY not set — returning instant completion");
+      console.log("[Haramain] PI_API_KEY missing — returning 200 fallback");
       return new Response(
         JSON.stringify({
           completed: true,
           identifier: paymentId,
-          message: "PI_API_KEY not configured — set in Cloudflare Dashboard"
+          step: "no_api_key"
         }),
         { status: 200, headers: cors }
       );
     }
 
-    /* ── Call Pi API to complete ── */
-    console.log("[Haramain] Calling Pi API to complete:", paymentId, txid);
+    /* Step 5: Call Pi API */
+    console.log("[Haramain] Calling Pi API complete for:", paymentId, txid);
 
     let piResponse;
     try {
@@ -88,55 +88,50 @@ export async function onRequestPost(context) {
           body: JSON.stringify({ txid: txid })
         }
       );
+      console.log("[Haramain] Pi API complete status:", piResponse.status);
     } catch(fetchErr) {
-      console.error("[Haramain] Pi API fetch failed:", fetchErr.message);
+      console.error("[Haramain] Pi API unreachable:", fetchErr.message);
       return new Response(
         JSON.stringify({
           completed: true,
           identifier: paymentId,
-          message: "Pi API unreachable — completed with fallback"
+          step: "pi_api_unreachable",
+          error: fetchErr.message
         }),
         { status: 200, headers: cors }
       );
     }
 
-    /* Parse Pi API response safely */
+    /* Step 6: Parse response */
     let data;
     try {
       data = await piResponse.json();
+      console.log("[Haramain] Pi API complete response:", JSON.stringify(data));
     } catch(e) {
-      data = { completed: true, identifier: paymentId };
+      data = { identifier: paymentId };
     }
 
-    console.log("[Haramain] Pi API complete status:", piResponse.status);
-    console.log("[Haramain] Pi API complete response:", JSON.stringify(data));
-
-    /* ALWAYS return 200 */
+    /* Step 7: Always return 200 */
+    console.log("[Haramain] Returning 200 complete success");
     return new Response(
       JSON.stringify({
         completed: true,
         identifier: data.identifier || paymentId,
         pi_status: piResponse.status,
-        data: data
+        step: "complete"
       }),
       { status: 200, headers: cors }
     );
 
   } catch(err) {
-
-    console.error("[Haramain] complete unexpected error:", err.message);
+    console.error("[Haramain] Unexpected error:", err.message);
     return new Response(
-      JSON.stringify({
-        completed: true,
-        error: err.message
-      }),
+      JSON.stringify({ completed: true, step: "unexpected_error", error: err.message }),
       { status: 200, headers: cors }
     );
-
   }
 }
 
-/* CORS preflight */
 export async function onRequestOptions() {
   return new Response(null, {
     status: 200,
