@@ -1,16 +1,28 @@
 {
-  "name": "haramain-testnet",
-  "version": "2.0.0-testnet",
-  "description": "HARAMAIN — Smart Pilgrim Platform · Pi Network TESTNET",
+  "name": "haramain",
+  "version": "3.0.0",
+  "description": "HARAMAIN — The Web3 Pilgrimage Platform on Pi Network",
+
   "private": true,
-  "dependencies": {
-    "axios": "^1.6.0"
-  },
+
   "scripts": {
-    "build": "echo \"Static build — TESTNET\"",
-    "start": "echo \"Netlify deployment — TESTNET\""
+    "build": "echo \"Static build\"",
+    "start": "echo \"Cloudflare Pages deployment\""
   },
+
   "engines": {
     "node": "18"
-  }
+  },
+
+  "keywords": [
+    "pi-network",
+    "hajj",
+    "umrah",
+    "haramain",
+    "mainnet",
+    "web3",
+    "islamic"
+  ],
+
+  "license": "MIT"
 }
