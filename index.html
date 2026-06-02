@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -2628,8 +2627,6 @@ select.fi{cursor:pointer;}
 ════════════════════════════════════════════════════════════ */
 
 /* ── Pi SDK: Mainnet Initialization ── */
-Pi.init({ version: "2.0", sandbox: false });
-
 /* ── Smart Endpoint Detection ── */
 /* Works on Cloudflare Pages AND Netlify */
 var _HOST = window.location.hostname;
@@ -2691,8 +2688,16 @@ function buyPrem() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, expectedAmount: 1 })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Approved:', d); });
+      }).then(function(r) {
+          console.log('[Haramain] Approve HTTP status:', r.status);
+          return r.json();
+        })
+        .then(function(d) {
+          console.log('[Haramain] Approve response:', d);
+        })
+        .catch(function(err) {
+          console.error('[Haramain] Approve fetch failed:', err);
+        });
     },
     onReadyForServerCompletion: function(paymentId, txid) {
       console.log('[Haramain] Completing Pilgrim Pass:', paymentId, txid);
@@ -2700,8 +2705,12 @@ function buyPrem() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); })
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
         .then(function(d) {
+          console.log('[Haramain] Complete response:', d);
           console.log('[Haramain] Completed:', d);
           localStorage.setItem(K + 'prem', '1');
           if (btn) { btn.textContent = '✅ Pilgrim Pass Active'; btn.disabled = true; }
@@ -2709,6 +2718,9 @@ function buyPrem() {
           syncUI();
           toast('⭐ Pilgrim Pass activated! Taqabbal Allah!');
           addNotif('⭐', 'Pilgrim Pass Activated!', 'All premium features unlocked. Barakallah feek!', 'just now');
+        })
+        .catch(function(err) {
+          console.error('[Haramain] Complete fetch failed:', err);
         });
     },
     onCancel: function() {
@@ -2746,20 +2758,29 @@ function sendPi() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Approved send:', d); });
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
+        .then(function(d) {
+          console.log('[Haramain] Complete response:', d); console.log('[Haramain] Approved send:', d); });
     },
     onReadyForServerCompletion: function(paymentId, txid) {
       return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); })
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
         .then(function(d) {
+          console.log('[Haramain] Complete response:', d);
           console.log('[Haramain] Send complete:', d);
           addTx('💸 Sent ' + amt + 'π to ' + to + ' · ' + memo + ' · txid:' + txid.slice(0,12) + '...');
           toast('✅ Sent ' + amt + 'π to ' + to + '!');
-        });
+        })
+        .catch(function(err) { console.error('[Haramain] Send complete failed:', err); });
     },
     onCancel: function() { toast('Send cancelled'); },
     onError: function(err) { console.error('[Haramain] Send error:', err); toast('Send failed — try again'); }
@@ -2784,21 +2805,30 @@ function sendZakat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Zakat approved:', d); });
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
+        .then(function(d) {
+          console.log('[Haramain] Complete response:', d); console.log('[Haramain] Zakat approved:', d); });
     },
     onReadyForServerCompletion: function(paymentId, txid) {
       return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); })
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
         .then(function(d) {
+          console.log('[Haramain] Complete response:', d);
           console.log('[Haramain] Zakat complete:', d);
           addTx('🤲 Zakat ' + amt + 'π paid · txid:' + txid.slice(0,12) + '...');
           toast('🤲 Zakat accepted! Barakallah feek!');
           addNotif('🤲', 'Zakat Paid', amt + 'π Zakat paid. May Allah accept it.', 'just now');
-        });
+        })
+        .catch(function(err) { console.error('[Haramain] Zakat complete failed:', err); });
     },
     onCancel: function() { toast('Zakat cancelled'); },
     onError: function(err) { console.error('[Haramain] Zakat error:', err); toast('Zakat failed — try again'); }
@@ -2824,21 +2854,30 @@ function sendSadaqah(cause, amt) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Sadaqah approved:', d); });
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
+        .then(function(d) {
+          console.log('[Haramain] Complete response:', d); console.log('[Haramain] Sadaqah approved:', d); });
     },
     onReadyForServerCompletion: function(paymentId, txid) {
       return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); })
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
         .then(function(d) {
+          console.log('[Haramain] Complete response:', d);
           console.log('[Haramain] Sadaqah complete:', d);
           addTx('💚 Sadaqah ' + amt + 'π · ' + cause + ' · txid:' + txid.slice(0,12) + '...');
           toast('💚 Sadaqah accepted! May Allah reward you!');
           addNotif('💚', 'Sadaqah Paid', amt + 'π Sadaqah for ' + cause + '. Jazakallah khayran!', 'just now');
-        });
+        })
+        .catch(function(err) { console.error('[Haramain] Sadaqah complete failed:', err); });
     },
     onCancel: function() { toast('Sadaqah cancelled'); },
     onError: function(err) { console.error('[Haramain] Sadaqah error:', err); toast('Sadaqah failed — try again'); }
@@ -2865,21 +2904,30 @@ function orderQurbani() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Qurbani approved:', d); });
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
+        .then(function(d) {
+          console.log('[Haramain] Complete response:', d); console.log('[Haramain] Qurbani approved:', d); });
     },
     onReadyForServerCompletion: function(paymentId, txid) {
       return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); })
+      }).then(function(r) {
+          console.log('[Haramain] Complete HTTP status:', r.status);
+          return r.json();
+        })
         .then(function(d) {
+          console.log('[Haramain] Complete response:', d);
           console.log('[Haramain] Qurbani complete:', d);
           addTx('🐑 Qurbani ' + amt + 'π · ' + animal + ' · ' + country + ' · txid:' + txid.slice(0,12) + '...');
           toast('🐑 Qurbani ordered! May Allah accept it!');
           addNotif('🐑', 'Qurbani Ordered', animal + ' in ' + country + ' · ' + amt + 'π paid. Taqabbal Allah!', 'just now');
-        });
+        })
+        .catch(function(err) { console.error('[Haramain] Qurbani complete failed:', err); });
     },
     onCancel: function() { toast('Qurbani cancelled'); },
     onError: function(err) { console.error('[Haramain] Qurbani error:', err); toast('Qurbani failed — try again'); }
