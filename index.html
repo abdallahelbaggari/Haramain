@@ -2977,7 +2977,7 @@ console.log('[HARAMAIN] Endpoint:', _APPROVE);
 
 
     Pi.authenticate(['username', 'payments'], onIncompletePayment)
-      .then(auth => {
+      .then(function(auth) {
         user = auth.user;
         console.log('[Haramain] ✅ Authenticated:', user.username, '| sandbox: false');
         genPilgrimId();
@@ -3414,7 +3414,7 @@ function buyPrem() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paymentId: paymentId, txid: txid })
-        }).then(function() {
+        }).then(function(r) { return r.json(); }).then(function() {
           localStorage.setItem(K + 'prem', '1');
           btn.textContent = '✅ Pilgrim Pass Active';
           btn.disabled = true;
@@ -3476,7 +3476,7 @@ function sendPi() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function() {
+      }).then(function(r) { return r.json(); }).then(function() {
         addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo);
         toast('✅ Sent ' + amt + 'π to @' + to.trim() + '!');
       });
@@ -3538,7 +3538,7 @@ function sendZakat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function() {
+      }).then(function(r) { return r.json(); }).then(function() {
         addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
         toast('🤲 Zakat accepted! Taqabbal Allah!');
         addPts(20, 'Zakat sent');
@@ -3573,7 +3573,7 @@ function sendSadaqah(cause, amt) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function() {
+      }).then(function(r) { return r.json(); }).then(function() {
         addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
         toast('💝 Sadaqah accepted! Barakallah feek!');
         addPts(10, 'Sadaqah sent');
@@ -3613,7 +3613,7 @@ function orderQurbani() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function() {
+      }).then(function(r) { return r.json(); }).then(function() {
         const certId = 'QURB-' + Date.now().toString(36).toUpperCase();
         addTx('🐑 Qurbani ' + animal + ' — ' + country + ' — ' + amt + 'π · Cert:' + certId);
         toast('🐑 Qurbani ordered! Taqabbal Allah!');
