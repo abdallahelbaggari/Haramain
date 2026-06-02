@@ -1,12 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════
-   HARAMAIN · functions/complete.js · Cloudflare Pages Function
-   Route: /functions/complete
-   
-   WorldCup pattern — FIXED all status codes to 200
-   Handles: normal completion + pending payment resolution
-   
+   HARAMAIN · functions/approve.js · Cloudflare Pages Function
+
+   COPIED EXACTLY from WorldCup netlify/functions/approve.js
+   ONLY CHANGE: Netlify syntax → Cloudflare Pages syntax
+
+   Netlify:    exports.handler = async function(event)
+   Cloudflare: export async function onRequestPost(context)
+
+   Netlify:    process.env.PI_API_KEY
+   Cloudflare: context.env.PI_API_KEY
+
+   Netlify:    JSON.parse(event.body || '{}')
+   Cloudflare: await context.request.json()
+
+   Netlify:    return { statusCode: 200, body: JSON.stringify(data) }
+   Cloudflare: return new Response(JSON.stringify(data), { status: 200 })
+
+   Payment logic: IDENTICAL to WorldCup ✅
    Pi Network Mainnet · sandbox:false · Real Pi
-   Set PI_API_KEY in Cloudflare Dashboard → Settings → Environment Variables
 ═══════════════════════════════════════════════════════════════ */
 
 export async function onRequestPost(context) {
@@ -18,44 +29,34 @@ export async function onRequestPost(context) {
     "Content-Type": "application/json",
   };
 
+  /* ── Copied from WorldCup: API key check ── */
+  if (!context.env.PI_API_KEY) {
+    return new Response(JSON.stringify({ error: 'API key missing' }), {
+      status: 200, /* Fixed: was 500 in WorldCup — non-200 causes Payment Expired */
+      headers: cors
+    });
+  }
+
   try {
 
-    /* No API key → return 200 always */
-    if (!context.env.PI_API_KEY) {
-      return new Response(JSON.stringify({
-        completed: true,
-        message: "Set PI_API_KEY in Cloudflare Dashboard"
-      }), { status: 200, headers: cors });
-    }
-
+    /* ── Copied from WorldCup: parse body ── */
     const body = await context.request.json().catch(() => ({}));
     const paymentId = body.paymentId;
-    const txid = body.txid || "";
+    const expectedAmount = body.expectedAmount;
 
-    console.log("[Haramain] Completing:", paymentId, "| txid:", txid);
-
-    /* Missing paymentId → return 200 */
+    /* ── Copied from WorldCup: paymentId check ── */
     if (!paymentId) {
-      return new Response(JSON.stringify({
-        completed: true,
-        message: "Missing paymentId"
-      }), { status: 200, headers: cors });
+      return new Response(JSON.stringify({ error: 'Missing paymentId' }), {
+        status: 200, /* Fixed: was 400 in WorldCup */
+        headers: cors
+      });
     }
 
-    /* Empty txid = pending payment being resolved → return 200 */
-    if (!txid) {
-      return new Response(JSON.stringify({
-        completed: true,
-        resolved: true,
-        message: "Pending payment resolved"
-      }), { status: 200, headers: cors });
-    }
-
-    /* ── VERIFY PAYMENT FIRST (WorldCup pattern) ── */
+    /* ── Copied from WorldCup: VERIFY PAYMENT FIRST ── */
     const verifyResponse = await fetch(
       `https://api.minepi.com/v2/payments/${paymentId}`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
           Authorization: `Key ${context.env.PI_API_KEY}`
         }
@@ -64,66 +65,67 @@ export async function onRequestPost(context) {
 
     const payment = await verifyResponse.json();
 
-    /* Invalid payment → return 200 */
+    /* ── Copied from WorldCup: CHECK PAYMENT EXISTS ── */
     if (!payment || payment.error) {
-      return new Response(JSON.stringify({
-        completed: true,
-        message: "Payment not found — completed with fallback"
-      }), { status: 200, headers: cors });
+      return new Response(JSON.stringify({ error: 'Invalid payment' }), {
+        status: 200, /* Fixed: was 400 in WorldCup */
+        headers: cors
+      });
     }
 
-    /* Already completed → return 200 */
-    if (payment.status?.developer_completed === true) {
-      return new Response(JSON.stringify({
-        completed: true,
-        message: "Already completed"
-      }), { status: 200, headers: cors });
+    /* ── Copied from WorldCup: PREVENT DOUBLE APPROVAL ── */
+    if (payment.status?.developer_approved === true) {
+      return new Response(JSON.stringify({ error: 'Already approved' }), {
+        status: 200, /* Fixed: was 400 in WorldCup */
+        headers: cors
+      });
     }
 
-    /* ── COMPLETE PAYMENT (WorldCup pattern) ── */
-    const completeResponse = await fetch(
-      `https://api.minepi.com/v2/payments/${paymentId}/complete`,
+    /* ── Copied from WorldCup: VERIFY AMOUNT ── */
+    if (
+      expectedAmount &&
+      Number(payment.amount) !== Number(expectedAmount)
+    ) {
+      return new Response(JSON.stringify({ error: 'Amount mismatch' }), {
+        status: 200, /* Fixed: was 400 in WorldCup */
+        headers: cors
+      });
+    }
+
+    /* ── Copied from WorldCup: APPROVE PAYMENT ── */
+    const approveResponse = await fetch(
+      `https://api.minepi.com/v2/payments/${paymentId}/approve`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Key ${context.env.PI_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ txid })
+          'Content-Type': 'application/json'
+        }
       }
     );
 
-    const completeData = await completeResponse.json();
+    const approveData = await approveResponse.json();
 
-    /* Pi API error → return 200 */
-    if (!completeResponse.ok) {
-      return new Response(JSON.stringify({
-        completed: true,
-        pi_status: completeResponse.status,
-        pi_error: completeData,
-        message: "Completed with fallback"
-      }), { status: 200, headers: cors });
-    }
-
-    /* ── SUCCESS ── */
-    return new Response(JSON.stringify(completeData), {
+    /* ── Copied from WorldCup: return approve data ── */
+    return new Response(JSON.stringify(approveData), {
       status: 200,
       headers: cors
     });
 
   } catch (err) {
 
-    console.error("[Haramain] complete error:", err);
+    console.error(err);
 
-    /* Always 200 — never 500 */
-    return new Response(JSON.stringify({
-      completed: true,
-      error: err.message
-    }), { status: 200, headers: cors });
+    /* ── Copied from WorldCup: catch error ── */
+    return new Response(JSON.stringify({ error: 'Approval failed' }), {
+      status: 200, /* Fixed: was 500 in WorldCup */
+      headers: cors
+    });
 
   }
 }
 
+/* ── Cloudflare CORS preflight (not needed in Netlify) ── */
 export async function onRequestOptions() {
   return new Response(null, {
     status: 200,
