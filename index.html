@@ -2611,6 +2611,303 @@ select.fi{cursor:pointer;}
 
 <!-- ✅ HARAMAIN SCRIPT — MAINNET · sandbox:false · All inline -->
 <script>
+/* ════════════════════════════════════════════════════════════
+   HARAMAIN PAYMENT SYSTEM — Pi Network Mainnet
+   Platform: Cloudflare Pages
+   Endpoints: /functions/approve · /functions/complete
+   Pattern: WorldCup proven working pattern
+   sandbox: false — MAINNET ONLY
+   
+   CRITICAL RULES:
+   1. Use function() not async function() in callbacks
+   2. Use return fetch().then().then() not await
+   3. NEVER throw errors inside callbacks
+   4. NEVER check if(!response.ok) inside callbacks  
+   5. Always return the fetch promise from approval
+════════════════════════════════════════════════════════════ */
+
+/* ── Pi SDK: Mainnet Initialization ── */
+Pi.init({ version: "2.0", sandbox: false });
+
+/* ── Smart Endpoint Detection ── */
+/* Works on Cloudflare Pages AND Netlify */
+var _HOST = window.location.hostname;
+var _APPROVE  = _HOST.includes('netlify') ? '/.netlify/functions/approve'  : '/functions/approve';
+var _COMPLETE = _HOST.includes('netlify') ? '/.netlify/functions/complete' : '/functions/complete';
+var _CANCEL   = _HOST.includes('netlify') ? '/.netlify/functions/cancel-payment' : '/functions/cancel-payment';
+
+console.log('[Haramain] Pi Mainnet · sandbox:false · endpoint:', _APPROVE);
+
+/* ── Incomplete Payment Handler ── */
+/* Called by Pi SDK when a previous payment was not finished */
+function onIncompletePayment(payment) {
+  console.log('[Haramain] Incomplete payment found:', payment);
+  if (!payment || !payment.identifier) return;
+  var pid = payment.identifier;
+  var txid = (payment.transaction && payment.transaction.txid) ? payment.transaction.txid : '';
+  if (txid) {
+    /* Has blockchain txid — complete it */
+    fetch(_COMPLETE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentId: pid, txid: txid })
+    }).then(function(r) { return r.json(); })
+      .then(function(d) { console.log('[Haramain] Resumed incomplete payment:', d); })
+      .catch(function(e) { console.warn('[Haramain] Resume error:', e); });
+  } else {
+    /* No txid — cancel so user can retry */
+    fetch(_CANCEL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentId: pid })
+    }).then(function(r) { return r.json(); })
+      .catch(function(e) { console.warn('[Haramain] Cancel error:', e); });
+  }
+}
+
+/* ══════════════════════════════════════
+   PAYMENT 1: Pilgrim Pass — 1π
+══════════════════════════════════════ */
+function buyPrem() {
+  if (localStorage.getItem(K + 'prem') === '1') {
+    toast('⭐ Already have Pilgrim Pass!'); return;
+  }
+  var btn = document.getElementById('prem-btn');
+  if (btn) { btn.textContent = 'Processing...'; btn.disabled = true; }
+
+  if (typeof Pi === 'undefined') {
+    toast('Open in Pi Browser to pay'); if (btn) { btn.textContent = 'Unlock Pilgrim Pass — 1π'; btn.disabled = false; } return;
+  }
+
+  Pi.createPayment({
+    amount: 1,
+    memo: 'Haramain Pilgrim Pass — Premium Access',
+    metadata: { type: 'pilgrim_pass', app: 'haramain.pi', network: 'mainnet' }
+  }, {
+    onReadyForServerApproval: function(paymentId) {
+      console.log('[Haramain] Approving Pilgrim Pass:', paymentId);
+      return fetch(_APPROVE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, expectedAmount: 1 })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Approved:', d); });
+    },
+    onReadyForServerCompletion: function(paymentId, txid) {
+      console.log('[Haramain] Completing Pilgrim Pass:', paymentId, txid);
+      return fetch(_COMPLETE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) {
+          console.log('[Haramain] Completed:', d);
+          localStorage.setItem(K + 'prem', '1');
+          if (btn) { btn.textContent = '✅ Pilgrim Pass Active'; btn.disabled = true; }
+          addTx('💰 Paid 1π — Pilgrim Pass Unlocked · txid:' + txid.slice(0,12) + '...');
+          syncUI();
+          toast('⭐ Pilgrim Pass activated! Taqabbal Allah!');
+          addNotif('⭐', 'Pilgrim Pass Activated!', 'All premium features unlocked. Barakallah feek!', 'just now');
+        });
+    },
+    onCancel: function() {
+      console.log('[Haramain] Pilgrim Pass cancelled');
+      if (btn) { btn.textContent = 'Unlock Pilgrim Pass — 1π'; btn.disabled = false; }
+      toast('Payment cancelled');
+    },
+    onError: function(err) {
+      console.error('[Haramain] Pilgrim Pass error:', err);
+      if (btn) { btn.textContent = 'Unlock Pilgrim Pass — 1π'; btn.disabled = false; }
+      toast('Payment error — try again');
+    }
+  });
+}
+
+/* ══════════════════════════════════════
+   PAYMENT 2: Send Pi — Pi Wallet
+══════════════════════════════════════ */
+function sendPi() {
+  var to   = (document.getElementById('send-to')  || {}).value || '';
+  var amt  = parseFloat((document.getElementById('send-amt') || {}).value) || 0.1;
+  var memo = ((document.getElementById('send-memo') || {}).value || 'Haramain tip').trim();
+  to = to.trim();
+  if (!to) { toast('Enter recipient'); return; }
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser'); return; }
+
+  Pi.createPayment({
+    amount: amt,
+    memo: memo,
+    metadata: { type: 'send_pi', to: to, app: 'haramain.pi', network: 'mainnet' }
+  }, {
+    onReadyForServerApproval: function(paymentId) {
+      console.log('[Haramain] Approving send Pi:', paymentId);
+      return fetch(_APPROVE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Approved send:', d); });
+    },
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) {
+          console.log('[Haramain] Send complete:', d);
+          addTx('💸 Sent ' + amt + 'π to ' + to + ' · ' + memo + ' · txid:' + txid.slice(0,12) + '...');
+          toast('✅ Sent ' + amt + 'π to ' + to + '!');
+        });
+    },
+    onCancel: function() { toast('Send cancelled'); },
+    onError: function(err) { console.error('[Haramain] Send error:', err); toast('Send failed — try again'); }
+  });
+}
+
+/* ══════════════════════════════════════
+   PAYMENT 3: Zakat — 0.5π minimum
+══════════════════════════════════════ */
+function sendZakat() {
+  var amt = parseFloat((document.getElementById('zakat-amount') || {}).value) || 0.5;
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser'); return; }
+
+  Pi.createPayment({
+    amount: amt,
+    memo: 'Haramain Zakat — In the path of Allah',
+    metadata: { type: 'zakat', app: 'haramain.pi', network: 'mainnet', amount: amt }
+  }, {
+    onReadyForServerApproval: function(paymentId) {
+      console.log('[Haramain] Approving Zakat:', paymentId);
+      return fetch(_APPROVE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Zakat approved:', d); });
+    },
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) {
+          console.log('[Haramain] Zakat complete:', d);
+          addTx('🤲 Zakat ' + amt + 'π paid · txid:' + txid.slice(0,12) + '...');
+          toast('🤲 Zakat accepted! Barakallah feek!');
+          addNotif('🤲', 'Zakat Paid', amt + 'π Zakat paid. May Allah accept it.', 'just now');
+        });
+    },
+    onCancel: function() { toast('Zakat cancelled'); },
+    onError: function(err) { console.error('[Haramain] Zakat error:', err); toast('Zakat failed — try again'); }
+  });
+}
+
+/* ══════════════════════════════════════
+   PAYMENT 4: Sadaqah — variable amount
+══════════════════════════════════════ */
+function sendSadaqah(cause, amt) {
+  cause = cause || 'General Sadaqah';
+  amt = parseFloat(amt) || 0.3;
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser'); return; }
+
+  Pi.createPayment({
+    amount: amt,
+    memo: 'Haramain Sadaqah — ' + cause,
+    metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi', network: 'mainnet' }
+  }, {
+    onReadyForServerApproval: function(paymentId) {
+      console.log('[Haramain] Approving Sadaqah:', paymentId);
+      return fetch(_APPROVE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Sadaqah approved:', d); });
+    },
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) {
+          console.log('[Haramain] Sadaqah complete:', d);
+          addTx('💚 Sadaqah ' + amt + 'π · ' + cause + ' · txid:' + txid.slice(0,12) + '...');
+          toast('💚 Sadaqah accepted! May Allah reward you!');
+          addNotif('💚', 'Sadaqah Paid', amt + 'π Sadaqah for ' + cause + '. Jazakallah khayran!', 'just now');
+        });
+    },
+    onCancel: function() { toast('Sadaqah cancelled'); },
+    onError: function(err) { console.error('[Haramain] Sadaqah error:', err); toast('Sadaqah failed — try again'); }
+  });
+}
+
+/* ══════════════════════════════════════
+   PAYMENT 5: Qurbani — 5π minimum
+══════════════════════════════════════ */
+function orderQurbani() {
+  var animal = (document.getElementById('qurbani-animal') || {}).value || 'Sheep';
+  var country = (document.getElementById('qurbani-country') || {}).value || 'Saudi Arabia';
+  var amt = animal === 'Camel' ? 35 : animal === 'Cow' ? 15 : 5;
+  if (typeof Pi === 'undefined') { toast('Open in Pi Browser'); return; }
+
+  Pi.createPayment({
+    amount: amt,
+    memo: 'Haramain Qurbani — ' + animal + ' · ' + country,
+    metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi', network: 'mainnet' }
+  }, {
+    onReadyForServerApproval: function(paymentId) {
+      console.log('[Haramain] Approving Qurbani:', paymentId);
+      return fetch(_APPROVE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, expectedAmount: amt })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Qurbani approved:', d); });
+    },
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) {
+          console.log('[Haramain] Qurbani complete:', d);
+          addTx('🐑 Qurbani ' + amt + 'π · ' + animal + ' · ' + country + ' · txid:' + txid.slice(0,12) + '...');
+          toast('🐑 Qurbani ordered! May Allah accept it!');
+          addNotif('🐑', 'Qurbani Ordered', animal + ' in ' + country + ' · ' + amt + 'π paid. Taqabbal Allah!', 'just now');
+        });
+    },
+    onCancel: function() { toast('Qurbani cancelled'); },
+    onError: function(err) { console.error('[Haramain] Qurbani error:', err); toast('Qurbani failed — try again'); }
+  });
+}
+
+/* ══════════════════════════════════════
+   Request Pi — QR generator (no payment flow)
+══════════════════════════════════════ */
+function requestPi() {
+  var amt = parseFloat((document.getElementById('req-amt') || {}).value) || 0.1;
+  var reason = ((document.getElementById('req-reason') || {}).value || 'Haramain').trim();
+  var el = document.getElementById('req-qr-out');
+  if (!el) return;
+  var reqData = 'haramain.pi/pay?to=' + (user ? user.username : 'pilgrim') +
+    '&amount=' + amt + '&reason=' + encodeURIComponent(reason);
+  el.innerHTML = '<div class="qr-box" style="margin-top:.5rem">' +
+    '<div style="font-family:var(--dm);font-size:.55rem;color:var(--t3);margin-bottom:.4rem">Share to receive ' + amt + 'π</div>' +
+    '<canvas id="req-qr-canvas"></canvas>' +
+    '<div style="font-family:var(--dm);font-size:.5rem;color:var(--t3);margin-top:.3rem">' + reqData.slice(0,50) + '...</div>' +
+    '</div>';
+  if (typeof QRCode !== 'undefined') {
+    QRCode.toCanvas(document.getElementById('req-qr-canvas'), reqData,
+      { width: 140, margin: 1, color: { dark: '#C9A84C', light: '#040E07' } });
+  }
+  addTx('📨 Payment request: ' + amt + 'π for ' + reason);
+  toast('📨 QR generated — share to receive ' + amt + 'π');
+}
+
 
 /* ================================================================
    HARAMAIN · script.js · Pi Network · MAINNET · sandbox:false
@@ -2932,25 +3229,7 @@ function cUtil() {
    100% identical structure — only names changed
 ══════════════════════════════════════════════════════════════ */
 
-function onIncompletePayment(payment) {
-  console.log('[Haramain] Incomplete payment found:', payment);
-  if (!payment || !payment.identifier) return;
-  var pid = payment.identifier;
-  var txid = (payment.transaction && payment.transaction.txid) ? payment.transaction.txid : '';
-  if (txid) {
-    fetch(_COMPLETE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentId: pid, txid: txid })
-    }).then(function(r){return r.json();}).catch(function(e){console.warn(e);});
-  } else {
-    fetch(_CANCEL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentId: pid })
-    }).then(function(r){return r.json();}).catch(function(e){console.warn(e);});
-  }
-}
+
 
 function piLogin() {
   const status = document.getElementById('ls-msg');
@@ -2962,17 +3241,11 @@ function piLogin() {
   if (btnText) btnText.textContent = 'Authenticating...';
 
   if (typeof Pi !== 'undefined') {
-    Pi.init({ version: "2.0", sandbox: false });
-
-/* ═══════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════
    SMART ENDPOINT DETECTION
    Auto-detects correct function path per hosting platform
    Works on: Cloudflare Pages, Netlify, any host
 ═══════════════════════════════════════════════════════ */
-var _HOST = window.location.hostname;
-var _APPROVE = _HOST.includes('netlify') ? '/.netlify/functions/approve' : '/functions/approve';
-var _COMPLETE = _HOST.includes('netlify') ? '/.netlify/functions/complete' : '/functions/complete';
-var _CANCEL = _HOST.includes('netlify') ? '/.netlify/functions/cancel-payment' : '/functions/cancel-payment';
 console.log('[HARAMAIN] Endpoint:', _APPROVE);
 
 
@@ -3384,247 +3657,22 @@ function calcRisk(){
 ══════════════════════════════════════════════════════════════ */
 
 /* ── PILGRIM PASS — 1π (WorldCup Premium = 0.5π same pattern) ── */
-function buyPrem() {
-  if (localStorage.getItem(K + 'prem') === '1') {
-    toast('⭐ Already have Pilgrim Pass!');
-    return;
-  }
 
-  const btn = document.getElementById('prem-btn');
-  btn.textContent = 'Processing...';
-  btn.disabled = true;
-
-  if (typeof Pi !== 'undefined') {
-    Pi.createPayment({
-      amount: 1,
-      memo: 'Haramain Pilgrim Pass — Premium Access',
-      metadata: { type: 'pilgrim_pass', app: 'haramain.pi', network: 'mainnet' }
-    }, {
-      onReadyForServerApproval: function(paymentId) {
-        console.log('[Haramain] Approving:', paymentId);
-        return fetch(_APPROVE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId: paymentId })
-        }).then(function(r) { return r.json(); })
-          .then(function(d) { console.log('[Haramain] Approved:', d); });
-      },
-      onReadyForServerCompletion: function(paymentId, txid) {
-        return fetch(_COMPLETE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId: paymentId, txid: txid })
-        }).then(function(r) { return r.json(); }).then(function() {
-          localStorage.setItem(K + 'prem', '1');
-          btn.textContent = '✅ Pilgrim Pass Active';
-          btn.disabled = true;
-          addTx('💰 Paid 1π — Pilgrim Pass Unlocked · Mainnet · txid:' + txid.slice(0,12) + '...');
-          syncUI();
-          toast('⭐ Pilgrim Pass activated! Taqabbal Allah!');
-          addNotif('⭐', 'Pilgrim Pass Activated!', 'All premium features unlocked. Barakallah feek!', 'just now');
-        });
-      },
-      onCancel: function() {
-        btn.textContent = 'Unlock Pilgrim Pass — 1π';
-        btn.disabled = false;
-        toast('Payment cancelled');
-      },
-      onError: function(err) {
-        btn.textContent = 'Unlock Pilgrim Pass — 1π';
-        btn.disabled = false;
-        toast('Payment error: ' + err);
-        console.error('[Haramain] buyPrem error:', err);
-      }
-    });
-  } else {
-    // Demo mode — WorldCup exact pattern
-    setTimeout(() => {
-      localStorage.setItem(K + 'prem', '1');
-      btn.textContent = '✅ Pilgrim Pass Active';
-      btn.disabled = true;
-      addTx('💰 Demo — Pilgrim Pass Unlocked');
-      toast('⭐ Demo: Pilgrim Pass activated!');
-    }, 1200);
-  }
-}
 
 /* ── SEND PI (WorldCup sendPi exact structure) ── */
-function sendPi() {
-  const to = (document.getElementById('send-to') || {}).value || '';
-  const amt = parseFloat((document.getElementById('send-amt') || {}).value) || 0.1;
-  const memo = (document.getElementById('send-memo') || {}).value || 'Haramain Pilgrim';
 
-  if (!to.trim()) { toast('Enter recipient username'); return; }
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
-
-  Pi.createPayment({
-    amount: amt,
-    memo: memo,
-    metadata: { type: 'send', to: to, app: 'haramain.pi' }
-  }, {
-    onReadyForServerApproval: function(paymentId) {
-        console.log('[Haramain] Approving:', paymentId);
-        return fetch(_APPROVE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Approved:', d); });
-    },
-    onReadyForServerCompletion: function(paymentId, txid) {
-      return fetch(_COMPLETE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); }).then(function() {
-        addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo);
-        toast('✅ Sent ' + amt + 'π to @' + to.trim() + '!');
-      });
-    },
-    onCancel: function() { toast('Payment cancelled'); },
-    onError: function(err) { toast('Payment error: ' + err); console.error(err); }
-  });
-}
 
 /* ── REQUEST PI — QR Generator (WorldCup requestPi exact) ── */
-function requestPi() {
-  const amt = parseFloat((document.getElementById('req-amt') || {}).value) || 0.1;
-  const reason = (document.getElementById('req-reason') || {}).value || 'Haramain';
-  const el = document.getElementById('req-qr-out');
-  if (!el) return;
 
-  const uname = user ? user.username : 'Pilgrim';
-  const qrData = 'haramain.pi/pay?to=' + uname + '&amount=' + amt + '&reason=' + encodeURIComponent(reason) + '&pid=' + myPilgrimId;
-
-  el.innerHTML = '<div class="qr-box" style="margin-top:.5rem">' +
-    '<div class="qr-sub">Share this QR to receive ' + amt + 'π · ' + reason + '</div>' +
-    '<div class="qr-wrap"><canvas id="req-qr"></canvas></div>' +
-    '<div class="qr-id">@' + uname + ' · ' + amt + 'π · ' + reason + '</div>' +
-  '</div>';
-
-  if (typeof QRCode !== 'undefined') {
-    QRCode.toCanvas(document.getElementById('req-qr'), qrData,
-      { width: 155, margin: 1, color: { dark: '#020A06', light: '#FFFFFF' } },
-      function() {}
-    );
-  }
-  addTx('📨 Requested ' + amt + 'π — ' + reason);
-  toast('📨 QR generated — share to receive ' + amt + 'π');
-}
 
 /* ── SEND ZAKAT (WorldCup createPayment exact) ── */
-function sendZakat() {
-  const cause = (document.getElementById('zk-cause') || {}).value || 'charity';
-  const amt = parseFloat((document.getElementById('zk-amount') || {}).value) || 0.5;
 
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
-
-  Pi.createPayment({
-    amount: amt,
-    memo: 'Zakat — ' + cause + ' — haramain.pi',
-    metadata: { type: 'zakat', cause: cause, app: 'haramain.pi' }
-  }, {
-    onReadyForServerApproval: function(paymentId) {
-        console.log('[Haramain] Approving:', paymentId);
-        return fetch(_APPROVE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Approved:', d); });
-    },
-    onReadyForServerCompletion: function(paymentId, txid) {
-      return fetch(_COMPLETE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); }).then(function() {
-        addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
-        toast('🤲 Zakat accepted! Taqabbal Allah!');
-        addPts(20, 'Zakat sent');
-        addNotif('🤲','Zakat Sent!', amt+'π donated to '+cause+'. May Allah multiply your reward.','just now');
-      });
-    },
-    onCancel: function() { toast('Payment cancelled'); },
-    onError: function(err) { toast('Payment error: ' + err); }
-  });
-}
 
 /* ── SEND SADAQAH (WorldCup createPayment exact) ── */
-function sendSadaqah(cause, amt) {
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
 
-  Pi.createPayment({
-    amount: amt,
-    memo: 'Sadaqah — ' + cause + ' — haramain.pi',
-    metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi' }
-  }, {
-    onReadyForServerApproval: function(paymentId) {
-        console.log('[Haramain] Approving:', paymentId);
-        return fetch(_APPROVE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Approved:', d); });
-    },
-    onReadyForServerCompletion: function(paymentId, txid) {
-      return fetch(_COMPLETE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); }).then(function() {
-        addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
-        toast('💝 Sadaqah accepted! Barakallah feek!');
-        addPts(10, 'Sadaqah sent');
-        addNotif('💝','Sadaqah Sent!', amt+'π — May Allah multiply your reward 100x.','just now');
-      });
-    },
-    onCancel: function() { toast('Payment cancelled'); },
-    onError: function(err) { toast('Payment error: ' + err); }
-  });
-}
 
 /* ── ORDER QURBANI (WorldCup createPayment exact) ── */
-function orderQurbani() {
-  const country = (document.getElementById('qurb-country') || {}).value || 'Yemen';
-  const selected = document.querySelector('.qurb-selected');
-  const animal = selected ? selected.getAttribute('data-animal') : 'Sheep / Goat';
-  const amt = selected ? +(selected.getAttribute('data-price') || 5) : 5;
 
-  if (typeof Pi === 'undefined') { toast('Open in Pi Browser to send real Pi'); return; }
-
-  Pi.createPayment({
-    amount: amt,
-    memo: 'Qurbani — ' + animal + ' — ' + country + ' — haramain.pi',
-    metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi' }
-  }, {
-    onReadyForServerApproval: function(paymentId) {
-        console.log('[Haramain] Approving:', paymentId);
-        return fetch(_APPROVE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId })
-      }).then(function(r) { return r.json(); })
-        .then(function(d) { console.log('[Haramain] Approved:', d); });
-    },
-    onReadyForServerCompletion: function(paymentId, txid) {
-      return fetch(_COMPLETE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      }).then(function(r) { return r.json(); }).then(function() {
-        const certId = 'QURB-' + Date.now().toString(36).toUpperCase();
-        addTx('🐑 Qurbani ' + animal + ' — ' + country + ' — ' + amt + 'π · Cert:' + certId);
-        toast('🐑 Qurbani ordered! Taqabbal Allah!');
-        addPts(50, 'Qurbani ordered');
-        addNotif('🐑','Qurbani Ordered!', animal+' for '+country+' · Certificate: '+certId,'just now');
-      });
-    },
-    onCancel: function() { toast('Payment cancelled'); },
-    onError: function(err) { toast('Payment error: ' + err); }
-  });
-}
 
 /* ══ TAWAF COUNTER ══ */
 var TAWAF_DUAS = [
@@ -5199,8 +5247,7 @@ addTx = function(text) {
    WINDOW LOAD INIT — EXACT WORLDCUP PATTERN
    Source: worldcup script.js final lines
    window.addEventListener('load', () => {
-     if (typeof Pi !== 'undefined') Pi.init({ version: "2.0", sandbox: false });
-   })
+     if (typeof Pi !== 'undefined') })
 ══════════════════════════════════════════════════════════════ */
 /* ══════════════════════════════════════════════════════════════
    INIT — Runs IMMEDIATELY when script loads
@@ -5209,7 +5256,7 @@ addTx = function(text) {
 function _haramainInit() {
   /* ✅ Pi SDK init — MAINNET · sandbox:false */
   if (typeof Pi !== 'undefined') {
-    try { Pi.init({ version: "2.0", sandbox: false }); } catch(e) {}
+    try { } catch(e) {}
   }
   /* Apply saved language to landing screen */
   setLang(curLang, null);
@@ -7347,8 +7394,7 @@ if (document.readyState === 'loading') {
 /* Also keep window.load as backup — WorldCup pattern */
 window.addEventListener('load', function() {
   if (typeof Pi !== 'undefined') {
-    Pi.init({ version: "2.0", sandbox: false });
-  }
+    }
 });
 
 
