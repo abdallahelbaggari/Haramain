@@ -1735,6 +1735,88 @@ select.fi{cursor:pointer;}
     </section>
 
 
+
+    <!-- ══════════════════════════════════════════════════
+         SCREEN: LIVE TRACKER
+    ══════════════════════════════════════════════════ -->
+    <section class="scr" id="s-tracker">
+      <div class="scr-top-bar">
+        <div>
+          <div class="scr-top-title">📍 Live Tracker</div>
+          <div class="scr-top-sub">GPS · Family share · Zone detection</div>
+        </div>
+        <span class="live-badge">LIVE</span>
+      </div>
+      <div style="padding:1rem;padding-bottom:6rem">
+
+        <!-- Status -->
+        <div class="ibox" style="margin-bottom:.7rem">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-weight:700;font-size:.78rem;color:var(--t1)">GPS Location</div>
+              <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3);margin-top:.1rem" id="tracker-coords">Tap Start to begin tracking</div>
+            </div>
+            <div id="tracker-zone-badge" style="font-family:var(--dm);font-size:.5rem;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2);border-radius:var(--pill);padding:.15rem .5rem">--</div>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden;margin-bottom:.7rem">
+          <svg id="tracker-map" viewBox="0 0 340 220" width="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="340" height="220" fill="#040E07" rx="12"/>
+            <!-- Zones -->
+            <ellipse cx="170" cy="110" rx="48" ry="42" fill="rgba(201,168,76,.08)" stroke="rgba(201,168,76,.3)" stroke-width="1.5"/>
+            <text x="170" y="106" text-anchor="middle" font-size="9" fill="rgba(201,168,76,.8)" font-weight="bold">Masjid</text>
+            <text x="170" y="118" text-anchor="middle" font-size="8" fill="rgba(201,168,76,.6)">al-Haram</text>
+            <ellipse cx="278" cy="110" rx="40" ry="30" fill="rgba(243,156,18,.06)" stroke="rgba(243,156,18,.3)" stroke-width="1"/>
+            <text x="278" y="114" text-anchor="middle" font-size="9" fill="#F5B041">Mina</text>
+            <ellipse cx="292" cy="170" rx="32" ry="24" fill="rgba(46,204,113,.06)" stroke="rgba(46,204,113,.25)" stroke-width="1"/>
+            <text x="292" y="174" text-anchor="middle" font-size="9" fill="#2ECC71">Arafat</text>
+            <ellipse cx="235" cy="162" rx="28" ry="18" fill="rgba(52,152,219,.06)" stroke="rgba(52,152,219,.25)" stroke-width="1"/>
+            <text x="235" y="166" text-anchor="middle" font-size="8" fill="#3498DB">Muzdalifah</text>
+            <rect x="228" y="82" width="32" height="24" rx="6" fill="rgba(155,89,182,.08)" stroke="rgba(155,89,182,.3)" stroke-width="1"/>
+            <text x="244" y="98" text-anchor="middle" font-size="7" fill="#9B59B6">Jamarat</text>
+            <!-- User dot -->
+            <circle id="tracker-dot" cx="170" cy="110" r="7" fill="rgba(231,76,60,.25)">
+              <animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle id="tracker-dot-inner" cx="170" cy="110" r="4" fill="#E74C3C"/>
+            <text x="4" y="216" font-size="7" fill="rgba(201,168,76,.4)">HARAMAIN LIVE TRACKER · GPS</text>
+          </svg>
+        </div>
+
+        <!-- Controls -->
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-bottom:.7rem">
+          <button class="btn btn-gold" id="tracker-start-btn" onclick="startTracker()">📍 Start Tracking</button>
+          <button class="btn btn-ghost" onclick="stopTracker()">⏹ Stop</button>
+        </div>
+
+        <!-- Zone info -->
+        <div class="sec-label">🗺️ Current Zone</div>
+        <div class="ibox" id="tracker-zone-info">
+          <div style="font-size:.7rem;color:var(--t2)">Start tracking to detect your Hajj zone</div>
+        </div>
+
+        <!-- Share -->
+        <div class="sec-label">👨‍👩‍👧 Share With Family</div>
+        <div class="ibox">
+          <div style="font-family:var(--dm);font-size:.58rem;color:var(--t2);margin-bottom:.5rem">Share your live location so family can find you anytime</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.4rem">
+            <button class="btn btn-ghost" onclick="shareTracker()" style="font-size:.65rem">📱 Share Location</button>
+            <button class="btn btn-ghost" onclick="shareTrackerWhatsApp()" style="font-size:.65rem">💬 WhatsApp</button>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="sec-label">📋 Location History</div>
+        <div id="tracker-history" style="max-height:200px;overflow-y:auto">
+          <div class="empty">No tracking history yet</div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- ══ RESELLER DASHBOARD ══ -->
     <section class="scr" id="s-reseller">
       <div class="scr-hdr">
@@ -2851,7 +2933,23 @@ function cUtil() {
 ══════════════════════════════════════════════════════════════ */
 
 function onIncompletePayment(payment) {
-  console.log('[Haramain] Incomplete payment:', payment);
+  console.log('[Haramain] Incomplete payment found:', payment);
+  if (!payment || !payment.identifier) return;
+  var pid = payment.identifier;
+  var txid = (payment.transaction && payment.transaction.txid) ? payment.transaction.txid : '';
+  if (txid) {
+    fetch(_COMPLETE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentId: pid, txid: txid })
+    }).then(function(r){return r.json();}).catch(function(e){console.warn(e);});
+  } else {
+    fetch(_CANCEL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentId: pid })
+    }).then(function(r){return r.json();}).catch(function(e){console.warn(e);});
+  }
 }
 
 function piLogin() {
@@ -2865,6 +2963,19 @@ function piLogin() {
 
   if (typeof Pi !== 'undefined') {
     Pi.init({ version: "2.0", sandbox: false });
+
+/* ═══════════════════════════════════════════════════════
+   SMART ENDPOINT DETECTION
+   Auto-detects correct function path per hosting platform
+   Works on: Cloudflare Pages, Netlify, any host
+═══════════════════════════════════════════════════════ */
+var _HOST = window.location.hostname;
+var _APPROVE = _HOST.includes('netlify') ? '/.netlify/functions/approve' : '/functions/approve';
+var _COMPLETE = _HOST.includes('netlify') ? '/.netlify/functions/complete' : '/functions/complete';
+var _CANCEL = _HOST.includes('netlify') ? '/.netlify/functions/cancel-payment' : '/functions/cancel-payment';
+console.log('[HARAMAIN] Endpoint:', _APPROVE);
+
+
     Pi.authenticate(['username', 'payments'], onIncompletePayment)
       .then(auth => {
         user = auth.user;
@@ -3289,19 +3400,21 @@ function buyPrem() {
       memo: 'Haramain Pilgrim Pass — Premium Access',
       metadata: { type: 'pilgrim_pass', app: 'haramain.pi', network: 'mainnet' }
     }, {
-      onReadyForServerApproval: (paymentId) => {
-        return fetch('/functions/approve', {
+      onReadyForServerApproval: function(paymentId) {
+        console.log('[Haramain] Approving:', paymentId);
+        return fetch(_APPROVE, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId })
-        });
+          body: JSON.stringify({ paymentId: paymentId })
+        }).then(function(r) { return r.json(); })
+          .then(function(d) { console.log('[Haramain] Approved:', d); });
       },
-      onReadyForServerCompletion: (paymentId, txid) => {
-        return fetch('/functions/complete', {
+      onReadyForServerCompletion: function(paymentId, txid) {
+        return fetch(_COMPLETE, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId, txid })
-        }).then(() => {
+          body: JSON.stringify({ paymentId: paymentId, txid: txid })
+        }).then(function() {
           localStorage.setItem(K + 'prem', '1');
           btn.textContent = '✅ Pilgrim Pass Active';
           btn.disabled = true;
@@ -3311,12 +3424,12 @@ function buyPrem() {
           addNotif('⭐', 'Pilgrim Pass Activated!', 'All premium features unlocked. Barakallah feek!', 'just now');
         });
       },
-      onCancel: () => {
+      onCancel: function() {
         btn.textContent = 'Unlock Pilgrim Pass — 1π';
         btn.disabled = false;
         toast('Payment cancelled');
       },
-      onError: (err) => {
+      onError: function(err) {
         btn.textContent = 'Unlock Pilgrim Pass — 1π';
         btn.disabled = false;
         toast('Payment error: ' + err);
@@ -3349,25 +3462,27 @@ function sendPi() {
     memo: memo,
     metadata: { type: 'send', to: to, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/functions/approve', {
+    onReadyForServerApproval: function(paymentId) {
+        console.log('[Haramain] Approving:', paymentId);
+        return fetch(_APPROVE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId })
-      });
+        body: JSON.stringify({ paymentId: paymentId })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Approved:', d); });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/functions/complete', {
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId, txid })
-      }).then(() => {
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function() {
         addTx('💸 Sent ' + amt + 'π to @' + to.trim() + ' — ' + memo);
         toast('✅ Sent ' + amt + 'π to @' + to.trim() + '!');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); console.error(err); }
+    onCancel: function() { toast('Payment cancelled'); },
+    onError: function(err) { toast('Payment error: ' + err); console.error(err); }
   });
 }
 
@@ -3409,27 +3524,29 @@ function sendZakat() {
     memo: 'Zakat — ' + cause + ' — haramain.pi',
     metadata: { type: 'zakat', cause: cause, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/functions/approve', {
+    onReadyForServerApproval: function(paymentId) {
+        console.log('[Haramain] Approving:', paymentId);
+        return fetch(_APPROVE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId })
-      });
+        body: JSON.stringify({ paymentId: paymentId })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Approved:', d); });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/functions/complete', {
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId, txid })
-      }).then(() => {
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function() {
         addTx('🤲 Zakat ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
         toast('🤲 Zakat accepted! Taqabbal Allah!');
         addPts(20, 'Zakat sent');
         addNotif('🤲','Zakat Sent!', amt+'π donated to '+cause+'. May Allah multiply your reward.','just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); }
+    onCancel: function() { toast('Payment cancelled'); },
+    onError: function(err) { toast('Payment error: ' + err); }
   });
 }
 
@@ -3442,27 +3559,29 @@ function sendSadaqah(cause, amt) {
     memo: 'Sadaqah — ' + cause + ' — haramain.pi',
     metadata: { type: 'sadaqah', cause: cause, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/functions/approve', {
+    onReadyForServerApproval: function(paymentId) {
+        console.log('[Haramain] Approving:', paymentId);
+        return fetch(_APPROVE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId })
-      });
+        body: JSON.stringify({ paymentId: paymentId })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Approved:', d); });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/functions/complete', {
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId, txid })
-      }).then(() => {
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function() {
         addTx('💝 Sadaqah ' + amt + 'π — ' + cause + ' · txid:' + txid.slice(0,12)+'...');
         toast('💝 Sadaqah accepted! Barakallah feek!');
         addPts(10, 'Sadaqah sent');
         addNotif('💝','Sadaqah Sent!', amt+'π — May Allah multiply your reward 100x.','just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); }
+    onCancel: function() { toast('Payment cancelled'); },
+    onError: function(err) { toast('Payment error: ' + err); }
   });
 }
 
@@ -3480,19 +3599,21 @@ function orderQurbani() {
     memo: 'Qurbani — ' + animal + ' — ' + country + ' — haramain.pi',
     metadata: { type: 'qurbani', animal: animal, country: country, app: 'haramain.pi' }
   }, {
-    onReadyForServerApproval: (paymentId) => {
-      return fetch('/functions/approve', {
+    onReadyForServerApproval: function(paymentId) {
+        console.log('[Haramain] Approving:', paymentId);
+        return fetch(_APPROVE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId })
-      });
+        body: JSON.stringify({ paymentId: paymentId })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { console.log('[Haramain] Approved:', d); });
     },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      return fetch('/functions/complete', {
+    onReadyForServerCompletion: function(paymentId, txid) {
+      return fetch(_COMPLETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId, txid })
-      }).then(() => {
+        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+      }).then(function() {
         const certId = 'QURB-' + Date.now().toString(36).toUpperCase();
         addTx('🐑 Qurbani ' + animal + ' — ' + country + ' — ' + amt + 'π · Cert:' + certId);
         toast('🐑 Qurbani ordered! Taqabbal Allah!');
@@ -3500,8 +3621,8 @@ function orderQurbani() {
         addNotif('🐑','Qurbani Ordered!', animal+' for '+country+' · Certificate: '+certId,'just now');
       });
     },
-    onCancel: () => { toast('Payment cancelled'); },
-    onError: (err) => { toast('Payment error: ' + err); }
+    onCancel: function() { toast('Payment cancelled'); },
+    onError: function(err) { toast('Payment error: ' + err); }
   });
 }
 
@@ -7085,6 +7206,38 @@ function renderResellerLeaderboard() {
       '<div class="lr-val">' + b.refs + ' refs · ' + b.earned + '</div>' +
     '</div>';
   }).join('');
+}
+
+
+/* ── Tracker map rendering ── */
+function renderTrackerMap(lat, lng) {
+  /* Convert GPS to SVG coordinates */
+  var centerLat = 21.4225, centerLng = 39.8262;
+  var scale = 2000;
+  var svgX = 170 + (lng - centerLng) * scale;
+  var svgY = 110 - (lat - centerLat) * scale;
+  svgX = Math.max(10, Math.min(330, svgX));
+  svgY = Math.max(10, Math.min(210, svgY));
+  var dot = document.getElementById('tracker-dot');
+  var inner = document.getElementById('tracker-dot-inner');
+  if (dot) { dot.setAttribute('cx', svgX); dot.setAttribute('cy', svgY); }
+  if (inner) { inner.setAttribute('cx', svgX); inner.setAttribute('cy', svgY); }
+}
+
+function shareTrackerWhatsApp() {
+  if (!trackerLat || !trackerLng) { toast('Start tracking first'); return; }
+  var msg = buildTrackerMsg();
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+}
+
+function buildTrackerMsg() {
+  var zone = detectZone ? detectZone(parseFloat(trackerLat), parseFloat(trackerLng)) : null;
+  return '📍 My Hajj Location — HARAMAIN\n' +
+    '👤 @' + (user ? user.username : 'Pilgrim') + '\n' +
+    '📍 Zone: ' + (zone ? zone.name : 'Unknown') + '\n' +
+    '🗺️ Map: https://maps.google.com?q=' + trackerLat + ',' + trackerLng + '\n' +
+    '🕐 Time: ' + new Date().toLocaleTimeString() + '\n' +
+    '📱 HARAMAIN · haramain-pi.netlify.app';
 }
 
 console.log('[HARAMAIN v3.0] ✅ 10 Advanced Utilities loaded · Payments untouched · Saudi-grade infrastructure');
