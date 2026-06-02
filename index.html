@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -3232,49 +3233,41 @@ function cUtil() {
 
 
 function piLogin() {
-  const status = document.getElementById('ls-msg');
-  if (status) status.textContent = 'Connecting to Pi Network...';
+  var btn     = document.getElementById('loginBtn');
+  var btnText = document.getElementById('loginBtnText');
+  var status  = document.getElementById('ls-msg');
 
-  const btn = document.getElementById('loginBtn');
-  const btnText = document.getElementById('loginBtnText');
   if (btn) btn.disabled = true;
   if (btnText) btnText.textContent = 'Authenticating...';
+  if (status) status.textContent = 'Connecting to Pi Network...';
 
   if (typeof Pi !== 'undefined') {
-    /* ═══════════════════════════════════════════════════════
-   SMART ENDPOINT DETECTION
-   Auto-detects correct function path per hosting platform
-   Works on: Cloudflare Pages, Netlify, any host
-═══════════════════════════════════════════════════════ */
-console.log('[HARAMAIN] Endpoint:', _APPROVE);
 
+    /* ✅ MAINNET — sandbox:false */
+    Pi.init({ version: "2.0", sandbox: false });
 
     Pi.authenticate(['username', 'payments'], onIncompletePayment)
       .then(function(auth) {
         user = auth.user;
-        console.log('[Haramain] ✅ Authenticated:', user.username, '| sandbox: false');
+        console.log('[Haramain] ✅ Authenticated:', user.username);
+        console.log('[Haramain] Endpoint:', _APPROVE);
         genPilgrimId();
         launchApp();
         toast('Welcome, @' + user.username + '! 🕋');
       })
       .catch(function(err) {
         console.error('[Haramain] Auth error:', err);
-        var msg = document.getElementById('lmsg');
-        if (msg) msg.textContent = 'Please open in Pi Browser to sign in';
-        var btn = document.getElementById('loginBtn');
         if (btn) btn.disabled = false;
-      })
-      .catch(() => {
-        if (status) status.textContent = 'Login failed. Open in Pi Browser.';
-        if (btn) btn.disabled = false;
-        if (btnText) btnText.textContent = _('signin') || 'Sign In with Pi';
+        if (btnText) btnText.textContent = 'Sign In with Pi';
+        if (status) status.textContent = 'Open in Pi Browser to sign in';
       });
+
   } else {
-    // Demo mode — WorldCup exact pattern
-    user = { username: 'Pilgrim_Demo' };
+    /* Demo mode — outside Pi Browser */
+    user = { username: 'Quality66' };
     genPilgrimId();
     launchApp();
-    toast('Demo mode — open in Pi Browser for real Pi! 🕋');
+    toast('Demo mode — open in Pi Browser for real Pi!');
   }
 }
 
