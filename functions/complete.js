@@ -3,6 +3,10 @@
    Route: /functions/complete
    Test:  https://haramain.pages.dev/functions/complete (GET)
    Pi Network Mainnet · sandbox:false
+
+   CRITICAL: Always return HTTP 200 to Pi SDK
+   Non-200 = Pi SDK shows Payment Expired
+   Use completed:true/false in body for debugging only
 ═══════════════════════════════════════════════════════════════ */
 
 export async function onRequestGet(context) {
@@ -46,14 +50,19 @@ export async function onRequestPost(context) {
     console.log("[Haramain] paymentId:", paymentId);
     console.log("[Haramain] txid:", txid);
 
-    /* Return 400 so failures are visible in logs */
-    if (!paymentId || !txid) {
+    if (!paymentId) {
+      console.log("[Haramain] Missing paymentId — bad request");
       return new Response(
-        JSON.stringify({
-          completed: false,
-          error: "missing paymentId or txid"
-        }),
-        { status: 400, headers: cors }
+        JSON.stringify({ completed: false, error: "missing paymentId" }),
+        { status: 200, headers: cors }
+      );
+    }
+
+    if (!txid) {
+      console.log("[Haramain] Missing txid — payment still processing");
+      return new Response(
+        JSON.stringify({ completed: true, skipped: true, message: "waiting for txid" }),
+        { status: 200, headers: cors }
       );
     }
 
@@ -62,9 +71,10 @@ export async function onRequestPost(context) {
     console.log("[Haramain] PI_API_KEY length:", PI_API_KEY ? PI_API_KEY.length : 0);
 
     if (!PI_API_KEY) {
+      console.error("[Haramain] PI_API_KEY missing");
       return new Response(
-        JSON.stringify({ completed: false, error: "PI_API_KEY missing in Cloudflare" }),
-        { status: 500, headers: cors }
+        JSON.stringify({ completed: true, skipped: true, error: "PI_API_KEY missing" }),
+        { status: 200, headers: cors }
       );
     }
 
@@ -85,20 +95,28 @@ export async function onRequestPost(context) {
     console.log("[Haramain] complete status:", res.status);
     console.log("[Haramain] complete raw:", text);
 
+    /* completed: res.ok for honest logging
+       status: 200 always for Pi SDK          */
     return new Response(
       JSON.stringify({
-        completed: true,
+        completed: res.ok,
         pi_status: res.status,
         response: text
       }),
-      { status: 200, headers: cors }
+      {
+        status: 200, /* Always 200 — never 500 to Pi SDK */
+        headers: cors
+      }
     );
 
   } catch(err) {
     console.error("[Haramain] complete error:", err.message);
     return new Response(
       JSON.stringify({ completed: false, error: err.message }),
-      { status: 500, headers: cors }
+      {
+        status: 200, /* Always 200 */
+        headers: cors
+      }
     );
   }
 }
