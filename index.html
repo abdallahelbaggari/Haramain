@@ -2628,10 +2628,11 @@ select.fi{cursor:pointer;}
 
 /* ── Pi SDK: Mainnet Initialization ── */
 /* ── Smart Endpoint Detection ── */
-var _HOST     = window.location.hostname;
-var _APPROVE  = _HOST.includes('netlify') ? '/.netlify/functions/approve'       : '/functions/approve';
-var _COMPLETE = _HOST.includes('netlify') ? '/.netlify/functions/complete'      : '/functions/complete';
-var _CANCEL   = _HOST.includes('netlify') ? '/.netlify/functions/cancel-payment': '/functions/cancel-payment';
+/* ── Cloudflare Pages Endpoints ── */
+var _APPROVE  = '/functions/approve';
+var _COMPLETE = '/functions/complete';
+var _CANCEL   = '/functions/cancel-payment';
+console.log('[Haramain] Mainnet sandbox:false | endpoint:', _APPROVE);
 
 console.log('[Haramain] Mainnet · sandbox:false · approve endpoint:', _APPROVE);
 
@@ -2676,8 +2677,6 @@ function buyPrem() {
         return r.json();
       }).then(function(d) {
         console.log('[Haramain] Approve response:', JSON.stringify(d));
-      }).catch(function(err) {
-        console.error('[Haramain] Approve error:', err);
       });
     },
     onReadyForServerCompletion: function(paymentId, txid) {
