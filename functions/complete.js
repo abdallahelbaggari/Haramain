@@ -1,13 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
    HARAMAIN · functions/complete.js · Cloudflare Pages Function
-
    Route: /functions/complete
    Test:  https://haramain.pages.dev/functions/complete (GET)
-
    Pi Network Mainnet · sandbox:false
 ═══════════════════════════════════════════════════════════════ */
 
-/* GET: health check */
 export async function onRequestGet(context) {
   const key = context.env.PI_API_KEY;
   return new Response(
@@ -15,16 +12,20 @@ export async function onRequestGet(context) {
       success: true,
       message: "complete.js is working",
       route: "/functions/complete",
-      pi_api_key_present: !!key
+      pi_api_key_present: !!key,
+      pi_api_key_length: key ? key.length : 0,
+      pi_api_key_prefix: key ? key.substring(0, 8) + "..." : "MISSING"
     }),
     {
       status: 200,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
     }
   );
 }
 
-/* POST: complete payment */
 export async function onRequestPost(context) {
 
   const cors = {
@@ -38,38 +39,36 @@ export async function onRequestPost(context) {
 
   try {
 
-    let paymentId = null;
-    let txid = null;
-    try {
-      const body = await context.request.json();
-      paymentId = body.paymentId || null;
-      txid = body.txid || null;
-    } catch(e) {
-      console.error("[Haramain] Body parse error:", e.message);
-      return new Response(JSON.stringify({ completed: true, step: "body_parse_error" }), { status: 200, headers: cors });
-    }
+    const body = await context.request.json();
+    const paymentId = body.paymentId;
+    const txid = body.txid;
 
     console.log("[Haramain] paymentId:", paymentId);
     console.log("[Haramain] txid:", txid);
 
-    if (!paymentId) {
-      return new Response(JSON.stringify({ completed: true, step: "no_payment_id" }), { status: 200, headers: cors });
-    }
-
-    if (!txid) {
-      console.log("[Haramain] No txid — resolving pending payment");
-      return new Response(JSON.stringify({ completed: true, resolved: true, step: "no_txid" }), { status: 200, headers: cors });
+    /* Return 400 so failures are visible in logs */
+    if (!paymentId || !txid) {
+      return new Response(
+        JSON.stringify({
+          completed: false,
+          error: "missing paymentId or txid"
+        }),
+        { status: 400, headers: cors }
+      );
     }
 
     const PI_API_KEY = context.env.PI_API_KEY;
     console.log("[Haramain] PI_API_KEY present:", !!PI_API_KEY);
+    console.log("[Haramain] PI_API_KEY length:", PI_API_KEY ? PI_API_KEY.length : 0);
 
     if (!PI_API_KEY) {
-      return new Response(JSON.stringify({ completed: true, step: "no_api_key" }), { status: 200, headers: cors });
+      return new Response(
+        JSON.stringify({ completed: false, error: "PI_API_KEY missing in Cloudflare" }),
+        { status: 500, headers: cors }
+      );
     }
 
-    /* POST complete — use .text() */
-    const piRes = await fetch(
+    const res = await fetch(
       `https://api.minepi.com/v2/payments/${paymentId}/complete`,
       {
         method: "POST",
@@ -77,28 +76,33 @@ export async function onRequestPost(context) {
           "Authorization": `Key ${PI_API_KEY}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ txid: txid })
+        body: JSON.stringify({ txid })
       }
     );
 
-    const piStatus = piRes.status;
-    const piRaw = await piRes.text();
+    const text = await res.text();
 
-    console.log("[Haramain] complete status:", piStatus);
-    console.log("[Haramain] complete raw:", piRaw);
+    console.log("[Haramain] complete status:", res.status);
+    console.log("[Haramain] complete raw:", text);
 
     return new Response(
-      JSON.stringify({ completed: true, pi_status: piStatus, pi_response: piRaw }),
+      JSON.stringify({
+        completed: true,
+        pi_status: res.status,
+        response: text
+      }),
       { status: 200, headers: cors }
     );
 
   } catch(err) {
-    console.error("[Haramain] Error:", err.message);
-    return new Response(JSON.stringify({ completed: true, error: err.message }), { status: 200, headers: cors });
+    console.error("[Haramain] complete error:", err.message);
+    return new Response(
+      JSON.stringify({ completed: false, error: err.message }),
+      { status: 500, headers: cors }
+    );
   }
 }
 
-/* OPTIONS: CORS preflight */
 export async function onRequestOptions() {
   return new Response(null, {
     status: 200,
