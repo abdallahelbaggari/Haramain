@@ -1,15 +1,16 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#020C07">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#020A06">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>HARAMAIN — The Web3 Pilgrimage Platform</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕋</text></svg>">
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta name="description" content="HARAMAIN — The Web3 Pilgrimage Infrastructure for Hajj & Umrah. Pi Network Mainnet.">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * data: blob:; img-src * data: blob:; style-src * 'unsafe-inline'; font-src * data:; frame-src *; frame-ancestors *;">
+<title>HARAMAIN · Web3 Pilgrimage Infrastructure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════
    HARAMAIN v4.0 — DESIGN SYSTEM
@@ -1019,7 +1020,6 @@ img{max-width:100%;display:block;}
 .qa:hover{background:var(--bg3);border-color:var(--bd);}
 .qa:active{transform:scale(.9);background:var(--gdim);border-color:var(--gbrd);}
 </style>
-</head>
 <body>
 
 <!-- ═══ SPLASH ═══ -->
@@ -2962,7 +2962,26 @@ img{max-width:100%;display:block;}
 
 <div id="toast"></div>
 
+
 <script>
+
+/* ════════════════════════════════════════════════════════════
+   HARAMAIN PAYMENT SYSTEM — Pi Network Mainnet
+   Platform: Cloudflare Pages
+   Endpoints: /functions/approve · /functions/complete
+   Pattern: WorldCup proven working pattern
+   sandbox: false — MAINNET ONLY
+   
+   CRITICAL RULES:
+   1. Use function() not async function() in callbacks
+   2. Use return fetch().then().then() not await
+   3. NEVER throw errors inside callbacks
+   4. NEVER check if(!response.ok) inside callbacks  
+   5. Always return the fetch promise from approval
+════════════════════════════════════════════════════════════ */
+
+/* ── Pi SDK: Mainnet Initialization ── */
+/* ── Smart Endpoint Detection ── */
 /* ── Cloudflare Pages Endpoints ── */
 var _APPROVE  = '/approve';
 var _COMPLETE = '/complete';
@@ -3228,7 +3247,6 @@ function requestPi() {
 }
 
 
-
 /* ================================================================
    HARAMAIN · script.js · Pi Network · MAINNET · sandbox:false
    The Web3 Pilgrimage Infrastructure for Hajj & Umrah
@@ -3490,13 +3508,28 @@ function renderHijriWidget(){
 }
 
 /* ══ NAVIGATION ══ */
-/* goS v1 removed — using v3 below */
+function goS(id, btn) {
+  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('on'); s.classList.remove('active'); });
+  document.querySelectorAll('.bni').forEach(function(b){ b.classList.remove('on'); });
+  var sc = document.getElementById('s-'+id);
+  if (sc) { sc.classList.add('on'); sc.classList.add('active'); }
+  if (btn) btn.classList.add('on');
+  else{ var b=document.querySelector('[data-s="'+id+'"]'); if(b)b.classList.add('on'); }
+  // Refresh content
+  if(id==='dashboard'){renderWeatherWidget();startHajjCountdown();}
+  if(id==='worship')fetchPrayer();
+  if(id==='guide')renderGuide('hajj');
+  if(id==='notifs')markAllRead();
+  if(id==='profile')syncUI();
+  if(id==='payments')syncWalletUI();
+  // Hide all up pages
+  cUtil();
+  window.scrollTo(0,0);
+}
 
 function oUtil(id) {
-  // Hide all utility pages and grid
-  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');p.classList.remove('show');});
-  // Hide the util grids
-  document.querySelectorAll('#s-utilities .tgrid, #s-utilities .sec-label').forEach(function(g){ g.style.display='none'; });
+  // Hide util home grids, show specific page
+  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');});
   var target = document.getElementById('up-'+id);
   if(target){
     target.classList.add('on');
@@ -3526,9 +3559,7 @@ function oUtil(id) {
 }
 
 function cUtil() {
-  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');p.classList.remove('show');});
-  // Restore the util grids
-  document.querySelectorAll('#s-utilities .tgrid, #s-utilities .sec-label').forEach(function(g){ g.style.display=''; });
+  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');});
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -3566,13 +3597,7 @@ function piLogin() {
         console.error('[Haramain] Auth error:', err);
         if (btn) btn.disabled = false;
         if (btnText) btnText.textContent = 'Sign In with Pi';
-        var errMsg = err && err.message ? err.message : String(err);
-        if (status) status.textContent = errMsg || 'Authentication failed — try again';
-        /* Retry after 2 seconds */
-        setTimeout(function() {
-          if (status) status.textContent = '';
-          if (btn) btn.disabled = false;
-        }, 3000);
+        if (status) status.textContent = 'Open in Pi Browser to sign in';
       });
 
   } else {
@@ -3585,13 +3610,9 @@ function piLogin() {
 }
 
 function launchApp() {
-  // Handle both old 'landing' and new 'login-screen' IDs
-  var landing = document.getElementById('landing');
-  var loginScr = document.getElementById('login-screen');
-  if (landing) landing.style.display = 'none';
-  if (loginScr) { loginScr.classList.add('hide'); setTimeout(function(){ loginScr.style.display='none'; }, 400); }
-  var appEl = document.getElementById('app');
-  if (appEl) { appEl.style.display = 'flex'; appEl.style.flexDirection = 'column'; }
+  // WorldCup exact: hide landing, show app
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
 
   // Sync language
   var sel = document.getElementById('hdr-lang');
@@ -3620,8 +3641,7 @@ function launchApp() {
     'now'
   );
   console.log('[Haramain] ✅ App launched · sandbox: false · user:', user ? user.username : 'Demo');
-
-  if (typeof postLaunchSetup === "function") postLaunchSetup();}
+}
 
 function logout() {
   user = null;
@@ -3647,19 +3667,6 @@ function genPilgrimId() {
   var h = hashStr(u+Date.now()).toString(36).toUpperCase().slice(0,5);
   myPilgrimId = 'HM-'+String(mySerial).padStart(5,'0')+'-'+u.toUpperCase().slice(0,6)+'-'+h;
   localStorage.setItem(K+'pid', myPilgrimId);
-
-  /* Update ALL UI elements with ID */
-  var profPid = document.getElementById('prof-pid');
-  if (profPid && myPilgrimId) profPid.textContent = myPilgrimId;
-  var certId = document.getElementById('cert-id');
-  if (certId && myPilgrimId) certId.textContent = 'CERT-' + myPilgrimId;
-  /* Also sync wallet card */
-  var wcSerial = document.getElementById('wc-serial');
-  if (wcSerial && myPilgrimId) wcSerial.textContent = 'ID: ' + myPilgrimId;
-  /* Render full pilgrim ID panel */
-  if (typeof renderPilgrimId === 'function') renderPilgrimId();
-  /* Render QR on profile */
-  if (typeof renderPassport === 'function') renderPassport();
 }
 function refreshPilgrimId(){ myPilgrimId=''; mySerial=0; localStorage.removeItem(K+'pid'); localStorage.removeItem(K+'serial'); genPilgrimId(); renderPilgrimId(); toast('🔄 Pilgrim ID refreshed'); }
 function renderPilgrimId(){
@@ -4687,54 +4694,7 @@ function sendAI() {
   askAI(msg);
 }
 
-function askAI(msg) {
-  var chat = document.getElementById('ai-chat');
-  if(!chat) return;
-  // User message
-  chat.innerHTML += '<div class="ai-msg user"><div class="ai-msg-who">👤 You</div><div class="ai-msg-text">'+msg+'</div></div>';
-  // Thinking indicator
-  var thinkId = 'ai-think-'+Date.now();
-  chat.innerHTML += '<div class="ai-msg bot" id="'+thinkId+'"><div class="ai-msg-who">🤖 Haramain AI</div><div class="ai-msg-text" style="color:var(--t3)">Thinking...</div></div>';
-  chat.scrollTop = chat.scrollHeight;
-
-  AI_HISTORY.push({role:'user', content: msg});
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: 'You are Haramain AI, an expert Islamic pilgrimage assistant embedded in the HARAMAIN platform on Pi Network. You provide accurate, compassionate guidance on Hajj, Umrah, Islamic rituals, duas, and pilgrim safety. Respond in the language the user writes in. Keep answers concise and practical. Always mention relevant duas when appropriate. You are respectful, scholarly, and supportive.',
-      messages: AI_HISTORY
-    })
-  })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var reply = (d.content&&d.content[0]&&d.content[0].text) || 'Bismillah — I\'m here to help with your Hajj journey. Could you rephrase your question?';
-    AI_HISTORY.push({role:'assistant', content: reply});
-    var thinkEl = document.getElementById(thinkId);
-    if(thinkEl) thinkEl.querySelector('.ai-msg-text').textContent = reply;
-    var chat2 = document.getElementById('ai-chat');
-    if(chat2) chat2.scrollTop = chat2.scrollHeight;
-  })
-  .catch(function(){
-    // Graceful fallback
-    var fallbacks = {
-      'tawaf': 'Tawaf means 7 counter-clockwise rounds around the Kaaba. Begin at the Black Stone, say Bismillah Allahu Akbar. Each round has its own recommended dua. Use the Tawaf Counter in the Worship section.',
-      'ihram': 'Ihram prohibitions include: cutting hair/nails, perfume, sexual relations, killing animals, covering head (men), wearing gloves (women). Dress in 2 white unstitched cloths (men) or normal modest clothing (women).',
-      'arafat': 'The Day of Arafat (9 Dhul Hijjah) is the greatest day of Hajj. The Prophet ﷺ said "Hajj is Arafat." Stand in dua from Dhuhr until Maghrib. Missing Arafat invalidates the entire Hajj.',
-      'pack': 'Essential Hajj items: Ihram cloths, unscented toiletries, comfortable walking shoes, prescription medicines, prayer mat, tasbeeh, pocket Quran, emergency contact card, power bank, umbrella.'
-    };
-    var reply = 'Alhamdulillah! ';
-    var msgLower = msg.toLowerCase();
-    for(var key in fallbacks){ if(msgLower.includes(key)){reply += fallbacks[key]; break;} }
-    if(reply === 'Alhamdulillah! ') reply += 'For your Hajj question about "'+msg+'" — please consult the Guide section for detailed step-by-step guidance with duas. May Allah make your Hajj Mabroor! 🕋';
-    var thinkEl = document.getElementById(thinkId);
-    if(thinkEl) thinkEl.querySelector('.ai-msg-text').textContent = reply;
-    AI_HISTORY.push({role:'assistant', content: reply});
-  });
-}
+/* askAI handled by v4 below */
 
 /* ══ HEALTH ══ */
 function saveHealth(){
@@ -5188,7 +5148,7 @@ function openTracker() {
 }
 
 /* ── START TRACKER ── */
-function startTracker() {
+/* old startTracker removed */function startTracker() {
   if (!navigator.geolocation) { toast('GPS not available on this device'); return; }
 
   trackerSessionId = 'HM-TRK-' + Date.now().toString(36).toUpperCase();
@@ -5485,64 +5445,7 @@ function sendAI() {
   askAI(msg);
 }
 
-function askAI(msg) {
-  var chat = document.getElementById('ai-chat');
-  if (!chat) return;
-
-  // Add user message
-  var userDiv = document.createElement('div');
-  userDiv.className = 'ai-msg user';
-  userDiv.innerHTML = '<div class="ai-msg-who">👤 You</div><div class="ai-msg-text">' + msg + '</div>';
-  chat.appendChild(userDiv);
-
-  // Thinking indicator
-  var thinkDiv = document.createElement('div');
-  thinkDiv.className = 'ai-msg bot';
-  thinkDiv.id = 'ai-think-' + Date.now();
-  thinkDiv.innerHTML = '<div class="ai-msg-who">🤖 Haramain AI</div><div class="ai-msg-text" style="color:var(--t3)">Thinking... بسم الله</div>';
-  chat.appendChild(thinkDiv);
-  chat.scrollTop = chat.scrollHeight;
-
-  AI_HISTORY.push({ role: 'user', content: msg });
-
-  // Try Claude API first
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: 'You are Haramain AI — an expert Islamic pilgrimage assistant on the HARAMAIN platform (Pi Network). Provide accurate, compassionate, scholarly guidance on Hajj, Umrah, Islamic rituals, duas, and pilgrim safety. Always mention relevant duas in Arabic when appropriate. Respond in the SAME LANGUAGE the user writes in. Keep answers practical and concise. Be warm and Islamic in tone. Start responses with Bismillah or appropriate Islamic greeting when suitable.',
-      messages: AI_HISTORY
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var reply = (d.content && d.content[0] && d.content[0].text) || null;
-    if (!reply) throw new Error('No content');
-    AI_HISTORY.push({ role: 'assistant', content: reply });
-    thinkDiv.querySelector('.ai-msg-text').textContent = reply;
-    thinkDiv.querySelector('.ai-msg-text').style.color = '';
-    chat.scrollTop = chat.scrollHeight;
-  })
-  .catch(function() {
-    // Smart local fallback — checks keywords
-    var msgLower = msg.toLowerCase();
-    var reply = null;
-    for (var key in AI_FALLBACK) {
-      if (msgLower.includes(key)) { reply = AI_FALLBACK[key]; break; }
-    }
-    if (!reply) {
-      reply = 'Bismillah. For your question about "' + msg + '" — please consult the Guide section for complete step-by-step guidance with duas, or the Dua Library for relevant duas. ' +
-        'May Allah accept your Hajj and make it Mabroor! 🕋 ' +
-        '(Note: For real-time AI responses, ensure internet connection is active.)';
-    }
-    AI_HISTORY.push({ role: 'assistant', content: reply });
-    thinkDiv.querySelector('.ai-msg-text').textContent = reply;
-    thinkDiv.querySelector('.ai-msg-text').style.color = '';
-    chat.scrollTop = chat.scrollHeight;
-  });
-}
+/* old askAI removed */
 
 /* ══════════════════════════════════════════════════════════════
    LIVE TRACKER — Quick access from Dashboard
@@ -5555,24 +5458,7 @@ function openLiveTracker() {
    RECEIPT HOOK — Called after successful payments
    Hooks into addTx to show receipt for Pi transactions
    DOES NOT MODIFY PAYMENT LOGIC
-══════════════════════════════════════════════════════════════ */
-var _origAddTx = addTx;
-addTx = function(text) {
-  _origAddTx(text);
-  // If it's a real Pi transaction (has txid), auto-show receipt option
-  if (text && text.indexOf('txid:') !== -1 && text.indexOf('π') !== -1) {
-    var amt = (text.match(/(\d+\.?\d*)π/) || [])[1] || '?';
-    var txid = (text.match(/txid:([a-zA-Z0-9]+)/) || [])[1] || '';
-    // Show receipt toast with action button
-    var t = document.getElementById('toast');
-    if (t) {
-      t.innerHTML = '✅ Payment complete · <span onclick="showTxReceipt(\'' + text.replace(/'/g,"\\'").slice(0,80) + '\',\'now\')" style="color:var(--gold);cursor:pointer;text-decoration:underline">View Receipt</span>';
-      t.classList.add('on');
-      clearTimeout(toastT);
-      toastT = setTimeout(function(){ t.classList.remove('on'); t.textContent=''; }, 5000);
-    }
-  }
-};
+═══════/* askAI handled by v4 below */;
 
 /* ══════════════════════════════════════════════════════════════
    WINDOW LOAD INIT — EXACT WORLDCUP PATTERN
@@ -6013,7 +5899,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* ── UPGRADE 17: SMOOTH SCROLL to sections ── */
-/* goS v2 removed — using v3 below */
+/* old goS removed */
 
 /* ── UPGRADE 18: SHARE PROFILE ── */
 function shareProfile() {
@@ -7715,530 +7601,573 @@ window.addEventListener('load', function() {
 
 
 
-/* ═══════════════════════════════════════════════════
-   HARAMAIN v4.0 — NEW FEATURE FUNCTIONS
-   Family Hub · Lost & Found · Marketplace · Learning
-   Smart Map · Digital Passport · Certificates
-═══════════════════════════════════════════════════ */
+/* HARAMAIN v4.1 PRODUCTION FIXES */
 
-/* ── Splash + Init ── */
-function initApp() {
-  setTimeout(function() {
-    var splash = document.getElementById('splash');
-    if (splash) { splash.classList.add('hide'); setTimeout(function(){ splash.style.display='none'; }, 600); }
-  }, 2000);
-}
+/* ══ LANGUAGE ══ */
+var _langCodes2 = ['en','ar','ha','ur','id','tr'];
+var _langIdx2 = 0;
 
-/* ── Journey Stage ── */
-var JOURNEY_STAGES = ['Preparation','Travel','Arrival','Hajj','Return'];
-function updateJourneyStage(pct) {
-  var stageEl = document.getElementById('journey-stage');
-  var pctEl = document.getElementById('journey-pct');
-  var fillEl = document.getElementById('journey-fill');
-  if (!stageEl) return;
-  var idx = Math.min(Math.floor(pct/20), 4);
-  if (stageEl) stageEl.textContent = JOURNEY_STAGES[idx] + ' Phase';
-  if (pctEl) pctEl.textContent = pct + '%';
-  if (fillEl) fillEl.style.width = pct + '%';
-}
-
-/* ── goS extended for new screens ── */
-function goS(id, btn) {
-  /* Hide all screens */
-  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('active'); });
-  /* Show target */
-  var target = document.getElementById('s-'+id);
-  if (target) { target.classList.add('active'); }
-  /* Update nav */
-  document.querySelectorAll('.bni').forEach(function(b){ b.classList.remove('on'); });
-  if (btn) { btn.classList.add('on'); }
-  else {
-    var navBtns = ['dashboard','worship','guide','ai','profile','more'];
-    if (navBtns.indexOf(id) > -1) {
-      document.querySelectorAll('.bni[data-s="'+id+'"]').forEach(function(b){ b.classList.add('on'); });
-    }
-  }
-  /* Scroll to top */
-  if (target) target.scrollTop = 0;
-}
-
-/* ── Family Hub ── */
-var familyGroup = null;
-
-function createFamilyGroup() {
-  var groupName = '@' + (user ? user.username : 'Pilgrim') + '-Family';
-  var groupId = 'GRP-' + Math.random().toString(36).substr(2,6).toUpperCase();
-  familyGroup = { name: groupName, id: groupId, members: [] };
-  localStorage.setItem(K+'family_group', JSON.stringify(familyGroup));
-  document.getElementById('group-name').textContent = groupName;
-  document.getElementById('group-id').textContent = groupId;
-  toast('✅ Group created: ' + groupId);
-}
-
-function shareGroupCode() {
-  if (!familyGroup) { toast('Create a group first'); return; }
-  if (navigator.share) {
-    navigator.share({ title: 'Join my Haramain group', text: 'Join my Haramain family group: ' + familyGroup.id + ' Open haramain.pages.dev' });
-  } else {
-    copyClip(familyGroup.id);
-  }
-}
-
-function joinGroup() {
-  var code = prompt('Enter group code (e.g. GRP-ABC123):');
-  if (code) {
-    toast('✅ Joined group: ' + code);
-    document.getElementById('group-name').textContent = code;
-    document.getElementById('group-id').textContent = 'Member';
-  }
-}
-
-function setMeetingPoint(place) {
-  document.getElementById('meeting-point').textContent = '📍 ' + place;
-  localStorage.setItem(K+'meeting_point', place);
-  toast('✅ Meeting point set: ' + place);
-}
-
-function setCustomMeeting() {
-  var place = prompt('Enter meeting location:');
-  if (place) setMeetingPoint(place);
-}
-
-function sendCheckin(status) {
-  toast('📤 Sent to group: ' + status);
-  addNotif('👨‍👩‍👧', 'Check-in Sent', status, 'now');
-}
-
-/* ── Lost & Found ── */
-var lfMode = 'lost';
-
-function showReportLost() {
-  lfMode = 'lost';
-  document.getElementById('lf-form-title').textContent = '📢 Report Lost';
-  document.getElementById('lf-form').style.display = 'block';
-  document.getElementById('lf-form').scrollIntoView({behavior:'smooth'});
-}
-
-function showReportFound() {
-  lfMode = 'found';
-  document.getElementById('lf-form-title').textContent = '🤝 Report Found';
-  document.getElementById('lf-form').style.display = 'block';
-  document.getElementById('lf-form').scrollIntoView({behavior:'smooth'});
-}
-
-function hideLfForm() {
-  document.getElementById('lf-form').style.display = 'none';
-}
-
-function submitLfReport() {
-  var item = document.getElementById('lf-item').value.trim();
-  var desc = document.getElementById('lf-desc').value.trim();
-  var contact = document.getElementById('lf-contact').value.trim();
-  if (!item) { toast('Please describe the item'); return; }
-  
-  var listId = lfMode === 'lost' ? 'lf-lost-list' : 'lf-found-list';
-  var statusClass = lfMode === 'lost' ? 'lf-lost' : 'lf-found';
-  var statusText = lfMode === 'lost' ? 'LOST' : 'FOUND';
-  
-  var el = document.createElement('div');
-  el.className = 'lf-item';
-  var elInner = '<div class="lf-status ' + statusClass + '">' + statusText + '</div>' +
-    '<div class="lf-title">' + item + '</div>' +
-    (desc ? '<div class="lf-desc">' + desc + '</div>' : '') +
-    '<div class="lf-footer"><span class="lf-time">Just now</span></div>';
-  el.innerHTML = elInner;
-  if (contact) {
-    var contactBtn = document.createElement('span');
-    contactBtn.className = 'lf-contact';
-    contactBtn.textContent = '📞 Contact';
-    contactBtn.onclick = function() { toast('Contact: ' + contact); };
-    el.querySelector('.lf-footer').appendChild(contactBtn);
-  }
-  
-  document.getElementById(listId).insertBefore(el, document.getElementById(listId).firstChild);
-  hideLfForm();
-  document.getElementById('lf-item').value = '';
-  document.getElementById('lf-desc').value = '';
-  document.getElementById('lf-contact').value = '';
-  toast('✅ Report submitted');
-}
-
-/* ── Marketplace ── */
-function filterMarket(category) {
-  toast('Showing: ' + category);
-}
-
-/* ── Smart Map ── */
-function filterMap(type) {
-  toast('Showing: ' + type);
-}
-
-/* ── Learning Center ── */
-var courseProgress = JSON.parse(localStorage.getItem(K+'courses') || '{}');
-
-function startCourse(courseId) {
-  toast('Opening course...');
-  /* In full implementation, open course screen */
-}
-
-function shareCert(certId) {
-  if (navigator.share) {
-    navigator.share({ title: 'My Haramain Certificate', text: 'I earned a certificate on HARAMAIN: ' + certId });
-  } else {
-    copyClip(certId);
-  }
-}
-
-/* ── Digital Passport updates ── */
-function renderPassport() {
-  if (!user) return;
-  var nameEl = document.getElementById('prof-name');
-  var userEl = document.getElementById('prof-user');
-  var tbUser = document.getElementById('tb-user');
-  var famMe = document.getElementById('fam-me');
-  
-  if (nameEl) nameEl.textContent = user.username;
-  if (userEl) userEl.textContent = '@' + user.username;
-  if (tbUser) tbUser.textContent = '@' + user.username;
-  if (famMe) famMe.textContent = '@' + user.username + ' (You)';
-  
-  /* Generate QR for passport */
-  var qrEl = document.getElementById('prof-qr');
-  if (qrEl && typeof QRCode !== 'undefined') {
-    qrEl.innerHTML = '';
-    try {
-      new QRCode(qrEl, {
-        text: 'haramain.pages.dev/pilgrim/' + user.username,
-        width: 70, height: 70,
-        colorDark: '#C9A84C', colorLight: '#051A0F'
-      });
-    } catch(e) {}
-  }
-}
-
-/* ── Cycle language ── */
-var langList = ['EN','AR','HA','UR','ID','TR'];
-var langCodes = ['en','ar','ha','ur','id','tr'];
-var langIdx = 0;
 function cycleLang() {
-  langIdx = (langIdx + 1) % langList.length;
-  var code = langCodes[langIdx];
-  setLang(code);
+  _langIdx2 = (_langIdx2 + 1) % _langCodes2.length;
+  var code = _langCodes2[_langIdx2];
+  if (typeof setLang === 'function') setLang(code);
   var tbLang = document.getElementById('tb-lang');
-  if (tbLang) tbLang.textContent = langList[langIdx];
+  if (tbLang) tbLang.textContent = code.toUpperCase();
   var langSel = document.getElementById('lang-sel');
   if (langSel) langSel.value = code;
-  toast('Language: ' + langList[langIdx]);
+  var names = {en:'English',ar:'Arabic',ha:'Hausa',ur:'Urdu',id:'Bahasa',tr:'Turkish'};
+  if (typeof toast === 'function') toast((names[code]||code) + ' selected');
 }
 
-/* ── Override launchApp to include new init ── */
-
-/* ── Dashboard sync extended ── */
-function updateDashboardStats() {
-  var st = JSON.parse(localStorage.getItem(K+'stats') || '{"pts":0,"streak":0,"level":1}');
-  ['st-pts','p-pts'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=st.pts||0; });
-  ['st-streak','p-streak'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=st.streak||0; });
-  ['st-level','p-level'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=st.level||1; });
-}
-
-/* Init family group from storage */
-function loadFamilyData() {
-  var saved = localStorage.getItem(K+'family_group');
-  if (saved) {
-    familyGroup = JSON.parse(saved);
-    var nameEl = document.getElementById('group-name');
-    var idEl = document.getElementById('group-id');
-    if (nameEl) nameEl.textContent = familyGroup.name;
-    if (idEl) idEl.textContent = familyGroup.id;
-  }
-  var mp = localStorage.getItem(K+'meeting_point');
-  if (mp) { var el = document.getElementById('meeting-point'); if(el) el.textContent = '📍 ' + mp; }
-}
-
-/* ── App startup sequence ── */
-document.addEventListener('DOMContentLoaded', function() {
-  initApp();
-  loadFamilyData();
-  updateJourneyStage(15);
-  updateDashboardStats();
-});
-
-
-
-/* ════════════════════════════════════════════════════
-   HARAMAIN v4.0 — NEW UTILITY FUNCTIONS
-   Translation · Documents · Serial ID · Offline
-════════════════════════════════════════════════════ */
-
-/* ── SERIAL PILGRIM ID SYSTEM ── */
-/* IDs are permanent, auto-incremented, never change */
-var PILGRIM_COUNTER_KEY = 'hm_global_counter';
-
-function generateSerialPilgrimId(username) {
-  /* Get or create a persistent counter */
-  var existing = localStorage.getItem(K + 'serial_id');
-  if (existing) return existing;
-
-  /* Create new serial ID based on username hash + counter */
-  var hash = 0;
-  for (var i = 0; i < username.length; i++) {
-    hash = ((hash << 5) - hash) + username.charCodeAt(i);
-    hash = hash & hash;
-  }
-  var num = Math.abs(hash) % 90000 + 10000; /* 5-digit number */
-  var serial = 'HRM-' + String(num).padStart(5,'0');
-
-  /* Save permanently */
-  localStorage.setItem(K + 'serial_id', serial);
-  localStorage.setItem(K + 'serial_created', new Date().toISOString().split('T')[0]);
-  return serial;
-}
-
-/* ── TRANSLATION ── */
-var currentTransLang = 'ar';
-
-var TRANSLATIONS = {
-  ar: {
-    name: 'Arabic',
-    flag: '🇸🇦',
-    dir: 'rtl',
-    phrases: {
-      'Where is the toilet?': 'أين الحمام؟',
-      'I need help': 'أحتاج مساعدة',
-      'Where is Masjid al-Haram?': 'أين المسجد الحرام؟',
-      'My hotel is near Zamzam': 'فندقي بالقرب من زمزم',
-      'I am lost, please help': 'أنا تائه، من فضلك ساعدني',
-      'How much does this cost?': 'كم سعر هذا؟'
-    }
-  },
-  ha: {
-    name: 'Hausa',
-    flag: '🇳🇬',
-    dir: 'ltr',
-    phrases: {
-      'Where is the toilet?': 'Ina ne bandaki?',
-      'I need help': 'Ina bukatar taimako',
-      'Where is Masjid al-Haram?': 'Ina Masallacin Al-Haram?',
-      'My hotel is near Zamzam': 'Otal dina kusa da Zamzam ne',
-      'I am lost, please help': 'Na ɓace, don Allah ka taimake ni',
-      'How much does this cost?': 'Nawa ne wannan?'
-    }
-  },
-  ur: {
-    name: 'Urdu',
-    flag: '🇵🇰',
-    dir: 'rtl',
-    phrases: {
-      'Where is the toilet?': 'باتھ روم کہاں ہے؟',
-      'I need help': 'مجھے مدد چاہیے',
-      'Where is Masjid al-Haram?': 'مسجد الحرام کہاں ہے؟',
-      'My hotel is near Zamzam': 'میرا ہوٹل زمزم کے قریب ہے',
-      'I am lost, please help': 'میں گم ہو گیا ہوں، مدد کریں',
-      'How much does this cost?': 'یہ کتنے کا ہے؟'
-    }
-  },
-  id: {
-    name: 'Bahasa',
-    flag: '🇮🇩',
-    dir: 'ltr',
-    phrases: {
-      'Where is the toilet?': 'Di mana toiletnya?',
-      'I need help': 'Saya butuh bantuan',
-      'Where is Masjid al-Haram?': 'Di mana Masjid al-Haram?',
-      'My hotel is near Zamzam': 'Hotel saya dekat Zamzam',
-      'I am lost, please help': 'Saya tersesat, tolong bantu saya',
-      'How much does this cost?': 'Berapa harganya?'
-    }
-  },
-  tr: {
-    name: 'Turkish',
-    flag: '🇹🇷',
-    dir: 'ltr',
-    phrases: {
-      'Where is the toilet?': 'Tuvalet nerede?',
-      'I need help': 'Yardıma ihtiyacım var',
-      'Where is Masjid al-Haram?': 'Mescid-i Haram nerede?',
-      'My hotel is near Zamzam': 'Otelim Zemzem yakınında',
-      'I am lost, please help': 'Kayboldum, lütfen yardım edin',
-      'How much does this cost?': 'Bu ne kadar?'
-    }
-  },
-  fr: {
-    name: 'French',
-    flag: '🇫🇷',
-    dir: 'ltr',
-    phrases: {
-      'Where is the toilet?': 'Où sont les toilettes?',
-      'I need help': "J'ai besoin d'aide",
-      'Where is Masjid al-Haram?': 'Où est la Masjid al-Haram?',
-      'My hotel is near Zamzam': 'Mon hôtel est près de Zamzam',
-      'I am lost, please help': 'Je suis perdu, aidez-moi',
-      'How much does this cost?': 'Combien ça coûte?'
-    }
-  },
-  en: {
-    name: 'English',
-    flag: '🇬🇧',
-    dir: 'ltr',
-    phrases: {}
-  }
+/* ══ AI ══ */
+var AI_HISTORY_V4 = [];
+var AI_KB = {
+  tawaf: '7 counter-clockwise rounds around the Kaaba. Begin at the Black Stone saying Bismillah Allahu Akbar. Men bare right shoulder for first 3 rounds. Recite recommended duas each round.',
+  ihram: 'Ihram prohibitions: cutting hair or nails, perfume, marital relations, hunting, covering head (men). Men wear 2 white unstitched cloths. Women wear normal modest clothing. Say Talbiyah constantly.',
+  arafat: 'Day of Arafat (9 Dhul Hijjah) is the pinnacle of Hajj. Stand from Dhuhr to Maghrib in supplication. The Prophet said: Hajj is Arafat. Missing this day invalidates Hajj.',
+  mina: 'Mina valley where pilgrims stay days 8-13 of Dhul Hijjah. Stone the 3 Jamarat pillars: Small, Medium, Large. Throw 7 pebbles each, say Allahu Akbar with each throw.',
+  umrah: 'Umrah steps: 1) Enter Ihram at Miqat 2) Tawaf 7 rounds 3) Pray at Maqam Ibrahim 4) Drink Zamzam 5) Sai 7 times between Safa and Marwa 6) Shave or trim hair.',
+  zamzam: 'Zamzam water blessed by Allah. Drink facing Qibla. Say Bismillah. Make dua while drinking. The Prophet said: Zamzam is for whatever it is drunk for.',
+  dua: 'Key Hajj duas: Talbiyah, Entering Makkah dua, Before Tawaf, At Black Stone, Day of Arafat supplication. See the Audio Duas section for full collection.',
+  pack: 'Essential Hajj packing: Ihram cloths, unscented toiletries, comfortable shoes, medications, prayer mat, pocket Quran, power bank, umbrella, emergency contacts.',
+  safety: 'Stay with group. Memorize hotel address. Carry Hajj ID always. Stay hydrated (3-5L daily). Rest during peak heat. Emergency: 911 (Saudi), 920002814 (Hajj emergency).',
+  hajj: 'Hajj pillars: 1) Ihram 2) Standing at Arafat 3) Tawaf al-Ifadah 4) Sai. Hajj is the 5th pillar of Islam. Obligatory once in lifetime for able Muslims.',
+  prayer: 'Prayer in Masjid al-Haram = 100,000x reward. Times: Fajr ~5:15am, Dhuhr ~12:15pm, Asr ~3:30pm, Maghrib ~6:45pm, Isha ~8:15pm.',
+  zakat: 'Zakat is 2.5% of savings above Nisab held for one lunar year. Calculate in Finance section. Zakat al-Fitr due before Eid prayer.',
 };
 
-function setTransLang(lang) {
-  currentTransLang = lang;
-  var langData = TRANSLATIONS[lang];
-  if (!langData) return;
-  toast(langData.flag + ' ' + langData.name + ' selected');
-  /* Update button styles */
-  document.querySelectorAll('#s-translation .btn').forEach(function(b){
-    b.classList.remove('btn-gold');
-    b.classList.add('btn-ghost');
+function askAI(msg) {
+  if (!msg || !msg.trim()) return;
+  var chat = document.getElementById('ai-chat');
+  if (!chat) return;
+
+  var userDiv = document.createElement('div');
+  userDiv.className = 'ai-bubble user';
+  userDiv.textContent = msg;
+  chat.appendChild(userDiv);
+  chat.scrollTop = chat.scrollHeight;
+
+  var thinkDiv = document.createElement('div');
+  thinkDiv.className = 'ai-bubble bot';
+  thinkDiv.innerHTML = '<div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
+  chat.appendChild(thinkDiv);
+  chat.scrollTop = chat.scrollHeight;
+
+  AI_HISTORY_V4.push({ role: 'user', content: msg });
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 800,
+      system: 'You are Haramain AI, an expert Islamic pilgrimage guide on Pi Network. Help pilgrims with Hajj, Umrah, Islamic rituals, duas, and safety. Be concise, compassionate, scholarly. Respond in the user language.',
+      messages: AI_HISTORY_V4
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var reply = (d.content && d.content[0] && d.content[0].text) || getKBReply(msg);
+    AI_HISTORY_V4.push({ role: 'assistant', content: reply });
+    thinkDiv.innerHTML = '';
+    thinkDiv.textContent = reply;
+    chat.scrollTop = chat.scrollHeight;
+  })
+  .catch(function() {
+    thinkDiv.innerHTML = '';
+    thinkDiv.textContent = getKBReply(msg);
+    chat.scrollTop = chat.scrollHeight;
   });
-  /* Highlight selected */
-  var input = document.getElementById('trans-input');
-  if (input) input.placeholder = 'Type to translate to ' + langData.name;
+
+  var inp = document.getElementById('ai-input');
+  if (inp) inp.value = '';
 }
 
-function translateText() {
-  var input = document.getElementById('trans-input');
-  if (!input || !input.value.trim()) { toast('Enter text to translate'); return; }
-  var text = input.value.trim();
-  var lang = TRANSLATIONS[currentTransLang];
-  if (!lang) return;
-
-  /* Check our phrase dictionary first */
-  var result = lang.phrases[text];
-  if (!result) {
-    /* Generic fallback message */
-    result = '[' + lang.name + '] ' + text + ' — (Connect internet for full translation)';
+function getKBReply(msg) {
+  var lower = msg.toLowerCase();
+  for (var key in AI_KB) {
+    if (lower.indexOf(key) > -1) return String.fromCodePoint(0x1F54B) + ' ' + AI_KB[key];
   }
-
-  var outEl = document.getElementById('trans-output');
-  var resultEl = document.getElementById('trans-result');
-  var langLabel = document.getElementById('trans-lang-label');
-  if (outEl) outEl.style.display = 'block';
-  if (langLabel) langLabel.textContent = lang.flag + ' ' + lang.name.toUpperCase();
-  if (resultEl) {
-    resultEl.textContent = result;
-    resultEl.style.direction = lang.dir;
-    resultEl.style.textAlign = lang.dir === 'rtl' ? 'right' : 'left';
-    resultEl.className = 'trans-text' + (lang.dir === 'rtl' ? ' arabic' : '');
-  }
+  return String.fromCodePoint(0x1F54B) + ' Bismillah! Ask me about: tawaf, ihram, Arafat, Mina, Umrah, Zamzam, duas, packing, safety, prayer, or zakat. May Allah bless your pilgrimage!';
 }
 
-function quickTranslate(phrase) {
-  var input = document.getElementById('trans-input');
-  if (input) {
-    input.value = phrase;
-    translateText();
-  }
+function sendAIMessage() {
+  var inp = document.getElementById('ai-input');
+  if (!inp || !inp.value.trim()) return;
+  askAI(inp.value.trim());
+  inp.value = '';
 }
 
-function speakTrans() {
-  var resultEl = document.getElementById('trans-result');
-  if (!resultEl || resultEl.textContent === '--') { toast('Translate first'); return; }
+function initAIScreen() {
+  var chat = document.getElementById('ai-chat');
+  if (!chat || chat.children.length > 0) return;
+  var welcome = document.createElement('div');
+  welcome.className = 'ai-bubble bot';
+  welcome.textContent = String.fromCodePoint(0x1F54B) + ' Bismillah! I am Haramain AI - your personal pilgrimage guide. Ask me anything about Hajj, Umrah, duas, or safety. How can I help?';
+  chat.appendChild(welcome);
+}
+
+/* ══ AUDIO DUAS ══ */
+var DUA_ITEMS = [
+  { n:'Talbiyah', t:'Labbayk Allahumma labbayk - Here I am O Allah', a:'\u0644\u064E\u0628\u064E\u0651\u064A\u0652\u0643\u064E \u0627\u0644\u0644\u0651\u064E\u0647\u064F\u0645\u064E\u0651' },
+  { n:'Entering Makkah', t:'Allahumma antassalam wa minkas-salam', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0623\u064E\u0646\u0652\u062A\u064E \u0627\u0644\u0633\u064E\u0651\u0644\u0627\u064E\u0645\u064F' },
+  { n:'Before Tawaf', t:'Bismillah Allahu Akbar', a:'\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0647\u0650 \u0627\u0644\u0644\u0647\u064F \u0623\u064E\u0643\u0652\u0628\u064E\u0631' },
+  { n:'Day of Arafat', t:'La ilaha illallah wahdahu la sharika lah', a:'\u0644\u064E\u0627 \u0625\u0650\u0644\u064E\u0647\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0627\u0644\u0644\u064E\u0651\u0647\u064F \u0648\u064E\u062D\u0652\u062F\u064E\u0647\u064F' },
+  { n:'At Safa and Marwa', t:'Innas-Safa wal-Marwata min shaairillah', a:'\u0625\u0650\u0646\u064E\u0651 \u0627\u0644\u0635\u064E\u0651\u0641\u064E\u0627 \u0648\u064E\u0627\u0644\u0652\u0645\u064E\u0631\u0652\u0648\u064E\u0629\u064E' },
+  { n:'Morning Dua', t:'Allahumma bika asbahna wa bika amsayna', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0628\u0650\u0643\u064E \u0623\u064E\u0635\u0652\u0628\u064E\u062D\u0652\u0646\u064E\u0627' },
+  { n:'After Zamzam', t:'Allahumma inni asaluka ilman nafian', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0625\u0650\u0646\u064E\u0651\u064A \u0623\u064E\u0633\u0652\u0623\u064E\u0644\u064F\u0643\u064E' },
+  { n:'Farewell Tawaf', t:'Allahumma hadhal baytu baytuk', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0647\u064E\u0630\u064E\u0627 \u0627\u0644\u0652\u0628\u064E\u064A\u0652\u062A\u064F' },
+];
+var curDuaIdx = 0;
+
+function initAudioDuas() {
+  renderDuaPlayer();
+  renderDuaList();
+}
+
+function renderDuaPlayer() {
+  var dua = DUA_ITEMS[curDuaIdx];
+  if (!dua) return;
+  var nameEl = document.getElementById('audio-now-name');
+  var arabicEl = document.getElementById('audio-now-arabic');
+  var transEl = document.getElementById('audio-now-trans');
+  if (nameEl) nameEl.textContent = dua.n;
+  if (arabicEl) { arabicEl.textContent = dua.a; arabicEl.style.direction = 'rtl'; arabicEl.style.fontSize = '1.1rem'; arabicEl.style.color = 'var(--gold2)'; }
+  if (transEl) transEl.textContent = dua.t;
+}
+
+function renderDuaList() {
+  var list = document.getElementById('audio-dua-list');
+  if (!list) return;
+  list.innerHTML = DUA_ITEMS.map(function(d, i) {
+    var s = i === curDuaIdx ? 'background:var(--gdim);border-color:var(--gbrd);' : '';
+    return '<div style="display:flex;align-items:center;gap:.6rem;padding:.65rem;' + s + 'border-radius:var(--r2);margin-bottom:.3rem;cursor:pointer;border:1px solid var(--bd2);transition:all .15s" onclick="selectDuaItem(' + i + ')">' +
+      '<div style="font-size:1.1rem">' + (i === curDuaIdx ? '\uD83D\uDD0A' : '\uD83C\uDFB5') + '</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-size:.65rem;font-weight:600;color:var(--t1)">' + d.n + '</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">' + d.t.substring(0,45) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function selectDuaItem(idx) {
+  curDuaIdx = idx;
+  renderDuaPlayer();
+  renderDuaList();
+  speakDuaNow();
+}
+
+function speakDuaNow() {
+  var dua = DUA_ITEMS[curDuaIdx];
+  if (!dua) return;
   if ('speechSynthesis' in window) {
-    var utt = new SpeechSynthesisUtterance(resultEl.textContent);
-    var langMap = { ar:'ar-SA', ha:'ha', ur:'ur-PK', id:'id-ID', tr:'tr-TR', fr:'fr-FR', en:'en-US' };
-    utt.lang = langMap[currentTransLang] || 'en-US';
+    speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance(dua.n + '. ' + dua.t);
+    utt.lang = 'en-US'; utt.rate = 0.8;
     speechSynthesis.speak(utt);
-    toast('🔊 Speaking...');
+    if (typeof toast === 'function') toast('\uD83D\uDD0A ' + dua.n);
+    var btn = document.getElementById('audio-play-btn');
+    if (btn) btn.textContent = '\u23F8';
   } else {
-    toast('Speech not supported on this device');
+    if (typeof toast === 'function') toast(dua.n + ': ' + dua.t);
   }
 }
 
-/* ── DOCUMENTS ── */
-var docs = JSON.parse(localStorage.getItem(K + 'documents') || '[]');
-
-function addDocument() {
-  document.getElementById('doc-form').style.display = 'block';
-  document.getElementById('doc-form').scrollIntoView({behavior:'smooth'});
-}
-
-function saveDocument() {
-  var type = document.getElementById('doc-type').value;
-  var title = document.getElementById('doc-title').value.trim();
-  var notes = document.getElementById('doc-notes').value.trim();
-  if (!title) { toast('Enter a title for this document'); return; }
-
-  var doc = { id: Date.now(), type: type, title: title, notes: notes, date: new Date().toLocaleDateString() };
-  docs.push(doc);
-  localStorage.setItem(K + 'documents', JSON.stringify(docs));
-
-  document.getElementById('doc-form').style.display = 'none';
-  document.getElementById('doc-title').value = '';
-  document.getElementById('doc-notes').value = '';
-  renderDocuments();
-  toast('✅ Document saved');
-}
-
-function filterDocs(type) {
-  renderDocuments(type);
-}
-
-var DOC_ICONS = { passport:'🛂', visa:'📋', hotel:'🏨', flight:'✈️', medical:'💉', emergency:'🆘', other:'📄' };
-
-function renderDocuments(filter) {
-  var listEl = document.getElementById('doc-list');
-  if (!listEl) return;
-  var filtered = filter ? docs.filter(function(d){ return d.type === filter; }) : docs;
-
-  if (filtered.length === 0) {
-    listEl.innerHTML = '<div class="empty">No documents saved yet. Tap + Add to get started.</div>';
-    return;
+function toggleAudioPlay() {
+  if ('speechSynthesis' in window) {
+    if (speechSynthesis.speaking && !speechSynthesis.paused) {
+      speechSynthesis.pause();
+      var btn = document.getElementById('audio-play-btn');
+      if (btn) btn.textContent = '\u25B6';
+    } else if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+      var btn = document.getElementById('audio-play-btn');
+      if (btn) btn.textContent = '\u23F8';
+    } else { speakDuaNow(); }
   }
+}
 
-  listEl.innerHTML = filtered.map(function(doc) {
-    return '<div class="ibox" style="margin-bottom:.4rem">' +
-      '<div style="display:flex;align-items:center;gap:.7rem">' +
-        '<div style="font-size:1.4rem">' + (DOC_ICONS[doc.type] || '📄') + '</div>' +
-        '<div style="flex:1">' +
-          '<div style="font-size:.68rem;font-weight:600;color:var(--t1)">' + doc.title + '</div>' +
-          (doc.notes ? '<div style="font-size:.52rem;color:var(--t3)">' + doc.notes + '</div>' : '') +
-          '<div style="font-size:.48rem;color:var(--t4);margin-top:.15rem">Saved ' + doc.date + '</div>' +
-        '</div>' +
-        '<button class="btn btn-red btn-sm" onclick="deleteDoc(' + doc.id + ')">🗑️</button>' +
+function prevDua() { curDuaIdx = (curDuaIdx - 1 + DUA_ITEMS.length) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
+function nextDua() { curDuaIdx = (curDuaIdx + 1) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
+
+/* ══ LEARNING CENTER ══ */
+var COURSES2 = {
+  hajj:      { t:'Complete Hajj Guide', i:'\u{1F54B}', l:[
+    { h:'What is Hajj?', b:'Hajj is the 5th pillar of Islam. Every able Muslim must perform it once. Takes place in Dhul Hijjah. It is the greatest act of worship.' },
+    { h:'Preparing for Hajj', b:'Physical: walking training, vaccination. Spiritual: repent, settle debts. Financial: save, get visa. Knowledge: learn rites, memorize duas.' },
+    { h:'Entering Ihram', b:'Men wear 2 white unstitched cloths. Women wear modest clothing. Enter at Miqat. Say intention and Talbiyah: Labbayk Allahumma labbayk.' },
+    { h:'Performing Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Begin at Black Stone. Men bare right shoulder first 3 rounds. Pray 2 rakahs at Maqam Ibrahim after.' },
+    { h:'Sai at Safa and Marwa', b:'7 trips between the two hills. Commemorates Hajars search for water. Start at Safa, end at Marwa. Total about 3.15km.' },
+    { h:'Day of Arafat', b:'The most important day of Hajj. Stand from Dhuhr to Maghrib in dua and dhikr. The Prophet said: Hajj is Arafat. Missing invalidates Hajj.' },
+    { h:'Muzdalifah Night', b:'Travel from Arafat after Maghrib. Pray combined Maghrib and Isha. Sleep under sky. Collect 49 pebbles for Jamarat. Leave for Mina after Fajr.' },
+    { h:'Stoning Jamarat', b:'Stone 3 Jamarat pillars. Day 1: Large Jamarat only (7 pebbles). Days 2-3: All 3 (7 each). Say Allahu Akbar with each throw.' },
+    { h:'Farewell Tawaf', b:'Last act before leaving Makkah. 7 rounds around Kaaba. Say farewell prayers and dua. Leave with gratitude and hope.' },
+  ]},
+  umrah: { t:'Umrah Step by Step', i:'\uD83C\uDF19', l:[
+    { h:'What is Umrah?', b:'Umrah is the lesser pilgrimage. Performable any time of year. Highly recommended Sunnah. Takes 2-4 hours to complete.' },
+    { h:'Entering Ihram', b:'Enter at Miqat for your direction. Ghusl (bath), wear Ihram. Say intention and Talbiyah. Avoid all Ihram prohibitions.' },
+    { h:'Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Start and end at Black Stone. Recite duas. Pray 2 rakahs at Maqam Ibrahim after.' },
+    { h:'Sai', b:'7 trips between Safa and Marwa. Start at Safa. Make dua facing Kaaba at each hilltop. Total about 3.15km.' },
+    { h:'Shave or Trim', b:'After Sai: shave or trim hair. This exits the state of Ihram. Men shaving is more rewarding. Women trim one fingertip length only.' },
+  ]},
+  arabic: { t:'Essential Arabic Phrases', i:'\uD83C\uDF10', l:[
+    { h:'Greetings', b:'As-salamu alaykum = Peace be upon you. Wa alaykum as-salam = And upon you peace. Marhaba = Welcome. Kayfa halak = How are you.' },
+    { h:'At the Mosque', b:'Al-masjid = mosque. Al-Kaabah = the Kaaba. Salah = prayer. Wudu = ablution. Imam = prayer leader. Qiblah = direction of prayer.' },
+    { h:'Asking for Help', b:'Musaadah = Help! Ayna al-hammam = Where is the toilet? La afham = I do not understand. Hal tatakallam Inglizi = Do you speak English?' },
+    { h:'Emergencies', b:'Al-isaaf = Ambulance! Ana marid = I am sick. Itasil bil-isaaf = Call ambulance. Al-mustashfa ayna = Where is the hospital?' },
+    { h:'Islamic Phrases', b:'Bismillah = In the name of Allah. Alhamdulillah = All praise to Allah. Inshallah = If Allah wills. Allahu Akbar = Allah is Greatest.' },
+  ]},
+  etiquette: { t:'Mosque Etiquette', i:'\uD83D\uDD4C', l:[
+    { h:'Entering', b:'Enter with right foot. Say: Allahumma iftah li abwaba rahmatik. Remove shoes. Be in state of wudu. Be quiet and respectful.' },
+    { h:'Inside', b:'Pray 2 rakahs when entering. Keep voice low. Do not walk in front of praying person. Phone on silent. Face Qiblah when making dua.' },
+    { h:'Prayer Rows', b:'Stand shoulder to shoulder. Fill gaps from front. Follow imam exactly. Do not precede imam in any movement.' },
+    { h:'Leaving', b:'Leave with left foot. Say: Allahumma inni asaluka min fadlik. Give way to others. Leave peacefully and quietly.' },
+  ]},
+  history: { t:'Islamic History of Makkah', i:'\uD83D\uDCDC', l:[
+    { h:'Origin of Makkah', b:'Built by Prophet Ibrahim and his son Ismail. Ibrahim received divine command to build the Kaaba. Black Stone brought from Paradise by Angel Jibreel.' },
+    { h:'The Kaaba', b:'First house of worship built for mankind (Quran 3:96). Measures 13.1m x 11.03m x 13.1m. Kiswah cloth changed annually. Black Stone embedded in corner.' },
+    { h:'Zamzam Well', b:'Appeared miraculously for Ismail when Hajar searched for water. Over 3,500 years old. Produces 11-18.5 liters per second. Most blessed water.' },
+    { h:'Birth of Prophet Muhammad', b:'Born in Makkah 570 CE. Received first revelation in Cave Hira at age 40. Migrated to Madinah 622 CE. Returned 630 CE for Conquest of Makkah.' },
+  ]},
+};
+var curCId = null, curLIdx = 0;
+var lDone = JSON.parse(localStorage.getItem(K+'ld') || '{}');
+
+function startCourse(id) {
+  curCId = id;
+  curLIdx = lDone[id] || 0;
+  showLsn();
+}
+
+function showLsn() {
+  var c = COURSES2[curCId];
+  if (!c) return;
+  goS('learning');
+  var con = document.getElementById('lesson-container');
+  var lst = document.getElementById('lesson-list-wrap');
+  if (con) con.style.display = 'block';
+  if (lst) lst.style.display = 'none';
+  var l = c.l[curLIdx];
+  if (!l) { finishCrs(); return; }
+  var total = c.l.length;
+  var pct = Math.round(curLIdx/total*100);
+  if (!con) return;
+  con.innerHTML =
+    '<button class="back-btn" onclick="exitLsn()">\u2190 ' + c.t + '</button>' +
+    '<div class="card card-gold" style="margin-bottom:.7rem">' +
+      '<div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">' + c.i + ' Lesson ' + (curLIdx+1) + ' / ' + total + '</div>' +
+      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--t1);margin:.3rem 0">' + l.h + '</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+    '</div>' +
+    '<div class="ibox" style="font-size:.72rem;color:var(--t1);line-height:1.8;margin-bottom:.7rem">' + l.b + '</div>' +
+    '<div style="display:flex;gap:.5rem">' +
+      (curLIdx > 0 ? '<button class="btn btn-ghost" onclick="prevLsn()" style="flex:1">\u2190 Back</button>' : '') +
+      (curLIdx < total-1 ?
+        '<button class="btn btn-gold" onclick="nextLsn()" style="flex:2">Next \u2192</button>' :
+        '<button class="btn btn-gold" onclick="finishCrs()" style="flex:2">\u2705 Complete!</button>'
+      ) +
+    '</div>';
+}
+
+function nextLsn() {
+  lDone[curCId] = curLIdx + 1;
+  localStorage.setItem(K+'ld', JSON.stringify(lDone));
+  if (typeof addPts === 'function') addPts(5, 'Lesson');
+  curLIdx++;
+  showLsn();
+}
+
+function prevLsn() { curLIdx = Math.max(0, curLIdx-1); showLsn(); }
+
+function finishCrs() {
+  var c = COURSES2[curCId];
+  lDone[curCId] = c ? c.l.length : 0;
+  localStorage.setItem(K+'ld', JSON.stringify(lDone));
+  if (typeof addPts === 'function') addPts(50, 'Course');
+  exitLsn();
+  if (typeof toast === 'function') toast('\uD83C\uDFC6 Course completed! +50 pts');
+  if (typeof addNotif === 'function') addNotif('\uD83C\uDFC6','Course Done!',(c?c.t:curCId),'now');
+  renderCourses();
+}
+
+function exitLsn() {
+  var con = document.getElementById('lesson-container');
+  var lst = document.getElementById('lesson-list-wrap');
+  if (con) con.style.display = 'none';
+  if (lst) lst.style.display = 'block';
+  renderCourses();
+}
+
+function renderCourses() {
+  var w = document.getElementById('lesson-list-wrap');
+  if (!w) return;
+  w.innerHTML = Object.keys(COURSES2).map(function(id) {
+    var c = COURSES2[id];
+    var d = lDone[id] || 0;
+    var tot = c.l.length;
+    var p = Math.round(d/tot*100);
+    var col = d >= tot ? 'var(--grn)' : (d > 0 ? 'var(--gold)' : 'var(--t3)');
+    var st = d >= tot ? '\u2705 Done' : (d > 0 ? d+'/'+tot+' lessons' : 'Start');
+    return '<div class="course-card" onclick="startCourse(\''+id+'\')">' +
+      '<div class="course-thumb">'+c.i+'</div>' +
+      '<div style="flex:1">' +
+        '<div class="course-title">'+c.t+'</div>' +
+        '<div class="course-meta">'+tot+' lessons</div>' +
+        '<div class="course-progress"><div class="course-fill" style="width:'+p+'%"></div></div>' +
+        '<div style="font-size:.48rem;color:'+col+';margin-top:.2rem">'+st+'</div>' +
       '</div></div>';
   }).join('');
 }
 
-function deleteDoc(id) {
-  docs = docs.filter(function(d){ return d.id !== id; });
-  localStorage.setItem(K + 'documents', JSON.stringify(docs));
-  renderDocuments();
-  toast('Document deleted');
+/* ══ TRANSACTION RECEIPT ══ */
+function showReceipt(txText) {
+  var rid = 'TXN-' + Date.now().toString(36).toUpperCase();
+  var rdate = new Date().toLocaleString();
+  var ruser = (typeof user !== 'undefined' && user) ? '@'+user.username : '@pilgrim';
+  var rpid = (typeof myPilgrimId !== 'undefined' && myPilgrimId) ? myPilgrimId : 'HRM-00000';
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.id = 'receipt-modal';
+  var rtext = txText.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&apos;');
+  modal.innerHTML =
+    '<div style="background:var(--bg2);border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.5rem;width:100%;max-width:300px;text-align:center">' +
+      '<div style="font-size:2.5rem;margin-bottom:.4rem">\uD83E\uDDFE</div>' +
+      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold2)">Transaction Receipt</div>' +
+      '<div style="font-family:monospace;font-size:.52rem;color:var(--t3);margin:.3rem 0 .8rem">'+rid+'</div>' +
+      '<div style="background:var(--bg3);border-radius:var(--r2);padding:.8rem;margin-bottom:.8rem;text-align:left">' +
+        '<div style="font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.4rem">'+rtext+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCC5 '+rdate+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDC64 '+ruser+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83E\uDEAA '+rpid+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCF1 HARAMAIN \u00B7 Pi Mainnet</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:.4rem">' +
+        '<button class="btn btn-gold btn-sm" onclick="shareRcpt()" style="flex:1">\uD83D\uDCE4 Share</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'receipt-modal\').remove()" style="flex:1">\u2715 Close</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  modal._data = { id:rid, text:txText, date:rdate, user:ruser, pid:rpid };
+  var recs = JSON.parse(localStorage.getItem(K+'receipts') || '[]');
+  recs.unshift({ id:rid, text:txText, date:rdate });
+  if (recs.length > 100) recs.pop();
+  localStorage.setItem(K+'receipts', JSON.stringify(recs));
 }
 
-/* ── OFFLINE DETECTION ── */
-function updateOnlineStatus() {
-  var badge = document.getElementById('offline-badge');
-  if (!badge) return;
-  badge.style.display = navigator.onLine ? 'none' : 'block';
-}
-window.addEventListener('online', updateOnlineStatus);
-window.addEventListener('offline', updateOnlineStatus);
-updateOnlineStatus();
-
-/* ── PILGRIM ID ENHANCEMENT ── */
-/* Override genPilgrimId to use serial system */
-var _origGenId = typeof genPilgrimId === 'function' ? genPilgrimId : null;
-/* genPilgrimId handled by original */
-
-/* launchApp handled by patched original above */
-function postLaunchSetup() {
-  renderPassport();
-  renderDocuments();
-  updateDashboardStats();
-  updateOnlineStatus();
+function shareRcpt() {
+  var modal = document.getElementById('receipt-modal');
+  if (!modal || !modal._data) return;
+  var d = modal._data;
+  var text = 'HARAMAIN Receipt\n' + d.id + '\n' + d.text + '\n' + d.date + '\nharamain.pages.dev';
+  if (navigator.share) { navigator.share({ title: 'Haramain Receipt', text: text }); }
+  else { if (typeof copyClip === 'function') copyClip(text); if (typeof toast === 'function') toast('Receipt copied!'); }
 }
 
-/* ── JOURNEY STAGE FROM STORAGE ── */
+/* ══ LIVE TRACKER ══ */
+var _tWatchId = null;
+
+function startTracker() {
+  if (!navigator.geolocation) { if (typeof toast === 'function') toast('GPS not available'); return; }
+  var btn = document.getElementById('tracker-start-btn');
+  if (btn) { btn.textContent = '\uD83D\uDCCD Tracking...'; btn.disabled = true; }
+  if (typeof toast === 'function') toast('\uD83D\uDCCD GPS started...');
+  _tWatchId = navigator.geolocation.watchPosition(
+    function(pos) {
+      var lat = pos.coords.latitude, lng = pos.coords.longitude;
+      var el = document.getElementById('tracker-coords');
+      if (el) el.textContent = lat.toFixed(5) + ', ' + lng.toFixed(5);
+      var zone = getHajjZone(lat, lng);
+      var zEl = document.getElementById('tracker-zone-badge');
+      if (zEl) zEl.textContent = zone;
+      var zi = document.getElementById('tracker-zone-info');
+      if (zi) zi.innerHTML = '<div style="font-size:.68rem;font-weight:600;color:var(--t1)">' + zone + '</div>';
+      updateMapSvgDot(lat, lng, 'tracker-dot', 'tracker-dot-inner');
+    },
+    function(err) {
+      var msgs = ['','Permission denied - enable GPS in browser','Position unavailable','GPS timeout'];
+      if (typeof toast === 'function') toast('GPS: ' + (msgs[err.code] || 'Error'));
+      var btn2 = document.getElementById('tracker-start-btn');
+      if (btn2) { btn2.textContent = '\uD83D\uDCCD Start Tracking'; btn2.disabled = false; }
+    },
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
+
+function stopTracker() {
+  if (_tWatchId !== null) { navigator.geolocation.clearWatch(_tWatchId); _tWatchId = null; }
+  var btn = document.getElementById('tracker-start-btn');
+  if (btn) { btn.textContent = '\uD83D\uDCCD Start Tracking'; btn.disabled = false; }
+  if (typeof toast === 'function') toast('\u23F9 Tracking stopped');
+}
+
+function getHajjZone(lat, lng) {
+  var zones = [
+    { n:'Masjid al-Haram', lat:21.4225, lng:39.8262, r:0.3 },
+    { n:'Mina', lat:21.4131, lng:39.8934, r:2.0 },
+    { n:'Arafat', lat:21.3547, lng:39.9842, r:3.0 },
+    { n:'Muzdalifah', lat:21.3833, lng:39.9367, r:2.5 },
+    { n:'Makkah', lat:21.4225, lng:39.8262, r:8.0 },
+  ];
+  for (var i=0; i<zones.length; i++) {
+    var z = zones[i];
+    var d = Math.sqrt(Math.pow((lat-z.lat)*111,2)+Math.pow((lng-z.lng)*111,2));
+    if (d <= z.r) return z.n;
+  }
+  return 'Outside Hajj Zones';
+}
+
+function updateMapSvgDot(lat, lng, dotId, innerId) {
+  var dot = document.getElementById(dotId);
+  var inner = document.getElementById(innerId);
+  if (!dot || !inner) return;
+  var x = Math.max(10, Math.min(330, 170 + (lng - 39.8262) * 800));
+  var y = Math.max(10, Math.min(210, 110 - (lat - 21.4225) * 800));
+  dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+  inner.setAttribute('cx', x); inner.setAttribute('cy', y);
+}
+
+function shareTracker() {
+  var el = document.getElementById('tracker-coords');
+  var zEl = document.getElementById('tracker-zone-badge');
+  var msg = '\uD83D\uDCCD My Haramain Location\n' + (zEl ? zEl.textContent : '') + '\n' + (el ? el.textContent : '') + '\nharamain.pages.dev';
+  if (navigator.share) { navigator.share({ title:'My Location', text:msg }); }
+  else { if (typeof copyClip === 'function') copyClip(msg); if (typeof toast === 'function') toast('Location copied!'); }
+}
+
+/* ══ FAMILY HUB ══ */
+var famData = JSON.parse(localStorage.getItem(K+'fam2') || 'null') || { id:null, name:null };
+
+function createFamilyGroup() {
+  var name = ((typeof user !== 'undefined' && user) ? user.username : 'Pilgrim') + ' Family';
+  var id = 'GRP-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  famData = { id:id, name:name };
+  localStorage.setItem(K+'fam2', JSON.stringify(famData));
+  var gn = document.getElementById('group-name');
+  var gi = document.getElementById('group-id');
+  if (gn) gn.textContent = name;
+  if (gi) gi.textContent = id;
+  if (typeof toast === 'function') toast('\u2705 Group created: ' + id);
+}
+
+function joinGroup() {
+  var code = prompt('Enter group code:');
+  if (!code) return;
+  famData.id = code;
+  famData.name = 'Group ' + code;
+  localStorage.setItem(K+'fam2', JSON.stringify(famData));
+  var gn = document.getElementById('group-name');
+  var gi = document.getElementById('group-id');
+  if (gn) gn.textContent = famData.name;
+  if (gi) gi.textContent = code;
+  if (typeof toast === 'function') toast('\u2705 Joined: ' + code);
+}
+
+function shareGroupCode() {
+  if (!famData.id) { createFamilyGroup(); return; }
+  var msg = 'Join my Haramain family group! Code: ' + famData.id + '\nharamain.pages.dev';
+  if (navigator.share) { navigator.share({ title:'Join my group', text:msg }); }
+  else { if (typeof copyClip === 'function') copyClip(famData.id); if (typeof toast === 'function') toast('Copied: ' + famData.id); }
+}
+
+function setMeetingPoint(p) {
+  localStorage.setItem(K+'mtg', p);
+  var el = document.getElementById('meeting-point');
+  if (el) el.textContent = '\uD83D\uDCCD ' + p;
+  if (typeof toast === 'function') toast('\u2705 Meeting: ' + p);
+}
+
+function sendCheckin(s) {
+  if (typeof addTx === 'function') addTx('\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 ' + s);
+  if (typeof toast === 'function') toast('\uD83D\uDCE4 ' + s);
+}
+
+/* ══ SMART MAP ══ */
+function initSmartMap() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var zone = getHajjZone(pos.coords.latitude, pos.coords.longitude);
+    if (typeof toast === 'function') toast('\uD83D\uDCCD You are in: ' + zone);
+    updateMapSvgDot(pos.coords.latitude, pos.coords.longitude, 'tracker-dot', 'tracker-dot-inner');
+  });
+}
+
+function filterMap(t) {
+  if (typeof toast === 'function') toast('Showing: ' + (t === 'all' ? 'All places' : t));
+}
+
+/* ══ SCREEN INIT ON NAVIGATE ══ */
+var __goSv4 = goS;
+goS = function(id, btn) {
+  __goSv4(id, btn);
+  setTimeout(function() {
+    if (id === 'audio') initAudioDuas();
+    if (id === 'learning') renderCourses();
+    if (id === 'family') {
+      if (famData.id) {
+        var gn = document.getElementById('group-name');
+        var gi = document.getElementById('group-id');
+        if (gn) gn.textContent = famData.name;
+        if (gi) gi.textContent = famData.id;
+      }
+    }
+    if (id === 'map') initSmartMap();
+    if (id === 'ai') initAIScreen();
+  }, 100);
+};
+
+/* ══ DOM READY SETUP ══ */
 document.addEventListener('DOMContentLoaded', function() {
-  renderDocuments();
-  var stage = parseInt(localStorage.getItem(K + 'journey_stage') || '15');
-  updateJourneyStage(stage);
+  /* Setup lesson container in learning screen */
+  var ls = document.getElementById('s-learning');
+  if (ls) {
+    if (!document.getElementById('lesson-container')) {
+      var c = document.createElement('div');
+      c.id = 'lesson-container';
+      c.style.display = 'none';
+      ls.appendChild(c);
+    }
+    if (!document.getElementById('lesson-list-wrap')) {
+      var w = document.createElement('div');
+      w.id = 'lesson-list-wrap';
+      ls.appendChild(w);
+    }
+  }
+  renderCourses();
+  initAudioDuas();
+
+  /* Load language preference */
+  var savedLang = localStorage.getItem(K+'lang');
+  if (savedLang && typeof setLang === 'function') {
+    setLang(savedLang);
+    var tbLang = document.getElementById('tb-lang');
+    if (tbLang) tbLang.textContent = savedLang.toUpperCase();
+    _langIdx2 = _langCodes2.indexOf(savedLang);
+  }
+
+  /* Load meeting point */
+  var mp = localStorage.getItem(K+'mtg');
+  if (mp) { var mpEl = document.getElementById('meeting-point'); if (mpEl) mpEl.textContent = '\uD83D\uDCCD ' + mp; }
+
+  /* Load family group */
+  if (famData.id) {
+    var gn = document.getElementById('group-name');
+    var gi = document.getElementById('group-id');
+    if (gn) gn.textContent = famData.name;
+    if (gi) gi.textContent = famData.id;
+  }
 });
+
+/* ══ OVERRIDE addTx FOR RECEIPT ══ */
+var __addTxV4 = typeof addTx === 'function' ? addTx : function(){};
+addTx = function(text) {
+  __addTxV4(text);
+  var isPayment = text.indexOf('\u03C0') > -1 || text.indexOf('Paid') > -1 || text.indexOf('Sent') > -1 || text.indexOf('Zakat') > -1 || text.indexOf('Qurbani') > -1 || text.indexOf('Sadaqah') > -1;
+  if (isPayment) {
+    setTimeout(function() { showReceipt(text); }, 1000);
+  }
+};
+
 </script>
 </body>
 </html>
