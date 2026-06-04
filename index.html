@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -959,6 +960,64 @@ img{max-width:100%;display:block;}
 .tour-step-icon{font-size:1.6rem;flex-shrink:0;}
 .tour-step-title{font-size:.7rem;font-weight:600;color:var(--t1);margin-bottom:.15rem;}
 .tour-step-desc{font-size:.55rem;color:var(--t3);}
+
+/* ── UP pages — oUtil uses .on class ── */
+.up { display:none; }
+.up.on { display:block; animation:scrIn .2s ease; }
+/* Also support .show for new code */
+.up.show { display:block; animation:scrIn .2s ease; }
+
+/* ══ WALLET HERO ══ */
+.wallet-hero{
+  background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid var(--gbrd);border-radius:var(--r4);
+  padding:1.2rem;margin-bottom:.7rem;position:relative;overflow:hidden;
+}
+.wallet-hero::after{content:'';position:absolute;top:-20px;right:-20px;
+  width:100px;height:100px;
+  background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);
+  pointer-events:none;}
+.wh-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;}
+.wh-av{font-size:2rem;flex-shrink:0;}
+.wh-name{font-family:var(--serif);font-size:1.2rem;font-weight:600;color:var(--t1);}
+.wh-pid{font-family:monospace;font-size:.52rem;color:var(--gold2);margin:.15rem 0;}
+.wh-net{font-size:.48rem;color:var(--t3);}
+.wh-live{display:flex;align-items:center;gap:.3rem;font-size:.48rem;color:var(--grn);margin-top:.2rem;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);
+  animation:livePulse 2s infinite;}
+.pi-val{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold2);}
+.pi-val-usd{font-size:.55rem;color:var(--t3);margin-top:.1rem;}
+
+/* ══ UTILITY CARDS — enhanced visibility ══ */
+.tc{
+  background:var(--bg2);border:1px solid var(--bd2);
+  border-radius:var(--r3);padding:.9rem .8rem;
+  cursor:pointer;transition:all .2s;
+  border-left:3px solid transparent;
+  position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.tc:hover{background:var(--bg3);border-color:var(--bd);}
+.tc:active{transform:scale(.95);opacity:.85;}
+.tc-gold{border-left-color:var(--gold)!important;}
+.tc-green{border-left-color:var(--grn)!important;}
+.tc-blue{border-left-color:var(--blue)!important;}
+.tc-red{border-left-color:var(--red)!important;}
+.tc-teal{border-left-color:var(--cyan)!important;}
+.tc-purple{border-left-color:var(--purple)!important;}
+
+/* Quick action buttons */
+.qa{
+  background:var(--bg2);border:1px solid var(--bd2);
+  border-radius:var(--r3);padding:.65rem .4rem;
+  display:flex;flex-direction:column;align-items:center;gap:.25rem;
+  cursor:pointer;transition:all .18s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.qa:hover{background:var(--bg3);border-color:var(--bd);}
+.qa:active{transform:scale(.9);background:var(--gdim);border-color:var(--gbrd);}
 </style>
 </head>
 <body>
@@ -1395,7 +1454,30 @@ img{max-width:100%;display:block;}
     <section class="scr" id="s-payments">
 
       <div class="scr-hdr">
-        <div><div class="scr-hdr-title">Pi Payments</div><div class="scr-hdr-sub">Mainnet · sandbox:false · Real Pi</div></div>
+        <div><div class="scr-hdr-title">Pi Payments</div>
+      <!-- ⭐ PILGRIM PASS — PREMIUM -->
+      <div class="pay-card" style="margin-bottom:.6rem">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem">
+          <span style="font-size:2rem">⭐</span>
+          <div>
+            <div class="pay-name">Pilgrim Pass — Premium</div>
+            <div style="font-size:.55rem;color:var(--t3)">Unlock all features permanently</div>
+          </div>
+          <div class="pay-price" style="margin-left:auto">1π</div>
+        </div>
+        <ul class="pay-features">
+          <li>AI Pilgrim Assistant — unlimited access</li>
+          <li>AI personalised Hajj planner</li>
+          <li>Offline Quran & full dua library</li>
+          <li>Priority safety alerts</li>
+          <li>Verified Pilgrim badge</li>
+          <li>All tools permanently unlocked</li>
+        </ul>
+        <button class="btn btn-gold btn-full" id="prem-btn" onclick="buyPrem()">
+          ⭐ Unlock Pilgrim Pass — 1π
+        </button>
+      </div>
+<div class="scr-hdr-sub">Mainnet · sandbox:false · Real Pi</div></div>
       </div>
 
       <!-- Wallet -->
@@ -3411,8 +3493,10 @@ function renderHijriWidget(){
 /* goS v1 removed — using v3 below */
 
 function oUtil(id) {
-  // Hide util home grids, show specific page
-  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');});
+  // Hide all utility pages and grid
+  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');p.classList.remove('show');});
+  // Hide the util grids
+  document.querySelectorAll('#s-utilities .tgrid, #s-utilities .sec-label').forEach(function(g){ g.style.display='none'; });
   var target = document.getElementById('up-'+id);
   if(target){
     target.classList.add('on');
@@ -3442,7 +3526,9 @@ function oUtil(id) {
 }
 
 function cUtil() {
-  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.up').forEach(function(p){p.classList.remove('on');p.classList.remove('show');});
+  // Restore the util grids
+  document.querySelectorAll('#s-utilities .tgrid, #s-utilities .sec-label').forEach(function(g){ g.style.display=''; });
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -3562,11 +3648,18 @@ function genPilgrimId() {
   myPilgrimId = 'HM-'+String(mySerial).padStart(5,'0')+'-'+u.toUpperCase().slice(0,6)+'-'+h;
   localStorage.setItem(K+'pid', myPilgrimId);
 
-  /* Update new v4 UI elements */
+  /* Update ALL UI elements with ID */
   var profPid = document.getElementById('prof-pid');
   if (profPid && myPilgrimId) profPid.textContent = myPilgrimId;
   var certId = document.getElementById('cert-id');
   if (certId && myPilgrimId) certId.textContent = 'CERT-' + myPilgrimId;
+  /* Also sync wallet card */
+  var wcSerial = document.getElementById('wc-serial');
+  if (wcSerial && myPilgrimId) wcSerial.textContent = 'ID: ' + myPilgrimId;
+  /* Render full pilgrim ID panel */
+  if (typeof renderPilgrimId === 'function') renderPilgrimId();
+  /* Render QR on profile */
+  if (typeof renderPassport === 'function') renderPassport();
 }
 function refreshPilgrimId(){ myPilgrimId=''; mySerial=0; localStorage.removeItem(K+'pid'); localStorage.removeItem(K+'serial'); genPilgrimId(); renderPilgrimId(); toast('🔄 Pilgrim ID refreshed'); }
 function renderPilgrimId(){
@@ -7825,12 +7918,17 @@ function renderPassport() {
 
 /* ── Cycle language ── */
 var langList = ['EN','AR','HA','UR','ID','TR'];
+var langCodes = ['en','ar','ha','ur','id','tr'];
 var langIdx = 0;
 function cycleLang() {
   langIdx = (langIdx + 1) % langList.length;
-  var codes = ['en','ar','ha','ur','id','tr'];
-  setLang(codes[langIdx]);
-  document.getElementById('tb-lang').textContent = langList[langIdx];
+  var code = langCodes[langIdx];
+  setLang(code);
+  var tbLang = document.getElementById('tb-lang');
+  if (tbLang) tbLang.textContent = langList[langIdx];
+  var langSel = document.getElementById('lang-sel');
+  if (langSel) langSel.value = code;
+  toast('Language: ' + langList[langIdx]);
 }
 
 /* ── Override launchApp to include new init ── */
