@@ -3496,7 +3496,13 @@ function piLogin() {
         console.error('[Haramain] Auth error:', err);
         if (btn) btn.disabled = false;
         if (btnText) btnText.textContent = 'Sign In with Pi';
-        if (status) status.textContent = 'Open in Pi Browser to sign in';
+        var errMsg = err && err.message ? err.message : String(err);
+        if (status) status.textContent = errMsg || 'Authentication failed — try again';
+        /* Retry after 2 seconds */
+        setTimeout(function() {
+          if (status) status.textContent = '';
+          if (btn) btn.disabled = false;
+        }, 3000);
       });
 
   } else {
@@ -3509,9 +3515,13 @@ function piLogin() {
 }
 
 function launchApp() {
-  // WorldCup exact: hide landing, show app
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
+  // Handle both old 'landing' and new 'login-screen' IDs
+  var landing = document.getElementById('landing');
+  var loginScr = document.getElementById('login-screen');
+  if (landing) landing.style.display = 'none';
+  if (loginScr) { loginScr.classList.add('hide'); setTimeout(function(){ loginScr.style.display='none'; }, 400); }
+  var appEl = document.getElementById('app');
+  if (appEl) { appEl.style.display = 'flex'; appEl.style.flexDirection = 'column'; }
 
   // Sync language
   var sel = document.getElementById('hdr-lang');
@@ -3540,7 +3550,8 @@ function launchApp() {
     'now'
   );
   console.log('[Haramain] ✅ App launched · sandbox: false · user:', user ? user.username : 'Demo');
-}
+
+  if (typeof postLaunchSetup === "function") postLaunchSetup();}
 
 function logout() {
   user = null;
@@ -8154,23 +8165,12 @@ function genPilgrimId() {
   if (_origGenId) _origGenId();
 }
 
-/* ── ENHANCED launchApp ── */
-var _origLaunchApp2 = typeof launchApp === 'function' ? launchApp : null;
-function launchApp() {
-  /* Hide login, show app */
-  var loginEl = document.getElementById('login-screen');
-  if (loginEl) loginEl.classList.add('hide');
-  setTimeout(function(){
-    if (loginEl) loginEl.style.display = 'none';
-    var appEl = document.getElementById('app');
-    if (appEl) appEl.style.display = 'flex';
-    /* Update UI */
-    renderPassport();
-    renderDocuments();
-    updateDashboardStats();
-    updateOnlineStatus();
-  }, 300);
-  if (_origLaunchApp2) _origLaunchApp2();
+/* launchApp handled by patched original above */
+function postLaunchSetup() {
+  renderPassport();
+  renderDocuments();
+  updateDashboardStats();
+  updateOnlineStatus();
 }
 
 /* ── JOURNEY STAGE FROM STORAGE ── */
