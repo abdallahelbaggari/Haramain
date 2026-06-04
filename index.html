@@ -3408,23 +3408,7 @@ function renderHijriWidget(){
 }
 
 /* ══ NAVIGATION ══ */
-function goS(id, btn) {
-  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
-  document.querySelectorAll('.bni').forEach(function(b){b.classList.remove('on');});
-  var sc=document.getElementById('s-'+id); if(sc)sc.classList.add('on');
-  if(btn)btn.classList.add('on');
-  else{ var b=document.querySelector('[data-s="'+id+'"]'); if(b)b.classList.add('on'); }
-  // Refresh content
-  if(id==='dashboard'){renderWeatherWidget();startHajjCountdown();}
-  if(id==='worship')fetchPrayer();
-  if(id==='guide')renderGuide('hajj');
-  if(id==='notifs')markAllRead();
-  if(id==='profile')syncUI();
-  if(id==='payments')syncWalletUI();
-  // Hide all up pages
-  cUtil();
-  window.scrollTo(0,0);
-}
+/* goS v1 removed — using v3 below */
 
 function oUtil(id) {
   // Hide util home grids, show specific page
@@ -3577,6 +3561,12 @@ function genPilgrimId() {
   var h = hashStr(u+Date.now()).toString(36).toUpperCase().slice(0,5);
   myPilgrimId = 'HM-'+String(mySerial).padStart(5,'0')+'-'+u.toUpperCase().slice(0,6)+'-'+h;
   localStorage.setItem(K+'pid', myPilgrimId);
+
+  /* Update new v4 UI elements */
+  var profPid = document.getElementById('prof-pid');
+  if (profPid && myPilgrimId) profPid.textContent = myPilgrimId;
+  var certId = document.getElementById('cert-id');
+  if (certId && myPilgrimId) certId.textContent = 'CERT-' + myPilgrimId;
 }
 function refreshPilgrimId(){ myPilgrimId=''; mySerial=0; localStorage.removeItem(K+'pid'); localStorage.removeItem(K+'serial'); genPilgrimId(); renderPilgrimId(); toast('🔄 Pilgrim ID refreshed'); }
 function renderPilgrimId(){
@@ -5930,23 +5920,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* ── UPGRADE 17: SMOOTH SCROLL to sections ── */
-function goS(id, btn) {
-  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('on'); });
-  document.querySelectorAll('.bni').forEach(function(b){ b.classList.remove('on'); });
-  var sc = document.getElementById('s-'+id); if(sc) sc.classList.add('on');
-  if (btn) btn.classList.add('on');
-  else { var b = document.querySelector('[data-s="'+id+'"]'); if(b) b.classList.add('on'); }
-  if (id==='dashboard') { renderWeatherWidget(); startHajjCountdown(); updateDashboardStreak(); }
-  if (id==='worship') { fetchPrayer(); }
-  if (id==='guide') renderGuide('hajj');
-  if (id==='notifs') markAllRead();
-  if (id==='profile') { syncUI(); enhanceProfilePage(); }
-  if (id==='payments') syncWalletUI();
-  cUtil();
-  var main = document.getElementById('main');
-  if (main) main.scrollTop = 0;
-  window.scrollTo(0, 0);
-}
+/* goS v2 removed — using v3 below */
 
 /* ── UPGRADE 18: SHARE PROFILE ── */
 function shareProfile() {
@@ -7676,7 +7650,6 @@ function updateJourneyStage(pct) {
 }
 
 /* ── goS extended for new screens ── */
-var _origGoS = typeof goS === 'function' ? goS : null;
 function goS(id, btn) {
   /* Hide all screens */
   document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('active'); });
@@ -7861,7 +7834,6 @@ function cycleLang() {
 }
 
 /* ── Override launchApp to include new init ── */
-var _origLaunchApp = typeof launchApp === 'function' ? launchApp : null;
 
 /* ── Dashboard sync extended ── */
 function updateDashboardStats() {
@@ -8153,17 +8125,7 @@ updateOnlineStatus();
 /* ── PILGRIM ID ENHANCEMENT ── */
 /* Override genPilgrimId to use serial system */
 var _origGenId = typeof genPilgrimId === 'function' ? genPilgrimId : null;
-function genPilgrimId() {
-  if (user && user.username) {
-    var serial = generateSerialPilgrimId(user.username);
-    var pidEl = document.getElementById('prof-pid');
-    if (pidEl) pidEl.textContent = serial;
-    /* Also update cert id */
-    var certIdEl = document.getElementById('cert-id');
-    if (certIdEl) certIdEl.textContent = 'CERT-' + serial;
-  }
-  if (_origGenId) _origGenId();
-}
+/* genPilgrimId handled by original */
 
 /* launchApp handled by patched original above */
 function postLaunchSetup() {
