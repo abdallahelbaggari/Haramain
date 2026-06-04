@@ -1,932 +1,92 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#020A06">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#020C07">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="HARAMAIN — The Web3 Pilgrimage Infrastructure for Hajj & Umrah. Pi Network Mainnet.">
-<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * data: blob:; img-src * data: blob:; style-src * 'unsafe-inline'; font-src * data:; frame-src *; frame-ancestors *;">
-<title>HARAMAIN · Web3 Pilgrimage Infrastructure</title>
+<title>HARAMAIN — Web3 Pilgrimage Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-/* ═══════════════════════════════════════════════════════════
-   HARAMAIN v4.0 — DESIGN SYSTEM
-   Luxury Islamic Dark · Gold & Emerald · Premium Pi App
-═══════════════════════════════════════════════════════════ */
-
-/* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-:root {
-  /* Core Colors */
-  --bg:    #020C07;
-  --bg2:   #051A0F;
-  --bg3:   #081F13;
-  --bg4:   #0C2719;
-  --bg5:   #102E1E;
-
-  /* Gold Palette */
-  --gold:  #C9A84C;
-  --gold2: #E2C46A;
-  --gold3: #F5D78E;
-  --gold4: #FFF0C4;
-  --gdim:  rgba(201,168,76,.10);
-  --gbrd:  rgba(201,168,76,.20);
-
-  /* Emerald */
-  --grn:   #2ECC71;
-  --grn2:  #27AE60;
-  --grn3:  #1E8449;
-  --gdim2: rgba(46,204,113,.10);
-
-  /* Text */
-  --t1:    #F5F0E8;
-  --t2:    #B8A88A;
-  --t3:    #6B7A68;
-  --t4:    #2E3D2A;
-
-  /* Semantic */
-  --red:   #E74C3C;
-  --cyan:  #00BCD4;
-  --blue:  #3498DB;
-  --purple:#9B59B6;
-  --orange:#F39C12;
-
-  /* Borders */
-  --bd:    rgba(201,168,76,.15);
-  --bd2:   rgba(201,168,76,.08);
-  --bd3:   rgba(46,204,113,.12);
-
-  /* Radius */
-  --r1: 6px;
-  --r2: 10px;
-  --r3: 14px;
-  --r4: 20px;
-  --pill: 99px;
-
-  /* Typography */
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --dm:    'DM Sans', 'Segoe UI', sans-serif;
-
-  /* Shadows */
-  --shadow: 0 4px 24px rgba(0,0,0,.5);
-  --glow:   0 0 20px rgba(201,168,76,.15);
-
-  /* Spacing */
-  --nav-h: 64px;
-  --hdr-h: 52px;
-}
-
-/* ══ RESET ══ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;background:var(--bg);}
-body{font-family:var(--dm);color:var(--t1);font-size:14px;line-height:1.5;overscroll-behavior:none;}
-input,button,textarea,select{font-family:var(--dm);color:inherit;}
-button{cursor:pointer;border:none;background:none;}
-a{color:var(--gold);text-decoration:none;}
-img{max-width:100%;display:block;}
-
-/* ══ APP SHELL ══ */
-#app{
-  position:fixed;inset:0;
-  display:flex;flex-direction:column;
-  overflow:hidden;
-}
-
-/* ══ SPLASH SCREEN ══ */
-#splash{
-  position:fixed;inset:0;z-index:9999;
-  background:var(--bg);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  transition:opacity .6s ease;
-}
-#splash.hide{opacity:0;pointer-events:none;}
-.splash-kaaba{
-  font-size:4rem;margin-bottom:1rem;
-  animation:splashFloat 3s ease-in-out infinite;
-}
-.splash-logo{
-  font-family:var(--serif);font-size:2.4rem;
-  color:var(--gold2);letter-spacing:.15em;
-  margin-bottom:.3rem;
-}
-.splash-sub{
-  font-size:.65rem;letter-spacing:.3em;
-  color:var(--t3);text-transform:uppercase;
-  margin-bottom:2rem;
-}
-.splash-bar{
-  width:120px;height:2px;
-  background:var(--bg3);border-radius:var(--pill);
-  overflow:hidden;
-}
-.splash-fill{
-  height:100%;width:0;
-  background:linear-gradient(90deg,var(--gold),var(--gold2));
-  border-radius:var(--pill);
-  animation:splashLoad 1.8s ease forwards;
-}
-@keyframes splashFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
-@keyframes splashLoad{0%{width:0;}100%{width:100%;}}
-
-/* ══ LOGIN SCREEN ══ */
-#login-screen{
-  position:fixed;inset:0;z-index:500;
-  background:var(--bg);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:2rem 1.5rem;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,.08) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 60% at 50% 100%, rgba(46,204,113,.05) 0%, transparent 50%);
-}
-#login-screen.hide{display:none;}
-.ls-icon{font-size:3rem;margin-bottom:.8rem;animation:splashFloat 4s ease-in-out infinite;}
-.ls-brand{font-family:var(--serif);font-size:2rem;color:var(--gold2);letter-spacing:.1em;margin-bottom:.2rem;}
-.ls-tagline{font-size:.65rem;color:var(--t3);letter-spacing:.25em;text-transform:uppercase;margin-bottom:2.5rem;}
-.ls-features{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;width:100%;max-width:320px;margin-bottom:2rem;}
-.ls-feat{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r2);padding:.6rem .7rem;
-  display:flex;align-items:center;gap:.4rem;
-  font-size:.6rem;color:var(--t2);
-}
-.ls-feat span:first-child{font-size:.9rem;}
-.ls-badge{
-  display:flex;align-items:center;gap:.4rem;
-  font-size:.55rem;color:var(--grn);
-  background:rgba(46,204,113,.08);
-  border:1px solid rgba(46,204,113,.15);
-  border-radius:var(--pill);padding:.25rem .7rem;
-  margin-bottom:1.5rem;
-}
-.login-btn{
-  width:100%;max-width:320px;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#020C07;font-weight:700;font-size:.85rem;
-  letter-spacing:.05em;border-radius:var(--pill);
-  padding:.9rem 1.5rem;
-  display:flex;align-items:center;justify-content:center;gap:.5rem;
-  box-shadow:0 4px 24px rgba(201,168,76,.3);
-  transition:all .2s;
-  position:relative;overflow:hidden;
-}
-.login-btn::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.15));
-}
-.login-btn:active{transform:scale(.97);}
-.ls-security{font-size:.55rem;color:var(--t3);margin-top:.8rem;letter-spacing:.05em;}
-#ls-msg{font-size:.6rem;color:var(--gold);margin-top:.5rem;height:.8rem;}
-
-/* ══ MAIN APP AREA ══ */
-#main-area{
-  flex:1;overflow:hidden;
-  display:flex;flex-direction:column;
-  padding-bottom:var(--nav-h);
-}
-
-/* ══ TOP BAR ══ */
-#topbar{
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  height:var(--hdr-h);
-  background:rgba(2,12,7,.95);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--bd2);
-  display:flex;align-items:center;
-  padding:0 1rem;gap:.6rem;
-}
-.tb-brand{
-  font-family:var(--serif);
-  font-size:1.3rem;color:var(--gold2);
-  letter-spacing:.08em;flex:1;
-}
-.tb-badge{
-  font-size:.5rem;letter-spacing:.1em;
-  background:rgba(46,204,113,.12);
-  color:var(--grn);border:1px solid rgba(46,204,113,.2);
-  border-radius:var(--pill);padding:.18rem .55rem;
-}
-.tb-user{font-size:.55rem;color:var(--t3);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.tb-lang{
-  font-size:.5rem;font-weight:600;color:var(--gold);
-  background:var(--gdim);border:1px solid var(--gbrd);
-  border-radius:var(--r1);padding:.2rem .45rem;
-  cursor:pointer;
-}
-.tb-notif{
-  position:relative;font-size:1.1rem;cursor:pointer;
-  padding:.1rem;
-}
-.tb-notif-dot{
-  position:absolute;top:-2px;right:-2px;
-  width:7px;height:7px;
-  background:var(--red);border-radius:50%;
-  border:1.5px solid var(--bg);
-}
-
-/* ══ SCREEN CONTAINER ══ */
-#screens{
-  position:fixed;
-  top:var(--hdr-h);
-  bottom:var(--nav-h);
-  left:0;right:0;
-  overflow:hidden;
-}
-
-/* ══ SCREEN ══ */
-.scr{
-  position:absolute;inset:0;
-  overflow-y:auto;overflow-x:hidden;
-  padding:1rem 1rem calc(1rem + env(safe-area-inset-bottom));
-  display:none;
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-}
-.scr.active{display:block;animation:scrIn .25s ease;}
-@keyframes scrIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-
-/* ══ BOTTOM NAV ══ */
-#bnav{
-  position:fixed;bottom:0;left:0;right:0;z-index:300;
-  height:var(--nav-h);
-  background:rgba(2,12,7,.97);
-  backdrop-filter:blur(20px);
-  border-top:1px solid var(--bd2);
-  display:flex;align-items:center;
-  padding:0 0 max(0px,env(safe-area-inset-bottom));
-}
-.bni{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:.1rem;padding:.35rem .1rem;
-  border:none;background:none;
-  position:relative;transition:all .15s;
-}
-.bni-i{font-size:1.25rem;line-height:1;transition:transform .15s;}
-.bni-l{
-  font-size:.45rem;font-weight:500;
-  letter-spacing:.02em;color:var(--t3);
-  transition:color .15s;
-}
-.bni.on .bni-i{transform:scale(1.1);}
-.bni.on .bni-l{color:var(--gold);}
-.bni.on::after{
-  content:'';position:absolute;top:0;left:50%;
-  transform:translateX(-50%);
-  width:24px;height:2px;
-  background:linear-gradient(90deg,var(--gold),var(--gold2));
-  border-radius:0 0 var(--pill) var(--pill);
-}
-.bni-more-dot{
-  display:flex;gap:2px;align-items:center;
-  margin-bottom:.1rem;
-}
-.bni-more-dot span{
-  width:4px;height:4px;border-radius:50%;
-  background:var(--t3);transition:background .15s;
-}
-.bni.on .bni-more-dot span{background:var(--gold);}
-
-/* ══ SECTION LABELS ══ */
-.sec-label{
-  font-size:.55rem;font-weight:600;
-  letter-spacing:.15em;text-transform:uppercase;
-  color:var(--t3);
-  margin:.9rem 0 .45rem;
-  display:flex;align-items:center;gap:.4rem;
-}
-.sec-label::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,var(--bd2),transparent);
-}
-
-/* ══ CARDS ══ */
-.card{
-  background:var(--bg2);
-  border:1px solid var(--bd2);
-  border-radius:var(--r3);
-  padding:1rem;
-  margin-bottom:.55rem;
-  position:relative;overflow:hidden;
-}
-.card::before{
-  content:'';position:absolute;
-  top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--bd),transparent);
-}
-.card-gold{border-color:rgba(201,168,76,.2);}
-.card-gold::before{background:linear-gradient(90deg,transparent,rgba(201,168,76,.3),transparent);}
-.card-green{border-color:rgba(46,204,113,.15);}
-.card-green::before{background:linear-gradient(90deg,transparent,rgba(46,204,113,.2),transparent);}
-.card-red{border-color:rgba(231,76,60,.2);}
-.card-blue{border-color:rgba(52,152,219,.2);}
-
-/* ══ HERO CARD ══ */
-.hero-card{
-  background:linear-gradient(135deg,var(--bg3) 0%,var(--bg4) 100%);
-  border:1px solid var(--gbrd);
-  border-radius:var(--r4);
-  padding:1.3rem;
-  margin-bottom:.7rem;
-  position:relative;overflow:hidden;
-}
-.hero-card::after{
-  content:'';position:absolute;
-  top:-30px;right:-30px;
-  width:120px;height:120px;
-  background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);
-  pointer-events:none;
-}
-
-/* ══ ICON BOX (ibox) ══ */
-.ibox{
-  background:var(--bg2);
-  border:1px solid var(--bd2);
-  border-radius:var(--r3);
-  padding:.85rem;
-  margin-bottom:.5rem;
-}
-
-/* ══ UTILITY GRID ══ */
-.ugrid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:.5rem;
-  margin-bottom:.6rem;
-}
-.ugrid-2{grid-template-columns:repeat(2,1fr);}
-.ugrid-4{grid-template-columns:repeat(4,1fr);}
-.uc{
-  background:var(--bg2);
-  border:1px solid var(--bd2);
-  border-radius:var(--r3);
-  padding:.75rem .5rem;
-  display:flex;flex-direction:column;
-  align-items:center;gap:.3rem;
-  cursor:pointer;
-  transition:all .18s;
-  position:relative;overflow:hidden;
-}
-.uc:active{transform:scale(.96);}
-.uc.on{border-color:var(--gold);background:var(--gdim);}
-.uc-icon{font-size:1.5rem;line-height:1;}
-.uc-name{font-size:.55rem;font-weight:600;text-align:center;color:var(--t2);line-height:1.2;}
-.uc-desc{font-size:.48rem;color:var(--t3);text-align:center;line-height:1.2;}
-.uc-badge{
-  position:absolute;top:4px;right:4px;
-  background:var(--gold);color:#020C07;
-  font-size:.4rem;font-weight:700;
-  border-radius:var(--pill);padding:.1rem .3rem;
-}
-
-/* Feature cards (2-col) */
-.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.55rem;}
-.tc{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.9rem .8rem;
-  cursor:pointer;transition:all .18s;
-  border-left:2px solid transparent;
-  position:relative;overflow:hidden;
-}
-.tc:active{transform:scale(.97);}
-.tc-icon{font-size:1.4rem;display:block;margin-bottom:.3rem;}
-.tc-name{font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.15rem;}
-.tc-desc{font-size:.52rem;color:var(--t3);}
-.tc-gold{border-left-color:var(--gold);}
-.tc-green{border-left-color:var(--grn);}
-.tc-blue{border-left-color:var(--blue);}
-.tc-red{border-left-color:var(--red);}
-.tc-teal{border-left-color:var(--cyan);}
-.tc-purple{border-left-color:var(--purple);}
-
-/* ══ BUTTONS ══ */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  gap:.35rem;border-radius:var(--pill);
-  padding:.6rem 1.2rem;font-size:.7rem;font-weight:600;
-  letter-spacing:.02em;transition:all .15s;border:none;
-  cursor:pointer;
-}
-.btn:active{transform:scale(.96);}
-.btn-gold{
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#020C07;
-  box-shadow:0 2px 12px rgba(201,168,76,.25);
-}
-.btn-green{
-  background:linear-gradient(135deg,var(--grn3),var(--grn2));
-  color:#fff;
-}
-.btn-ghost{
-  background:var(--bg3);border:1px solid var(--bd);
-  color:var(--t2);
-}
-.btn-red{
-  background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.25);
-  color:var(--red);
-}
-.btn-full{width:100%;}
-.btn-sm{padding:.4rem .85rem;font-size:.6rem;}
-
-/* ══ FORM ELEMENTS ══ */
-.fi{
-  width:100%;background:var(--bg3);
-  border:1px solid var(--bd);border-radius:var(--r2);
-  padding:.65rem .75rem;font-size:.7rem;color:var(--t1);
-  outline:none;transition:border-color .15s;
-}
-.fi:focus{border-color:var(--gold);}
-.flbl{font-size:.58rem;color:var(--t3);margin-bottom:.25rem;display:block;}
-.fg{margin-bottom:.6rem;}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
-
-/* ══ PRAYER CARD ══ */
-.prayer-hero{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:.8rem;
-}
-.ph-label{font-size:.52rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.15rem;}
-.ph-name{font-family:var(--serif);font-size:1.8rem;font-weight:700;color:var(--gold2);line-height:1;}
-.ph-time{font-size:1.1rem;font-weight:600;color:var(--t1);margin-top:.2rem;}
-.ph-countdown{font-size:.6rem;color:var(--grn);margin-top:.2rem;}
-.ph-icon{font-size:2.5rem;opacity:.6;}
-.ph-progress{height:3px;background:var(--bg4);border-radius:var(--pill);overflow:hidden;}
-.ph-fill{height:100%;background:linear-gradient(90deg,var(--grn3),var(--grn));border-radius:var(--pill);transition:width .5s;}
-
-/* Hajj countdown */
-.hc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;}
-.hc-days{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold2);}
-.hc-sub{font-size:.52rem;color:var(--t3);margin-top:.15rem;}
-.hc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;}
-.hc-item{text-align:center;background:var(--bg3);border-radius:var(--r2);padding:.4rem;}
-.hc-num{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--gold2);}
-.hc-lbl{font-size:.45rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;}
-
-/* ══ PRAYER LIST ══ */
-.prayer-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.6rem 0;border-bottom:1px solid var(--bd2);
-}
-.prayer-row:last-child{border-bottom:none;}
-.pr-name{font-size:.7rem;font-weight:500;color:var(--t1);}
-.pr-time{font-size:.65rem;font-weight:600;color:var(--gold);}
-.pr-next{font-size:.48rem;color:var(--grn);background:rgba(46,204,113,.1);border-radius:var(--pill);padding:.15rem .45rem;}
-
-/* ══ QUICK ACTIONS ══ */
-.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:.6rem;}
-.qa{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.65rem .4rem;
-  display:flex;flex-direction:column;align-items:center;gap:.25rem;
-  cursor:pointer;transition:all .18s;
-}
-.qa:active{transform:scale(.94);}
-.qa-icon{font-size:1.3rem;}
-.qa-label{font-size:.48rem;font-weight:500;color:var(--t2);text-align:center;}
-
-/* ══ SCREEN HEADER ══ */
-.scr-hdr{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:1rem;padding-top:.2rem;
-}
-.scr-hdr-title{
-  font-family:var(--serif);font-size:1.4rem;
-  font-weight:600;color:var(--t1);line-height:1;
-}
-.scr-hdr-sub{font-size:.55rem;color:var(--t3);margin-top:.15rem;}
-.scr-hdr-action{
-  font-size:.6rem;color:var(--gold);cursor:pointer;
-  background:var(--gdim);border:1px solid var(--gbrd);
-  border-radius:var(--pill);padding:.3rem .7rem;
-}
-
-/* ══ BACK BUTTON / SUB PAGES ══ */
-.back-btn{
-  display:inline-flex;align-items:center;gap:.3rem;
-  font-size:.65rem;color:var(--gold);cursor:pointer;
-  background:var(--gdim);border:1px solid var(--gbrd);
-  border-radius:var(--pill);padding:.3rem .75rem;
-  margin-bottom:.8rem;
-}
-.up{display:none;}
-.up.show{display:block;animation:scrIn .2s ease;}
-.up-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;}
-.up-title{font-family:var(--serif);font-size:1.2rem;font-weight:600;color:var(--t1);}
-
-/* ══ EMPTY STATE ══ */
-.empty{
-  text-align:center;color:var(--t3);
-  font-size:.65rem;padding:2rem 1rem;
-}
-
-/* ══ LIVE BADGE ══ */
-.live-badge{
-  font-size:.45rem;font-weight:700;letter-spacing:.12em;
-  background:rgba(231,76,60,.15);color:var(--red);
-  border:1px solid rgba(231,76,60,.25);
-  border-radius:var(--pill);padding:.2rem .55rem;
-  animation:livePulse 2s infinite;
-}
-@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.6;}}
-
-/* ══ STAT ROW ══ */
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.6rem;}
-.stat-box{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r2);padding:.65rem .5rem;text-align:center;
-}
-.stat-val{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--gold2);}
-.stat-lbl{font-size:.48rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:.1rem;}
-
-/* ══ TOAST ══ */
-#toast{
-  position:fixed;bottom:calc(var(--nav-h) + .8rem);
-  left:50%;transform:translateX(-50%);
-  background:rgba(20,40,28,.97);
-  border:1px solid var(--gbrd);
-  border-radius:var(--pill);
-  padding:.55rem 1.2rem;
-  font-size:.65rem;font-weight:500;color:var(--t1);
-  white-space:nowrap;z-index:9000;
-  opacity:0;pointer-events:none;
-  transition:all .25s;
-  box-shadow:0 4px 20px rgba(0,0,0,.5);
-  backdrop-filter:blur(10px);
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
-
-/* ══ MORE HUB SCREEN ══ */
-.hub-section{margin-bottom:1.2rem;}
-.hub-section-title{
-  font-family:var(--serif);font-size:1rem;
-  color:var(--gold2);margin-bottom:.5rem;
-  display:flex;align-items:center;gap:.4rem;
-}
-.hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;}
-.hub-item{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.8rem .5rem;
-  display:flex;flex-direction:column;align-items:center;gap:.3rem;
-  cursor:pointer;transition:all .18s;
-}
-.hub-item:active{transform:scale(.94);}
-.hub-item.on{border-color:var(--gold);background:var(--gdim);}
-.hub-icon{font-size:1.6rem;}
-.hub-name{font-size:.55rem;font-weight:600;color:var(--t1);text-align:center;}
-.hub-badge{
-  font-size:.4rem;font-weight:700;
-  background:var(--gold);color:#020C07;
-  border-radius:var(--pill);padding:.1rem .3rem;
-}
-
-/* ══ PILGRIM PASSPORT ══ */
-.passport-card{
-  background:linear-gradient(135deg,var(--bg3),var(--bg4));
-  border:1px solid var(--gbrd);border-radius:var(--r4);
-  padding:1.2rem;margin-bottom:.7rem;
-  position:relative;overflow:hidden;
-}
-.passport-card::before{
-  content:'🕋';
-  position:absolute;right:.8rem;top:.8rem;
-  font-size:3rem;opacity:.08;
-}
-.pc-type{font-size:.48rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:.3rem;}
-.pc-name{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--t1);}
-.pc-id{font-size:.6rem;font-family:monospace;color:var(--gold2);margin:.3rem 0;}
-.pc-row{display:flex;gap:1rem;margin-top:.8rem;}
-.pc-field label{font-size:.42rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;}
-.pc-field span{font-size:.6rem;font-weight:500;color:var(--t1);}
-.pc-qr{
-  background:var(--bg5);border:1px solid var(--bd);
-  border-radius:var(--r2);padding:.4rem;
-  display:flex;align-items:center;justify-content:center;
-  min-width:70px;min-height:70px;
-  font-size:2rem;
-}
-
-/* ══ FAMILY GROUP ══ */
-.family-member{
-  display:flex;align-items:center;gap:.7rem;
-  padding:.7rem 0;border-bottom:1px solid var(--bd2);
-}
-.family-member:last-child{border-bottom:none;}
-.fm-avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:var(--bg4);border:1.5px solid var(--gbrd);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.1rem;flex-shrink:0;
-}
-.fm-name{font-size:.68rem;font-weight:500;color:var(--t1);}
-.fm-status{font-size:.52rem;color:var(--grn);}
-.fm-dist{font-size:.5rem;color:var(--t3);margin-left:auto;}
-.fm-safe{background:rgba(46,204,113,.1);color:var(--grn);border:1px solid rgba(46,204,113,.2);border-radius:var(--pill);padding:.12rem .4rem;font-size:.45rem;}
-
-/* ══ LEARNING COURSE ══ */
-.course-card{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.9rem;
-  margin-bottom:.5rem;display:flex;gap:.8rem;
-  cursor:pointer;transition:all .18s;
-}
-.course-card:active{transform:scale(.98);}
-.course-thumb{
-  width:50px;height:50px;border-radius:var(--r2);
-  background:var(--bg4);display:flex;align-items:center;
-  justify-content:center;font-size:1.6rem;flex-shrink:0;
-}
-.course-title{font-size:.7rem;font-weight:600;color:var(--t1);margin-bottom:.15rem;}
-.course-meta{font-size:.52rem;color:var(--t3);}
-.course-progress{height:2px;background:var(--bg4);border-radius:var(--pill);margin-top:.4rem;overflow:hidden;}
-.course-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:var(--pill);}
-
-/* ══ MARKETPLACE ══ */
-.market-item{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.9rem;margin-bottom:.5rem;
-}
-.mi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;}
-.mi-title{font-size:.7rem;font-weight:600;color:var(--t1);}
-.mi-price{font-size:.65rem;font-weight:700;color:var(--gold2);}
-.mi-meta{font-size:.52rem;color:var(--t3);margin-bottom:.5rem;}
-.mi-tags{display:flex;flex-wrap:wrap;gap:.3rem;}
-.mi-tag{
-  font-size:.45rem;background:var(--bg3);
-  color:var(--t3);border-radius:var(--pill);
-  padding:.15rem .45rem;
-}
-
-/* ══ LOST & FOUND ══ */
-.lf-item{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.85rem;margin-bottom:.5rem;
-}
-.lf-status{font-size:.45rem;font-weight:700;letter-spacing:.1em;border-radius:var(--pill);padding:.15rem .5rem;display:inline-block;margin-bottom:.4rem;}
-.lf-lost{background:rgba(231,76,60,.12);color:var(--red);border:1px solid rgba(231,76,60,.2);}
-.lf-found{background:rgba(46,204,113,.12);color:var(--grn);border:1px solid rgba(46,204,113,.2);}
-.lf-title{font-size:.68rem;font-weight:600;color:var(--t1);margin-bottom:.2rem;}
-.lf-desc{font-size:.55rem;color:var(--t3);margin-bottom:.4rem;}
-.lf-footer{display:flex;align-items:center;justify-content:space-between;}
-.lf-time{font-size:.48rem;color:var(--t3);}
-.lf-contact{font-size:.48rem;color:var(--gold);cursor:pointer;}
-
-/* ══ TRANSACTION HISTORY ══ */
-.tx-item{
-  display:flex;align-items:center;gap:.6rem;
-  padding:.6rem 0;border-bottom:1px solid var(--bd2);
-}
-.tx-item:last-child{border-bottom:none;}
-.tx-icon{font-size:1.1rem;flex-shrink:0;}
-.tx-label{font-size:.62rem;color:var(--t1);flex:1;}
-.tx-amount{font-size:.62rem;font-weight:600;color:var(--gold);}
-
-/* ══ MAP SVG ══ */
-.map-container{
-  background:var(--bg2);border:1px solid var(--bd);
-  border-radius:var(--r3);overflow:hidden;margin-bottom:.6rem;
-}
-
-/* ══ NOTIF ITEM ══ */
-.notif-item{
-  display:flex;gap:.7rem;padding:.75rem 0;
-  border-bottom:1px solid var(--bd2);
-}
-.notif-item:last-child{border-bottom:none;}
-.notif-icon{font-size:1.2rem;flex-shrink:0;}
-.notif-title{font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.1rem;}
-.notif-body{font-size:.55rem;color:var(--t2);}
-.notif-time{font-size:.48rem;color:var(--t3);margin-top:.1rem;}
-.notif-unread .notif-title::before{
-  content:'';display:inline-block;
-  width:6px;height:6px;border-radius:50%;
-  background:var(--gold);margin-right:.35rem;
-  vertical-align:middle;
-}
-
-/* ══ DHIKR COUNTER ══ */
-.dhikr-count{
-  font-family:var(--serif);
-  font-size:5rem;font-weight:700;
-  color:var(--gold2);text-align:center;
-  line-height:1;margin:.5rem 0;
-}
-.dhikr-btn{
-  width:100px;height:100px;border-radius:50%;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  display:flex;align-items:center;justify-content:center;
-  font-size:2rem;margin:0 auto;cursor:pointer;
-  box-shadow:0 4px 24px rgba(201,168,76,.3);
-  transition:all .1s;border:none;
-}
-.dhikr-btn:active{transform:scale(.93);}
-
-/* ══ AI CHAT ══ */
-.ai-bubble{
-  max-width:85%;padding:.7rem .9rem;
-  border-radius:var(--r3);margin-bottom:.5rem;
-  font-size:.65rem;line-height:1.5;
-}
-.ai-bubble.bot{
-  background:var(--bg3);border:1px solid var(--bd2);
-  margin-right:auto;border-bottom-left-radius:4px;
-  color:var(--t1);
-}
-.ai-bubble.user{
-  background:linear-gradient(135deg,var(--bg4),var(--bg5));
-  border:1px solid var(--gbrd);
-  margin-left:auto;border-bottom-right-radius:4px;
-  color:var(--t1);
-}
-.ai-typing{display:flex;gap:.3rem;align-items:center;padding:.5rem .9rem;}
-.ai-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--gold);opacity:.4;
-  animation:aiDot 1.2s infinite;
-}
-.ai-dot:nth-child(2){animation-delay:.2s;}
-.ai-dot:nth-child(3){animation-delay:.4s;}
-@keyframes aiDot{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:1;transform:scale(1.3);}}
-.ai-input-row{display:flex;gap:.4rem;align-items:center;padding:.6rem 0;}
-.ai-input{
-  flex:1;background:var(--bg3);border:1px solid var(--bd);
-  border-radius:var(--pill);padding:.55rem .85rem;
-  font-size:.65rem;color:var(--t1);outline:none;
-}
-.ai-input:focus{border-color:var(--gold);}
-.ai-send{
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  display:flex;align-items:center;justify-content:center;
-  font-size:.9rem;color:#020C07;flex-shrink:0;
-}
-
-/* ══ PROGRESS BAR ══ */
-.progress-bar{height:4px;background:var(--bg4);border-radius:var(--pill);overflow:hidden;margin:.4rem 0;}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:var(--pill);transition:width .4s;}
-
-/* ══ TOGGLE ══ */
-.toggle{
-  position:relative;width:38px;height:21px;
-  cursor:pointer;
-}
-.toggle input{opacity:0;width:0;height:0;}
-.toggle-slider{
-  position:absolute;inset:0;
-  background:var(--bg4);border-radius:var(--pill);
-  transition:.2s;
-}
-.toggle-slider::before{
-  content:'';position:absolute;
-  width:17px;height:17px;border-radius:50%;
-  background:var(--t3);top:2px;left:2px;
-  transition:.2s;
-}
-.toggle input:checked ~ .toggle-slider{background:var(--grn3);}
-.toggle input:checked ~ .toggle-slider::before{transform:translateX(17px);background:#fff;}
-
-/* ══ PAYMENT PAGE ══ */
-.pay-card{
-  background:linear-gradient(135deg,var(--bg3),var(--bg4));
-  border:1px solid var(--gbrd);border-radius:var(--r4);
-  padding:1.2rem;margin-bottom:.6rem;
-}
-.pay-name{font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--t1);margin-bottom:.3rem;}
-.pay-price{font-size:1.8rem;font-weight:700;color:var(--gold2);margin-bottom:.3rem;}
-.pay-features{list-style:none;margin-bottom:.8rem;}
-.pay-features li{font-size:.6rem;color:var(--t2);padding:.15rem 0;display:flex;align-items:center;gap:.35rem;}
-.pay-features li::before{content:'✓';color:var(--grn);font-weight:700;}
-
-/* ══ QIBLA COMPASS ══ */
-.compass-ring{
-  width:180px;height:180px;border-radius:50%;
-  border:2px solid var(--gbrd);
-  background:radial-gradient(circle,var(--bg3),var(--bg2));
-  display:flex;align-items:center;justify-content:center;
-  position:relative;margin:0 auto;
-}
-.compass-needle{
-  width:4px;height:80px;border-radius:var(--pill);
-  background:linear-gradient(to top,var(--red),var(--red) 50%,var(--t1) 50%);
-  transform-origin:center bottom;
-  position:absolute;bottom:50%;left:calc(50% - 2px);
-  transition:transform .5s ease;
-}
-
-/* ══ SCROLL HIDDEN ══ */
-.scr::-webkit-scrollbar{width:2px;}
-.scr::-webkit-scrollbar-track{background:transparent;}
-.scr::-webkit-scrollbar-thumb{background:var(--bd);border-radius:var(--pill);}
-
-/* ══ CERT CARD ══ */
-.cert-card{
-  background:linear-gradient(135deg,var(--bg3),var(--bg4));
-  border:1px solid var(--gbrd);border-radius:var(--r4);
-  padding:1.5rem;text-align:center;
-  position:relative;overflow:hidden;
-}
-.cert-card::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(circle at 10% 10%,rgba(201,168,76,.05),transparent 40%),
-    radial-gradient(circle at 90% 90%,rgba(46,204,113,.04),transparent 40%);
-}
-.cert-seal{font-size:2.5rem;margin-bottom:.5rem;}
-.cert-title{font-family:var(--serif);font-size:1.2rem;color:var(--gold2);margin-bottom:.3rem;}
-.cert-name{font-family:var(--serif);font-size:.9rem;color:var(--t1);}
-.cert-id{font-family:monospace;font-size:.55rem;color:var(--t3);margin-top:.4rem;}
-
-/* ══ UTILITIES ══ */
-.pill-tag{
-  display:inline-block;font-size:.48rem;font-weight:600;
-  background:var(--bg3);color:var(--t3);
-  border:1px solid var(--bd2);border-radius:var(--pill);
-  padding:.15rem .5rem;
-}
-.divider{height:1px;background:var(--bd2);margin:.7rem 0;}
-.row-between{display:flex;align-items:center;justify-content:space-between;}
-.row-center{display:flex;align-items:center;justify-content:center;}
-.mt-sm{margin-top:.4rem;}
-.mt-md{margin-top:.8rem;}
-.gap-sm{gap:.4rem;}
-.text-gold{color:var(--gold2);}
-.text-green{color:var(--grn);}
-.text-dim{color:var(--t3);}
-.text-sm{font-size:.58rem;}
-.text-xs{font-size:.5rem;}
-.font-serif{font-family:var(--serif);}
-.font-mono{font-family:monospace;}
-.fw-700{font-weight:700;}
-
-
-/* ══ CSS BRIDGE — old class names from preserved screens ══ */
-.scr-top-bar{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem .5rem;border-bottom:1px solid var(--bd2);margin-bottom:.7rem;}
+''' + open('/tmp/new_css.css').read() + '''
+/* ══ BRIDGE CSS ══ */
+.scr-top-bar{display:flex;align-items:center;justify-content:space-between;padding:.7rem 0 .5rem;margin-bottom:.6rem;}
 .scr-top-title{font-family:var(--serif);font-size:1.3rem;font-weight:600;color:var(--t1);}
-.scr-top-sub{font-size:.52rem;color:var(--t3);margin-top:.1rem;}
-.scr-top-action{font-size:.58rem;color:var(--gold);cursor:pointer;background:var(--gdim);border:1px solid var(--gbrd);border-radius:var(--pill);padding:.25rem .65rem;}
-
-/* stat-band */
-.stat-band{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.5rem;}
-.stat-band-item{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r2);padding:.55rem .4rem;text-align:center;}
+.scr-top-sub{font-size:.5rem;color:var(--t3);margin-top:.12rem;}
+.scr-top-action{font-size:.56rem;color:var(--gold);cursor:pointer;background:var(--gdim);border:1px solid var(--gbrd);border-radius:var(--pill);padding:.25rem .62rem;}
+.stat-band{display:grid;grid-template-columns:repeat(3,1fr);gap:.38rem;margin-bottom:.5rem;}
+.stat-band-item{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r2);padding:.52rem .4rem;text-align:center;}
 .stat-band-val{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--gold2);}
-.stat-band-lbl{font-size:.45rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;}
-
-/* checklist */
-.checklist-hero{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r3);padding:1rem;margin-bottom:.6rem;text-align:center;}
+.stat-band-lbl{font-size:.44rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;}
+.checklist-hero{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r3);padding:1rem;margin-bottom:.55rem;text-align:center;}
 .checklist-pct{font-family:var(--serif);font-size:2.5rem;font-weight:700;color:var(--gold2);}
-.checklist-bar{height:6px;background:var(--bg4);border-radius:var(--pill);overflow:hidden;margin:.5rem 0;}
+.checklist-bar{height:6px;background:var(--bg4);border-radius:var(--pill);overflow:hidden;margin:.4rem 0;}
 .checklist-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:var(--pill);transition:width .4s;}
-.checklist-item{display:flex;align-items:center;gap:.6rem;padding:.6rem 0;border-bottom:1px solid var(--bd2);cursor:pointer;}
+.checklist-item{display:flex;align-items:center;gap:.55rem;padding:.55rem 0;border-bottom:1px solid var(--bd2);cursor:pointer;}
 .checklist-item:last-child{border-bottom:none;}
-.checklist-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;}
-.ci-label{font-size:.65rem;color:var(--t1);}
-.ci-sub{font-size:.5rem;color:var(--t3);}
-
-/* analytics */
-.analytics-hero{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r3);padding:1rem;margin-bottom:.6rem;}
-.analytics-week{display:grid;grid-template-columns:repeat(7,1fr);gap:.25rem;}
-.analytics-day{display:flex;flex-direction:column;align-items:center;gap:.2rem;}
-.analytics-bar-wrap{height:50px;display:flex;align-items:flex-end;}
+.checklist-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);flex-shrink:0;}
+.ci-label{font-size:.63rem;color:var(--t1);}
+.ci-sub{font-size:.49rem;color:var(--t3);}
+.analytics-hero{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r3);padding:1rem;margin-bottom:.55rem;}
+.analytics-week{display:grid;grid-template-columns:repeat(7,1fr);gap:.22rem;}
+.analytics-day{display:flex;flex-direction:column;align-items:center;gap:.18rem;}
+.analytics-bar-wrap{height:48px;display:flex;align-items:flex-end;}
 .analytics-bar{width:8px;border-radius:var(--pill) var(--pill) 0 0;background:var(--gold);min-height:3px;}
 .analytics-day-lbl{font-size:.42rem;color:var(--t3);}
-
-/* guide tabs */
-.guide-tabs{display:flex;gap:.3rem;margin-bottom:.8rem;overflow-x:auto;scrollbar-width:none;padding-bottom:.2rem;}
-.gtab{font-size:.6rem;font-weight:600;padding:.35rem .8rem;border-radius:var(--pill);background:var(--bg3);border:1px solid var(--bd2);color:var(--t3);white-space:nowrap;transition:all .15s;}
+.guide-tabs{display:flex;gap:.3rem;margin-bottom:.75rem;overflow-x:auto;scrollbar-width:none;padding-bottom:.2rem;}
+.gtab{font-size:.58rem;font-weight:600;padding:.32rem .78rem;border-radius:var(--pill);background:var(--bg3);border:1px solid var(--bd2);color:var(--t3);white-space:nowrap;transition:all .15s;cursor:pointer;}
 .gtab.on{background:var(--gdim);border-color:var(--gbrd);color:var(--gold);}
 .guide-section{display:none;}
-.guide-section.show{display:block;}
-.guide-step{display:flex;gap:.7rem;padding:.8rem 0;border-bottom:1px solid var(--bd2);}
+.guide-section.show{display:block;animation:scrIn .2s ease;}
+.guide-step{display:flex;gap:.65rem;padding:.75rem 0;border-bottom:1px solid var(--bd2);}
 .guide-step:last-child{border-bottom:none;}
-.gs-num{width:28px;height:28px;border-radius:50%;background:var(--gdim);border:1px solid var(--gbrd);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:var(--gold);flex-shrink:0;}
-.gs-title{font-size:.68rem;font-weight:600;color:var(--t1);margin-bottom:.15rem;}
-.gs-desc{font-size:.55rem;color:var(--t3);}
-
-/* prayer rows in worship */
-.pw-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.6rem;}
-.pw-item{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r2);padding:.65rem .6rem;cursor:pointer;transition:all .15s;}
-.pw-item:active{transform:scale(.96);}
-.pw-icon{font-size:1.3rem;margin-bottom:.25rem;}
-.pw-name{font-size:.62rem;font-weight:600;color:var(--t1);}
-.pw-desc{font-size:.5rem;color:var(--t3);}
-
-/* dua library */
-.dua-item{padding:.7rem 0;border-bottom:1px solid var(--bd2);}
-.dua-item:last-child{border-bottom:none;}
-.dua-arabic{font-size:1rem;color:var(--gold2);direction:rtl;text-align:right;margin-bottom:.3rem;line-height:1.6;}
-.dua-transliteration{font-size:.55rem;color:var(--t2);margin-bottom:.15rem;}
-.dua-meaning{font-size:.52rem;color:var(--t3);}
-
-/* qibla */
+.gs-num{width:26px;height:26px;border-radius:50%;background:var(--gdim);border:1px solid var(--gbrd);display:flex;align-items:center;justify-content:center;font-size:.52rem;font-weight:700;color:var(--gold);flex-shrink:0;}
+.gs-title{font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.12rem;}
+.gs-desc{font-size:.52rem;color:var(--t3);}
 .qibla-wrap{display:flex;flex-direction:column;align-items:center;padding:1rem 0;}
 .compass-ring{width:180px;height:180px;border-radius:50%;border:2px solid var(--gbrd);background:radial-gradient(circle,var(--bg3),var(--bg2));display:flex;align-items:center;justify-content:center;position:relative;margin:0 auto .6rem;}
 .compass-needle{width:4px;height:80px;border-radius:var(--pill);background:linear-gradient(to top,var(--red),var(--red) 50%,var(--t1) 50%);transform-origin:center bottom;position:absolute;bottom:50%;left:calc(50% - 2px);transition:transform .5s ease;}
-
-/* itinerary */
+.dua-item{padding:.65rem 0;border-bottom:1px solid var(--bd2);}
+.dua-item:last-child{border-bottom:none;}
+.dua-arabic{font-size:1rem;color:var(--gold2);direction:rtl;text-align:right;margin-bottom:.25rem;line-height:1.7;}
+.dua-trans{font-size:.52rem;color:var(--t2);margin-bottom:.12rem;}
+.dua-meaning{font-size:.5rem;color:var(--t3);}
+.pw-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.55rem;}
+.pw-item{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r2);padding:.62rem .55rem;cursor:pointer;transition:all .15s;}
+.pw-item:active{transform:scale(.95);}
+.pw-icon{font-size:1.25rem;margin-bottom:.22rem;}
+.pw-name{font-size:.6rem;font-weight:600;color:var(--t1);}
+.pw-desc{font-size:.48rem;color:var(--t3);}
+.crowd-map{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden;margin-bottom:.55rem;}
+.health-hero{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r3);padding:1rem;margin-bottom:.55rem;}
+.gps-badge{font-size:.44rem;font-weight:700;letter-spacing:.1em;background:var(--grndim);color:var(--grn);border:1px solid rgba(46,204,113,.18);border-radius:var(--pill);padding:.18rem .52rem;}
+.wallet-hero{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.15rem;margin-bottom:.65rem;position:relative;overflow:hidden;}
+.wallet-hero::after{content:'';position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);}
+.wh-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;}
+.wh-av{font-size:2rem;}
+.wh-name{font-family:var(--serif);font-size:1.15rem;font-weight:600;color:var(--t1);}
+.wh-pid{font-family:monospace;font-size:.5rem;color:var(--gold2);margin:.12rem 0;}
+.wh-net{font-size:.46rem;color:var(--t3);}
+.wh-live{display:flex;align-items:center;gap:.28rem;font-size:.46rem;color:var(--grn);margin-top:.2rem;}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--grn);animation:livePulse 2s infinite;}
+.pay-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.15rem;margin-bottom:.55rem;}
+.pay-name{font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--t1);margin-bottom:.25rem;}
+.pay-price{font-size:1.7rem;font-weight:700;color:var(--gold2);margin-bottom:.25rem;}
+.pay-features{list-style:none;margin-bottom:.7rem;}
+.pay-features li{font-size:.58rem;color:var(--t2);padding:.13rem 0;display:flex;align-items:center;gap:.3rem;}
+.pay-features li::before{content:"\\2713";color:var(--grn);font-weight:700;}
+.up{display:none;}
+.up.on{display:block;animation:scrIn .2s ease;}
+.course-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r3);padding:.85rem;margin-bottom:.45rem;display:flex;gap:.75rem;cursor:pointer;transition:all .18s;}
+.course-card:active{transform:scale(.97);}
+.course-thumb{width:48px;height:48px;border-radius:var(--r2);background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.course-title{font-size:.68rem;font-weight:600;color:var(--t1);margin-bottom:.12rem;}
+.course-meta{font-size:.5rem;color:var(--t3);}
+.course-progress{height:2px;background:var(--bg4);border-radius:var(--pill);margin-top:.4rem;overflow:hidden;}
+.course-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:var(--pill);}
 .itinerary-day{margin-bottom:.8rem;}
 .iday-header{background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--r2);padding:.6rem .8rem;margin-bottom:.4rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
 .iday-name{font-size:.7rem;font-weight:700;color:var(--gold2);}
@@ -937,97 +97,19 @@ img{max-width:100%;display:block;}
 .ie-time{font-size:.55rem;font-weight:600;color:var(--gold);min-width:40px;}
 .ie-title{font-size:.62rem;color:var(--t1);}
 .ie-desc{font-size:.5rem;color:var(--t3);}
-
-/* translation */
-.trans-box{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r3);padding:.8rem;margin-bottom:.5rem;}
-.trans-lang{font-size:.5rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.4rem;}
-.trans-text{font-size:.75rem;color:var(--t1);line-height:1.5;}
-.trans-text.arabic{font-size:1.1rem;direction:rtl;text-align:right;color:var(--gold2);}
-
-/* offline badge */
-#offline-badge{
-  position:fixed;top:0;left:0;right:0;z-index:9000;
-  background:rgba(231,76,60,.9);color:#fff;
-  text-align:center;font-size:.58rem;font-weight:600;
-  padding:.3rem;display:none;
-}
-
-/* tour welcome */
-.tour-step{
-  background:var(--bg3);border:1px solid var(--gbrd);
-  border-radius:var(--r3);padding:1rem;margin-bottom:.5rem;
-  display:flex;align-items:center;gap:.8rem;
-}
-.tour-step-icon{font-size:1.6rem;flex-shrink:0;}
-.tour-step-title{font-size:.7rem;font-weight:600;color:var(--t1);margin-bottom:.15rem;}
-.tour-step-desc{font-size:.55rem;color:var(--t3);}
-
-/* ── UP pages — oUtil uses .on class ── */
-.up { display:none; }
-.up.on { display:block; animation:scrIn .2s ease; }
-/* Also support .show for new code */
-.up.show { display:block; animation:scrIn .2s ease; }
-
-/* ══ WALLET HERO ══ */
-.wallet-hero{
-  background:linear-gradient(135deg,var(--bg3),var(--bg4));
-  border:1px solid var(--gbrd);border-radius:var(--r4);
-  padding:1.2rem;margin-bottom:.7rem;position:relative;overflow:hidden;
-}
-.wallet-hero::after{content:'';position:absolute;top:-20px;right:-20px;
-  width:100px;height:100px;
-  background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);
-  pointer-events:none;}
-.wh-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;}
-.wh-av{font-size:2rem;flex-shrink:0;}
-.wh-name{font-family:var(--serif);font-size:1.2rem;font-weight:600;color:var(--t1);}
-.wh-pid{font-family:monospace;font-size:.52rem;color:var(--gold2);margin:.15rem 0;}
-.wh-net{font-size:.48rem;color:var(--t3);}
-.wh-live{display:flex;align-items:center;gap:.3rem;font-size:.48rem;color:var(--grn);margin-top:.2rem;}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);
-  animation:livePulse 2s infinite;}
-.pi-val{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold2);}
-.pi-val-usd{font-size:.55rem;color:var(--t3);margin-top:.1rem;}
-
-/* ══ UTILITY CARDS — enhanced visibility ══ */
-.tc{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.9rem .8rem;
-  cursor:pointer;transition:all .2s;
-  border-left:3px solid transparent;
-  position:relative;overflow:hidden;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
-.tc:hover{background:var(--bg3);border-color:var(--bd);}
-.tc:active{transform:scale(.95);opacity:.85;}
-.tc-gold{border-left-color:var(--gold)!important;}
-.tc-green{border-left-color:var(--grn)!important;}
-.tc-blue{border-left-color:var(--blue)!important;}
-.tc-red{border-left-color:var(--red)!important;}
-.tc-teal{border-left-color:var(--cyan)!important;}
-.tc-purple{border-left-color:var(--purple)!important;}
-
-/* Quick action buttons */
-.qa{
-  background:var(--bg2);border:1px solid var(--bd2);
-  border-radius:var(--r3);padding:.65rem .4rem;
-  display:flex;flex-direction:column;align-items:center;gap:.25rem;
-  cursor:pointer;transition:all .18s;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
-.qa:hover{background:var(--bg3);border-color:var(--bd);}
-.qa:active{transform:scale(.9);background:var(--gdim);border-color:var(--gbrd);}
 </style>
+</head>
 <body>
 
+<div id="offline-badge" style="position:fixed;top:0;left:0;right:0;z-index:9100;background:rgba(231,76,60,.9);color:#fff;text-align:center;font-size:.56rem;font-weight:600;padding:.3rem;display:none">
+  📡 No internet connection — some features may be limited
+</div>
+
 <!-- ═══ SPLASH ═══ -->
-<div id="offline-badge">📡 No internet connection — some features may be limited</div>
 <div id="splash">
   <div class="splash-kaaba">🕋</div>
   <div class="splash-logo">HARAMAIN</div>
-  <div class="splash-sub">Web3 Pilgrimage Infrastructure</div>
+  <div class="splash-sub">Web3 Pilgrimage Platform</div>
   <div class="splash-bar"><div class="splash-fill"></div></div>
 </div>
 
@@ -1046,21 +128,19 @@ img{max-width:100%;display:block;}
   </div>
   <div class="ls-badge">🟢 Pi Mainnet · sandbox:false · Real Pi</div>
   <button class="login-btn" id="loginBtn" onclick="piLogin()">
-    <span>🕋</span>
-    <span id="loginBtnText">SIGN IN WITH PI</span>
+    <span>🕋</span><span id="loginBtnText">Sign In with Pi</span>
   </button>
   <div class="ls-security">🔒 Secure Pi Mainnet Authentication · sandbox:false</div>
   <div id="ls-msg"></div>
 </div>
 
-<!-- ═══ APP SHELL ═══ -->
-<div id="app" style="display:none">
+<!-- ═══ APP ═══ -->
+<div id="app">
 
-  <!-- TOP BAR -->
+  <!-- TOPBAR -->
   <div id="topbar">
     <div class="tb-brand">HARAMAIN</div>
     <div class="tb-badge" id="net-badge">✅ Mainnet</div>
-    <div class="tb-user" id="tb-user">@pilgrim</div>
     <div class="tb-lang" onclick="cycleLang()" id="tb-lang">EN</div>
     <div class="tb-notif" onclick="goS('notifs')">🔔<div class="tb-notif-dot" id="notif-dot" style="display:none"></div></div>
   </div>
@@ -1068,123 +148,105 @@ img{max-width:100%;display:block;}
   <!-- SCREENS -->
   <div id="screens">
 
-    <!-- ══ DASHBOARD ══ -->
-    <section class="scr active" id="s-dashboard">
-      <div style="padding-top:.2rem">
-
-        <!-- Greeting -->
-        <div class="hero-card" style="margin-bottom:.7rem">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between">
-            <div>
-              <div style="font-size:.52rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem">BISMILLAH</div>
-              <div style="font-family:var(--serif);font-size:1.4rem;font-weight:600;color:var(--t1)" id="greeting-txt">Welcome, Pilgrim</div>
-              <div style="font-size:.58rem;color:var(--t3);margin-top:.15rem" id="greeting-sub">Your journey begins here</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-size:1.5rem" id="greeting-icon">🌙</div>
-              <div style="font-size:.55rem;color:var(--gold);margin-top:.2rem" id="hijri-widget">--</div>
-            </div>
+    <!-- HOME -->
+    <section class="scr on" id="s-dashboard">
+      <div class="hero-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between">
+          <div>
+            <div style="font-size:.5rem;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.18rem">BISMILLAH</div>
+            <div style="font-family:var(--serif);font-size:1.4rem;font-weight:600;color:var(--t1)" id="greeting-txt">Welcome, Pilgrim</div>
+            <div style="font-size:.56rem;color:var(--t3);margin-top:.12rem" id="greeting-sub">Your journey begins here</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:1.5rem" id="greeting-icon">🌙</div>
+            <div style="font-size:.5rem;color:var(--gold);margin-top:.18rem" id="hijri-widget">Loading...</div>
           </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="sec-label">⚡ Quick Actions</div>
-        <div class="qa-grid">
-          <div class="qa" onclick="goS('worship')"><div class="qa-icon">🕌</div><div class="qa-label">Prayer</div></div>
-          <div class="qa" onclick="goS('ai')"><div class="qa-icon">🤖</div><div class="qa-label">AI Guide</div></div>
-          <div class="qa" onclick="goS('tracker')"><div class="qa-icon">📍</div><div class="qa-label">Tracker</div></div>
-          <div class="qa" onclick="goS('emergency')"><div class="qa-icon">🚨</div><div class="qa-label">SOS</div></div>
-          <div class="qa" onclick="goS('guide')"><div class="qa-icon">📖</div><div class="qa-label">Guide</div></div>
-          <div class="qa" onclick="goS('crowd')"><div class="qa-icon">🌊</div><div class="qa-label">Crowd</div></div>
-          <div class="qa" onclick="goS('checklist')"><div class="qa-icon">✅</div><div class="qa-label">Checklist</div></div>
-          <div class="qa" onclick="goS('payments')"><div class="qa-icon">💰</div><div class="qa-label">Payments</div></div>
-        </div>
-
-        <!-- Prayer -->
-        <div class="sec-label">🕌 Prayer Intelligence</div>
-        <div class="card card-green" id="next-prayer-card">
-          <div class="prayer-hero">
-            <div>
-              <div class="ph-label">Next Prayer</div>
-              <div class="ph-name" id="np-name">—</div>
-              <div class="ph-time" id="np-time">--:--</div>
-              <div class="ph-countdown" id="np-countdown">Loading...</div>
-            </div>
-            <div class="ph-icon" id="np-icon">🕌</div>
-          </div>
-          <div class="ph-progress"><div id="prayer-progress" class="ph-fill" style="width:0%"></div></div>
-        </div>
-
-        <!-- Hajj Countdown -->
-        <div class="card card-gold">
-          <div class="hc-top">
-            <div>
-              <div class="ph-label">Hajj 1447 AH · Day of Arafat</div>
-              <div class="hc-days" id="hc-days">-- Days</div>
-              <div class="hc-sub">June 17, 2026 · Live countdown</div>
-            </div>
-            <div style="font-size:2rem">🕋</div>
-          </div>
-          <div class="hc-grid">
-            <div class="hc-item"><div class="hc-num" id="hc-d">--</div><div class="hc-lbl">Days</div></div>
-            <div class="hc-item"><div class="hc-num" id="hc-h">--</div><div class="hc-lbl">Hrs</div></div>
-            <div class="hc-item"><div class="hc-num" id="hc-m">--</div><div class="hc-lbl">Min</div></div>
-            <div class="hc-item"><div class="hc-num" id="hc-s">--</div><div class="hc-lbl">Sec</div></div>
-          </div>
-        </div>
-
-        <!-- Weather -->
-        <div class="sec-label">🌡️ Makkah Live</div>
-        <div class="card card-gold" id="weather-widget"><div class="empty">Loading Makkah weather...</div></div>
-
-        <!-- Journey Progress -->
-        <div class="sec-label">🗺️ Journey Stage</div>
-        <div class="ibox">
-          <div class="row-between" style="margin-bottom:.6rem">
-            <div style="font-size:.65rem;font-weight:600;color:var(--t1)" id="journey-stage">Preparation Phase</div>
-            <div style="font-size:.55rem;color:var(--gold)" id="journey-pct">0%</div>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" id="journey-fill" style="width:0%"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:.4rem">
-            <div style="font-size:.42rem;color:var(--t3)">Prep</div>
-            <div style="font-size:.42rem;color:var(--t3)">Travel</div>
-            <div style="font-size:.42rem;color:var(--t3)">Arrival</div>
-            <div style="font-size:.42rem;color:var(--t3)">Hajj</div>
-            <div style="font-size:.42rem;color:var(--t3)">Return</div>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="sec-label">📊 My Stats</div>
-        <div class="stat-row">
-          <div class="stat-box"><div class="stat-val" id="st-pts">0</div><div class="stat-lbl">Points</div></div>
-          <div class="stat-box"><div class="stat-val" id="st-streak">0</div><div class="stat-lbl">Streak</div></div>
-          <div class="stat-box"><div class="stat-val" id="st-level">1</div><div class="stat-lbl">Level</div></div>
-        </div>
-
-        <!-- Daily Reward -->
-        <div class="card card-gold" style="margin-bottom:.6rem">
-          <div style="display:flex;align-items:center;gap:.8rem">
-            <div style="font-size:2rem">🎁</div>
-            <div style="flex:1">
-              <div style="font-size:.7rem;font-weight:700;color:var(--gold2)">Daily Reward</div>
-              <div style="font-size:.55rem;color:var(--t3)">+10 pts every 24 hrs · 7-day streak = +20 bonus</div>
-            </div>
-            <button class="btn btn-gold btn-sm" onclick="claimDaily()">Claim</button>
-          </div>
-        </div>
-
-        <!-- Transaction History -->
-        <div class="sec-label">💳 Transactions <span class="scr-hdr-action" onclick="clrTx()" style="margin-left:auto;font-size:.48rem">Clear</span></div>
-        <div class="ibox" id="tx-list"><div class="empty">No transactions yet</div></div>
-
       </div>
+
+      <div class="sec-label">⚡ Quick Actions</div>
+      <div class="qa-grid">
+        <div class="qa" onclick="goS('worship')"><div class="qa-icon">🕌</div><div class="qa-label">Prayer</div></div>
+        <div class="qa" onclick="goS('ai')"><div class="qa-icon">🤖</div><div class="qa-label">AI</div></div>
+        <div class="qa" onclick="goS('tracker')"><div class="qa-icon">📍</div><div class="qa-label">Track</div></div>
+        <div class="qa" onclick="goS('emergency')"><div class="qa-icon">🚨</div><div class="qa-label">SOS</div></div>
+        <div class="qa" onclick="goS('crowd')"><div class="qa-icon">🌊</div><div class="qa-label">Crowd</div></div>
+        <div class="qa" onclick="goS('guide')"><div class="qa-icon">📖</div><div class="qa-label">Guide</div></div>
+        <div class="qa" onclick="goS('checklist')"><div class="qa-icon">✅</div><div class="qa-label">Tasks</div></div>
+        <div class="qa" onclick="goS('payments')"><div class="qa-icon">💰</div><div class="qa-label">Pay</div></div>
+      </div>
+
+      <div class="sec-label">🕌 Next Prayer</div>
+      <div class="card card-green">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+          <div>
+            <div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Next Prayer</div>
+            <div style="font-family:var(--serif);font-size:1.7rem;font-weight:700;color:var(--gold2);line-height:1" id="np-name">—</div>
+            <div style="font-size:.95rem;font-weight:600;color:var(--t1);margin-top:.12rem" id="np-time">--:--</div>
+            <div style="font-size:.56rem;color:var(--grn);margin-top:.1rem" id="np-countdown">Loading...</div>
+          </div>
+          <div style="font-size:2.4rem;opacity:.5" id="np-icon">🕌</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prayer-progress" style="width:0%"></div></div>
+      </div>
+
+      <div class="card card-gold">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
+          <div>
+            <div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Hajj 1447 · Day of Arafat</div>
+            <div style="font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--gold2)" id="hc-days">-- Days</div>
+            <div style="font-size:.5rem;color:var(--t3)">June 17, 2026</div>
+          </div>
+          <div style="font-size:2rem">🕋</div>
+        </div>
+        <div class="hc-grid">
+          <div class="hc-item"><div class="hc-num" id="hc-d">--</div><div class="hc-lbl">Days</div></div>
+          <div class="hc-item"><div class="hc-num" id="hc-h">--</div><div class="hc-lbl">Hrs</div></div>
+          <div class="hc-item"><div class="hc-num" id="hc-m">--</div><div class="hc-lbl">Min</div></div>
+          <div class="hc-item"><div class="hc-num" id="hc-s">--</div><div class="hc-lbl">Sec</div></div>
+        </div>
+      </div>
+
+      <div class="sec-label">🌡️ Makkah Weather</div>
+      <div class="card card-gold" id="weather-widget"><div class="empty" style="padding:.8rem">Loading...</div></div>
+
+      <div class="sec-label">🗺️ Journey Stage</div>
+      <div class="ibox">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+          <div style="font-size:.65rem;font-weight:600;color:var(--t1)" id="journey-stage">Preparation Phase</div>
+          <div style="font-size:.55rem;color:var(--gold)" id="journey-pct">15%</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="journey-fill" style="width:15%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:.32rem">
+          <span style="font-size:.4rem;color:var(--t3)">Prep</span><span style="font-size:.4rem;color:var(--t3)">Travel</span>
+          <span style="font-size:.4rem;color:var(--t3)">Arrival</span><span style="font-size:.4rem;color:var(--t3)">Hajj</span>
+          <span style="font-size:.4rem;color:var(--t3)">Return</span>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box"><div class="stat-val" id="st-pts">0</div><div class="stat-lbl">Points</div></div>
+        <div class="stat-box"><div class="stat-val" id="st-streak">0</div><div class="stat-lbl">Streak</div></div>
+        <div class="stat-box"><div class="stat-val" id="st-level">1</div><div class="stat-lbl">Level</div></div>
+      </div>
+
+      <div class="card card-gold" style="margin-bottom:.6rem">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <span style="font-size:1.8rem">🎁</span>
+          <div style="flex:1">
+            <div style="font-size:.68rem;font-weight:700;color:var(--gold2)">Daily Reward</div>
+            <div style="font-size:.52rem;color:var(--t3)">+10 pts · 7-day streak = +20 bonus</div>
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="claimDaily()">Claim</button>
+        </div>
+      </div>
+
+      <div class="sec-label">💳 Transactions <span class="scr-top-action" onclick="clrTx()" style="margin-left:auto;font-size:.46rem">Clear</span></div>
+      <div class="ibox" id="tx-list"><div class="empty">No transactions yet</div></div>
     </section>
 
-    <!-- ══ WORSHIP ══ -->
-    <section class="scr" id="s-worship">
-
-      <div class="scr-hdr">
+    <!-- WORSHIP -->
+    <section class="scr" id="s-worship"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Worship Center</div><div class="scr-hdr-sub">Ritual tracking & spiritual tools</div></div>
       </div>
 
@@ -1302,14 +364,10 @@ img{max-width:100%;display:block;}
         <div class="fg"><select class="fi" id="surah-select" onchange="loadSurah()"><option value="">— Select Surah —</option></select></div>
         <div id="quran-content"><div class="empty">Select a Surah above</div></div>
       </div>
-
-    
     </section>
 
-    <!-- ══ GUIDE ══ -->
-    <section class="scr" id="s-guide">
-
-      <div class="scr-hdr">
+    <!-- GUIDE -->
+    <section class="scr" id="s-guide"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Hajj & Umrah Guide</div><div class="scr-hdr-sub">Complete step-by-step pilgrimage guide</div></div>
       </div>
       <div class="guide-tabs">
@@ -1321,55 +379,35 @@ img{max-width:100%;display:block;}
         <button class="gtab" id="gtab-dua" onclick="switchGuide('dua',this)">Duas</button>
       </div>
       <div id="guide-content"></div>
-    
     </section>
 
-    <!-- ══ AI GUIDE ══ -->
+    <!-- AI -->
     <section class="scr" id="s-ai">
-
-      <div class="scr-hdr">
-        <div><div class="scr-hdr-title">Haramain AI</div><div class="scr-hdr-sub">Powered by Claude · Intelligent Hajj Guidance</div></div>
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">Haramain AI</div><div class="scr-top-sub">Powered by Claude · Your pilgrimage guide</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="clearAIChat()">Clear</button>
       </div>
-      <!-- AI Welcome -->
-      <div class="card card-gold">
-        <div style="display:flex;align-items:center;gap:.7rem">
-          <div style="font-size:2rem">🤖</div>
-          <div>
-            <div style="font-weight:700;font-size:.82rem;color:var(--pearl)">Haramain AI</div>
-            <div style="font-size:.62rem;color:var(--t3)">Powered by Claude · Available in 6 languages</div>
-            <div style="display:flex;align-items:center;gap:.3rem;margin-top:.2rem;font-family:var(--dm);font-size:.5rem;color:var(--grn)"><div class="live-dot"></div>Online · Ready to assist</div>
-          </div>
-        </div>
+      <div class="ai-chips" id="ai-chips">
+        <div class="ai-chip" onclick="askAI('How do I perform Tawaf correctly?')">🕋 Tawaf</div>
+        <div class="ai-chip" onclick="askAI('What are the ihram prohibitions?')">👘 Ihram</div>
+        <div class="ai-chip" onclick="askAI('What happens on Day of Arafat?')">⭐ Arafat</div>
+        <div class="ai-chip" onclick="askAI('What should I pack for Hajj?')">🧳 Packing</div>
+        <div class="ai-chip" onclick="askAI('Hajj safety tips?')">🛡️ Safety</div>
+        <div class="ai-chip" onclick="askAI('What is the dua for Tawaf?')">🤲 Duas</div>
       </div>
-      <!-- Suggested Prompts -->
-      <div class="sec-label">💡 Suggested Prompts</div>
-      <div class="ai-prompts">
-        <div class="ap" onclick="askAI('What invalidates Ihram?')">What invalidates Ihram?</div>
-        <div class="ap" onclick="askAI('How to perform Tawaf correctly?')">How to perform Tawaf?</div>
-        <div class="ap" onclick="askAI('What is the dua for Arafah?')">Dua for Arafah?</div>
-        <div class="ap" onclick="askAI('What should I pack for Hajj?')">Hajj packing list?</div>
-        <div class="ap" onclick="askAI('How many stones for Jamarat?')">Jamarat stoning?</div>
-        <div class="ap" onclick="askAI('What is Zamzam water and its benefits?')">Zamzam benefits?</div>
+      <div id="ai-chat" style="min-height:200px;margin-bottom:.6rem"></div>
+      <div style="display:flex;gap:.4rem;align-items:center;padding:.4rem 0;background:var(--bg);position:sticky;bottom:0">
+        <input type="text" class="fi" id="ai-input" placeholder="Ask about Hajj, Umrah, duas..." style="border-radius:var(--pill)" onkeydown="if(event.key==='Enter')sendAIMessage()">
+        <button class="btn btn-gold" style="width:40px;height:40px;padding:0;border-radius:50%;flex-shrink:0;font-size:1rem" onclick="sendAIMessage()">→</button>
       </div>
-      <!-- Chat -->
-      <div id="ai-chat">
-        <div class="ai-msg bot"><div class="ai-msg-who">🤖 Haramain AI</div><div class="ai-msg-text">Assalamu Alaikum! I am Haramain AI, your intelligent pilgrimage assistant. Ask me anything about Hajj, Umrah, rituals, duas, or Islamic guidance. I respond in your language.</div></div>
-      </div>
-      <div style="display:flex;gap:.5rem">
-        <input class="fi" type="text" id="ai-input" placeholder="Ask about Hajj, Umrah, rituals..." style="flex:1" onkeydown="if(event.key==='Enter')sendAI()">
-        <button class="btn" onclick="sendAI()" style="width:auto;padding:.58rem 1rem;margin-bottom:0">Send</button>
-      </div>
-    
     </section>
 
-    <!-- ══ PROFILE & PASSPORT ══ -->
+    <!-- PROFILE -->
     <section class="scr" id="s-profile">
-      <div class="scr-hdr">
-        <div><div class="scr-hdr-title">My Profile</div><div class="scr-hdr-sub">Digital Pilgrim Passport</div></div>
-        <div class="scr-hdr-action" onclick="logout()">Logout</div>
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">My Passport</div><div class="scr-top-sub">Digital Pilgrim Identity</div></div>
+        <button class="btn btn-red btn-sm" onclick="logout()">Logout</button>
       </div>
-
-      <!-- Digital Passport -->
       <div class="passport-card">
         <div class="pc-type">🕋 Haramain Digital Passport</div>
         <div class="pc-name" id="prof-name">Pilgrim</div>
@@ -1377,83 +415,66 @@ img{max-width:100%;display:block;}
         <div class="pc-row">
           <div style="flex:1">
             <div class="pc-field"><label>Username</label><span id="prof-user">@pilgrim</span></div>
-            <div class="pc-field" style="margin-top:.4rem"><label>Member Since</label><span id="prof-since">2026</span></div>
-            <div class="pc-field" style="margin-top:.4rem"><label>Status</label><span style="color:var(--grn)">✅ Verified Pilgrim</span></div>
+            <div class="pc-field" style="margin-top:.38rem"><label>Network</label><span style="font-size:.6rem;color:var(--grn)">Pi Mainnet ✅</span></div>
           </div>
           <div class="pc-qr" id="prof-qr">📱</div>
         </div>
-        <div style="display:flex;gap:.4rem;margin-top:.8rem">
+        <div style="display:flex;gap:.38rem;margin-top:.8rem">
           <button class="btn btn-gold btn-sm" onclick="sharePilgrimId()">📤 Share</button>
-          <button class="btn btn-ghost btn-sm" onclick="copyClip(document.getElementById('prof-pid').textContent)">📋 Copy ID</button>
-          <button class="btn btn-ghost btn-sm" onclick="refreshPilgrimId()">🔄 Refresh</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyClip(document.getElementById('prof-pid').textContent)">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="refreshPilgrimId()">🔄</button>
         </div>
       </div>
-
-      <!-- Stats -->
-      <div class="sec-label">📊 Stats</div>
       <div class="stat-row">
         <div class="stat-box"><div class="stat-val" id="p-pts">0</div><div class="stat-lbl">Points</div></div>
         <div class="stat-box"><div class="stat-val" id="p-streak">0</div><div class="stat-lbl">Streak</div></div>
         <div class="stat-box"><div class="stat-val" id="p-level">1</div><div class="stat-lbl">Level</div></div>
       </div>
-
-      <!-- Pilgrim Pass Status -->
       <div class="sec-label">⭐ Pilgrim Pass</div>
-      <div class="card card-gold">
-        <div style="display:flex;align-items:center;gap:.8rem">
-          <div style="font-size:1.8rem">⭐</div>
+      <div class="pay-card">
+        <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.5rem">
+          <span style="font-size:1.8rem">⭐</span>
           <div style="flex:1">
-            <div style="font-size:.7rem;font-weight:700;color:var(--gold2)" id="prem-status">Free Tier</div>
-            <div style="font-size:.55rem;color:var(--t3)">Upgrade for all premium features</div>
+            <div class="pay-name" style="font-size:.85rem">Pilgrim Pass — Premium</div>
+            <div class="pay-price">1π</div>
           </div>
-          <button class="btn btn-gold btn-sm" id="prem-btn" onclick="buyPrem()">1π</button>
+          <span id="prem-status-badge" style="display:none;font-size:.5rem;color:var(--grn)">Active ✅</span>
         </div>
+        <ul class="pay-features" style="margin-bottom:.65rem">
+          <li>Unlimited AI Pilgrim Guide</li>
+          <li>All learning courses unlocked</li>
+          <li>Priority safety alerts</li>
+          <li>Verified Pilgrim badge</li>
+        </ul>
+        <button class="btn btn-gold btn-full" id="prem-btn" onclick="buyPrem()">⭐ Unlock Pilgrim Pass — 1π</button>
       </div>
-
-      <!-- Achievement Certificate -->
       <div class="sec-label">🏆 Certificate</div>
-      <div class="cert-card" id="cert-card">
+      <div class="cert-card">
         <div class="cert-seal">🏅</div>
         <div class="cert-title">Haramain Pilgrim</div>
-        <div class="cert-name" id="cert-name">Complete learning modules to earn your certificate</div>
+        <div class="cert-name" id="cert-name">Complete courses to earn your certificate</div>
         <div class="cert-id" id="cert-id"></div>
-        <div style="margin-top:.8rem">
-          <button class="btn btn-gold btn-sm" onclick="goS('learning')" style="margin:0 auto">📚 Start Learning</button>
-        </div>
+        <button class="btn btn-ghost btn-sm" onclick="goS('learning')" style="margin:.65rem auto 0;display:block">📚 Start Learning</button>
       </div>
-
-      <!-- Settings -->
       <div class="sec-label">⚙️ Settings</div>
       <div class="ibox">
         <div class="row-between" style="padding:.4rem 0;border-bottom:1px solid var(--bd2)">
-          <div>
-            <div style="font-size:.65rem;color:var(--t1)">Language</div>
-            <div style="font-size:.52rem;color:var(--t3)">App display language</div>
-          </div>
-          <select class="fi" style="width:auto;padding:.3rem .5rem;font-size:.6rem" onchange="setLang(this.value)" id="lang-sel">
-            <option value="en">English</option>
-            <option value="ar">العربية</option>
-            <option value="ha">Hausa</option>
-            <option value="ur">اردو</option>
-            <option value="id">Bahasa</option>
-            <option value="tr">Türkçe</option>
+          <div><div style="font-size:.63rem;color:var(--t1)">Language</div><div style="font-size:.5rem;color:var(--t3)">App display language</div></div>
+          <select class="fi" style="width:auto;padding:.28rem .5rem;font-size:.58rem" onchange="switchLang(this.value)" id="lang-sel">
+            <option value="en">English</option><option value="ar">العربية</option>
+            <option value="ha">Hausa</option><option value="ur">اردو</option>
+            <option value="id">Bahasa</option><option value="tr">Türkçe</option>
           </select>
         </div>
         <div class="row-between" style="padding:.5rem 0">
-          <div>
-            <div style="font-size:.65rem;color:var(--t1)">Notifications</div>
-            <div style="font-size:.52rem;color:var(--t3)">Prayer & safety alerts</div>
-          </div>
-          <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+          <div><div style="font-size:.63rem;color:var(--t1)">Version</div><div style="font-size:.5rem;color:var(--t3)">HARAMAIN v5.0 · Pi Mainnet</div></div>
+          <span style="font-size:.5rem;color:var(--grn)">✅ Latest</span>
         </div>
       </div>
-
     </section>
 
-    <!-- ══ PAYMENTS ══ -->
-    <section class="scr" id="s-payments">
-
-      <div class="scr-hdr">
+    <!-- PAYMENTS -->
+    <section class="scr" id="s-payments"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Pi Payments</div>
       <!-- ⭐ PILGRIM PASS — PREMIUM -->
       <div class="pay-card" style="margin-bottom:.6rem">
@@ -1570,14 +591,10 @@ img{max-width:100%;display:block;}
           <div class="qk-grid"><button class="btn btn-ghost btn-sm" onclick="spi(100)">100π</button><button class="btn btn-ghost btn-sm" onclick="spi(500)">500π</button><button class="btn btn-ghost btn-sm" onclick="spi(1000)">1Kπ</button><button class="btn btn-ghost btn-sm" onclick="spi(5000)">5Kπ</button></div>
         </div>
       </div>
-
-    
     </section>
 
-    <!-- ══ LIVE TRACKER ══ -->
-    <section class="scr" id="s-tracker">
-
-      <div class="scr-top-bar">
+    <!-- TRACKER -->
+    <section class="scr" id="s-tracker"><div class="scr-top-bar">
         <div>
           <div class="scr-top-title">📍 Live Tracker</div>
           <div class="scr-top-sub">GPS · Family share · Zone detection</div>
@@ -1652,13 +669,10 @@ img{max-width:100%;display:block;}
         </div>
 
       </div>
-    
     </section>
 
-    <!-- ══ EMERGENCY ══ -->
-    <section class="scr" id="s-emergency">
-
-      <div class="scr-top-bar">
+    <!-- EMERGENCY -->
+    <section class="scr" id="s-emergency"><div class="scr-top-bar">
         <div><div class="scr-top-title">🆘 Emergency Command</div><div class="scr-top-sub">Saudi Civil Defense · Red Crescent · Embassy</div></div>
         <span class="live-badge">LIVE</span>
       </div>
@@ -1752,107 +766,14 @@ img{max-width:100%;display:block;}
           📱 HARAMAIN Emergency System
         </div>
       </div>
-    
     </section>
 
-    <!-- ══ HEALTH INTEL ══ -->
-    <section class="scr" id="s-health-intel">
-
-      <div class="scr-top-bar">
-        <div><div class="scr-top-title">🏥 Health Intelligence</div><div class="scr-top-sub">Medical passport · Risk monitoring · Medication</div></div>
-        <span class="gps-badge">LIVE</span>
-      </div>
-      <div style="padding:1rem;padding-bottom:6rem">
-
-        <!-- Health Score -->
-        <div class="health-hero">
-          <div style="display:flex;align-items:center;gap:1rem">
-            <div class="health-score">
-              <svg class="health-ring" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(201,168,76,.15)" stroke-width="8"/>
-                <circle cx="60" cy="60" r="52" fill="none" stroke="#C9A84C" stroke-width="8"
-                  stroke-dasharray="327" stroke-dashoffset="var(--hdash,82)"
-                  stroke-linecap="round" transform="rotate(-90 60 60)"
-                  id="health-ring-circle"/>
-              </svg>
-              <div class="health-score-val" id="health-score-val">75</div>
-              <div class="health-score-lbl">Health</div>
-            </div>
-            <div style="flex:1">
-              <div style="font-weight:700;font-size:.85rem;color:var(--t1);margin-bottom:.3rem">Pilgrim Health Status</div>
-              <div id="health-status-text" style="font-family:var(--dm);font-size:.6rem;color:var(--grn);margin-bottom:.4rem">✅ Good condition for Hajj</div>
-              <div class="heat-risk low" id="heat-risk-display">
-                <span style="font-size:1rem">🌡️</span>
-                <span id="heat-risk-text">Heat risk: LOW · 36°C · Stay hydrated</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Vital Signs -->
-        <div class="sec-label">📊 Vital Monitoring</div>
-        <div class="vital-grid">
-          <div class="vital-card" style="--fill:65%;--accent:#E74C3C">
-            <div class="vital-val" id="vi-heart">72</div>
-            <div class="vital-unit">bpm</div>
-            <div class="vital-lbl">Heart Rate</div>
-          </div>
-          <div class="vital-card" style="--fill:75%;--accent:#3498DB">
-            <div class="vital-val" id="vi-bp">120/80</div>
-            <div class="vital-unit">mmHg</div>
-            <div class="vital-lbl">Blood Pressure</div>
-          </div>
-          <div class="vital-card" style="--fill:90%;--accent:var(--grn)">
-            <div class="vital-val" id="vi-spo2">98</div>
-            <div class="vital-unit">%</div>
-            <div class="vital-lbl">SpO2</div>
-          </div>
-          <div class="vital-card" style="--fill:50%;--accent:#F5B041">
-            <div class="vital-val" id="vi-temp">37.0</div>
-            <div class="vital-unit">°C</div>
-            <div class="vital-lbl">Temperature</div>
-          </div>
-        </div>
-        <button class="btn btn-ghost" onclick="logVitals()" style="margin-bottom:.6rem;font-size:.65rem">
-          + Log Current Vitals
-        </button>
-
-        <!-- Medical Profile -->
-        <div class="sec-label">🪪 Medical Passport</div>
-        <div class="card card-gold" style="margin-bottom:.6rem">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-            <div style="font-weight:700;font-size:.78rem;color:var(--t1)">Digital Medical Record</div>
-            <div id="med-qr-mini" style="width:48px;height:48px;background:rgba(201,168,76,.1);border-radius:8px;border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem">📋</div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.4rem;margin-bottom:.5rem">
-            <div class="fg"><label class="flbl">Blood Type</label><div id="mp-blood" style="font-family:var(--df);font-size:1.3rem;color:var(--red);padding:.2rem 0">A+</div></div>
-            <div class="fg"><label class="flbl">Age</label><div id="mp-age" style="font-family:var(--df);font-size:1.3rem;color:var(--gold);padding:.2rem 0">--</div></div>
-          </div>
-          <div class="fg" style="margin-bottom:.4rem"><label class="flbl">Known Conditions</label><div id="mp-conditions" style="font-size:.65rem;color:var(--t2);padding:.15rem 0">None recorded</div></div>
-          <div class="fg" style="margin-bottom:.4rem"><label class="flbl">Allergies</label><div id="mp-allergies" style="font-size:.65rem;color:var(--t2);padding:.15rem 0">None recorded</div></div>
-          <div class="fg" style="margin-bottom:.5rem"><label class="flbl">Current Medications</label><div id="mp-meds" style="font-size:.65rem;color:var(--t2);padding:.15rem 0">None recorded</div></div>
-          <div style="display:flex;gap:.5rem">
-            <button class="btn btn-gold" onclick="openHealthEdit()" style="flex:1;font-size:.62rem">✏️ Edit Profile</button>
-            <button class="btn btn-ghost" onclick="showMedQR()" style="flex:1;font-size:.62rem">📋 Hospital QR</button>
-          </div>
-        </div>
-
-        <!-- Medication Reminders -->
-        <div class="sec-label">💊 Medication Schedule</div>
-        <div id="med-schedule-list"></div>
-        <button class="btn btn-ghost" onclick="addMedication()" style="margin-bottom:.6rem;font-size:.65rem">+ Add Medication</button>
-
-        <!-- Nearby Hospitals -->
-        <div class="sec-label">🏥 Nearest Hospitals</div>
-        <div id="hospital-list"></div>
-      </div>
-    
+    <!-- HEALTH INTEL -->
+    <section class="scr" id="s-health-intel">''' + S.get('health-intel', '<div class="empty">Loading...</div>') + '''
     </section>
 
-    <!-- ══ CROWD INTEL ══ -->
-    <section class="scr" id="s-crowd">
-
-      <div class="scr-top-bar">
+    <!-- CROWD -->
+    <section class="scr" id="s-crowd"><div class="scr-top-bar">
         <div><div class="scr-top-title">🌊 Crowd Intelligence</div><div class="scr-top-sub">Zone density · Safe routes · Jamarat timing</div></div>
         <span class="live-badge">LIVE</span>
       </div>
@@ -1957,13 +878,10 @@ img{max-width:100%;display:block;}
           <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3)">Alert when any zone reaches critical density. Suggests safer alternatives immediately.</div>
         </div>
       </div>
-    
     </section>
 
-    <!-- ══ HYDRATION ══ -->
-    <section class="scr" id="s-hydration">
-
-      <div class="scr-top-bar">
+    <!-- HYDRATION -->
+    <section class="scr" id="s-hydration"><div class="scr-top-bar">
         <div><div class="scr-top-title">💧 Hydration System</div><div class="scr-top-sub">Smart water tracker · Heat prevention · Zamzam</div></div>
         <span class="gps-badge">AI</span>
       </div>
@@ -2031,68 +949,30 @@ img{max-width:100%;display:block;}
           <div style="font-family:var(--dm);font-size:.55rem;color:#F5B041">⚠️ Makkah heat: drink 500ml every hour minimum</div>
         </div>
       </div>
-    
     </section>
 
-    <!-- ══ AUDIO DUAS ══ -->
+    <!-- AUDIO DUAS -->
     <section class="scr" id="s-audio">
-
       <div class="scr-top-bar">
-        <div><div class="scr-top-title">🎵 Audio Duas & Quran</div><div class="scr-top-sub">Scholar recitations · Offline ready · 6 languages</div></div>
+        <div><div class="scr-top-title">Audio Duas</div><div class="scr-top-sub">Listen · Recite · Memorize</div></div>
       </div>
-      <div style="padding:1rem;padding-bottom:6rem">
-
-        <!-- Now Playing -->
-        <div class="audio-player-hero">
-          <div class="audio-now-playing">
-            <div class="audio-album-art" id="audio-album-art">🕋</div>
-            <div class="audio-title" id="audio-title">Dua for entering Makkah</div>
-            <div class="audio-artist" id="audio-artist">Sheikh Sudais · Arabic + Transliteration</div>
-          </div>
-          <div class="audio-progress">
-            <div class="audio-bar" id="audio-bar" onclick="seekAudio(event)">
-              <div class="audio-fill" id="audio-fill" style="width:0%"></div>
-              <div class="audio-dot" style="--pos:0%" id="audio-dot"></div>
-            </div>
-            <div class="audio-times">
-              <span id="audio-current">0:00</span>
-              <span id="audio-duration">--:--</span>
-            </div>
-          </div>
-          <div class="audio-controls">
-            <button class="audio-btn" onclick="prevTrack()">⏮</button>
-            <button class="audio-btn" onclick="toggleRepeat()" id="audio-repeat-btn">🔁</button>
-            <button class="audio-play-btn" onclick="toggleAudioPlay()" id="audio-play-btn">▶</button>
-            <button class="audio-btn" onclick="toggleShuffle()" id="audio-shuffle-btn">🔀</button>
-            <button class="audio-btn" onclick="nextTrack()">⏭</button>
-          </div>
-          <!-- Arabic text display -->
-          <div style="text-align:center;margin-top:.6rem;padding:.6rem;background:rgba(0,0,0,.2);border-radius:var(--r2)">
-            <div style="font-family:'Amiri','Traditional Arabic',serif;font-size:1.1rem;color:var(--gold2);direction:rtl;line-height:1.8;margin-bottom:.3rem" id="audio-arabic">بِسْمِ اللَّهِ وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ</div>
-            <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3);font-style:italic" id="audio-transliteration">Bismillah was-salatu was-salam ala rasulillah</div>
-          </div>
+      <div class="audio-player">
+        <div style="font-size:.46rem;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.38rem">NOW PLAYING</div>
+        <div style="font-size:.78rem;font-weight:600;color:var(--t1);margin-bottom:.3rem" id="audio-now-name">Tap a dua to begin</div>
+        <div class="audio-arabic" id="audio-now-arabic">—</div>
+        <div class="audio-trans" id="audio-now-trans">Select a dua from the list below</div>
+        <div class="audio-controls">
+          <button class="audio-btn audio-btn-side" onclick="prevDua()">⏮</button>
+          <button class="audio-btn audio-btn-main" id="audio-play-btn" onclick="toggleAudioPlay()">▶</button>
+          <button class="audio-btn audio-btn-side" onclick="nextDua()">⏭</button>
         </div>
-
-        <!-- Category Tabs -->
-        <div class="day-tab-row" id="audio-cats">
-          <div class="day-tab on" onclick="loadAudioCat('hajj',this)">🕋 Hajj Duas</div>
-          <div class="day-tab" onclick="loadAudioCat('prayer',this)">🕌 Prayer</div>
-          <div class="day-tab" onclick="loadAudioCat('morning',this)">🌅 Morning</div>
-          <div class="day-tab" onclick="loadAudioCat('evening',this)">🌙 Evening</div>
-          <div class="day-tab" onclick="loadAudioCat('quran',this)">📖 Quran</div>
-          <div class="day-tab" onclick="loadAudioCat('sleep',this)">😴 Sleep</div>
-        </div>
-
-        <!-- Playlist -->
-        <div class="dua-playlist" id="dua-playlist"></div>
       </div>
-    
+      <div class="sec-label">📖 Duas Collection</div>
+      <div id="audio-dua-list"></div>
     </section>
 
-    <!-- ══ HAJJ CHECKLIST ══ -->
-    <section class="scr" id="s-checklist">
-
-      <div class="scr-top-bar">
+    <!-- CHECKLIST -->
+    <section class="scr" id="s-checklist"><div class="scr-top-bar">
         <div><div class="scr-top-title">📋 Hajj Checklist</div><div class="scr-top-sub">Day-by-day · Ritual validation · Progress</div></div>
       </div>
       <div style="padding:1rem;padding-bottom:6rem">
@@ -2115,35 +995,51 @@ img{max-width:100%;display:block;}
         <!-- Checklist Items -->
         <div id="checklist-items"></div>
       </div>
-    
     </section>
 
-    <!-- ══ HAJJ ITINERARY ══ -->
+    <!-- ITINERARY -->
     <section class="scr" id="s-itinerary">
-
       <div class="scr-top-bar">
-        <div><div class="scr-top-title">🗓️ Hajj Itinerary</div><div class="scr-top-sub">Day 8–13 · Personal schedule · Smart reminders</div></div>
-        <div class="scr-top-action" onclick="exportItinerary()">Export</div>
+        <div><div class="scr-top-title">Hajj Itinerary</div><div class="scr-top-sub">Day-by-day journey · 1447 AH</div></div>
       </div>
-      <div style="padding:1rem;padding-bottom:6rem">
-
-        <!-- Overview -->
-        <div class="stat-band" style="margin-bottom:.8rem">
-          <div class="stat-band-item"><div class="stat-band-val">6</div><div class="stat-band-lbl">Days</div></div>
-          <div class="stat-band-item"><div class="stat-band-val" id="itin-events">24</div><div class="stat-band-lbl">Events</div></div>
-          <div class="stat-band-item"><div class="stat-band-val" id="itin-done">0</div><div class="stat-band-lbl">Done</div></div>
+      <div class="progress-bar" style="margin-bottom:.3rem"><div class="progress-fill" id="itin-prog" style="width:0%"></div></div>
+      <div style="font-size:.5rem;color:var(--t3);text-align:right;margin-bottom:.7rem" id="itin-pct">0 of 13 steps</div>
+      <div class="itinerary-day">
+        <div class="iday-header"><div><div class="iday-name">Day 1 · 8 Dhul Hijjah</div><div class="iday-sub">Day of Tarwiyah — Travel to Mina</div></div><span>▼</span></div>
+        <div class="iday-events">
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Fajr</div><div><div class="ie-title">Enter Ihram at Miqat</div><div class="ie-desc">Ghusl · wear Ihram · say intention · recite Talbiyah</div></div></div>
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Morning</div><div><div class="ie-title">Travel to Mina</div><div class="ie-desc">Spend the day in prayer and dhikr</div></div></div>
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">All day</div><div><div class="ie-title">Shorten all 5 prayers</div><div class="ie-desc">Qasr prayers in Mina</div></div></div>
         </div>
-
-        <!-- Day-by-day -->
-        <div id="itinerary-days"></div>
       </div>
-    
+      <div class="itinerary-day">
+        <div class="iday-header" style="border-color:rgba(46,204,113,.2)"><div><div class="iday-name" style="color:var(--grn)">Day 2 · 9 Dhul Hijjah ⭐</div><div class="iday-sub">Day of Arafat — THE PILLAR OF HAJJ</div></div><span>▼</span></div>
+        <div class="iday-events">
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Fajr</div><div><div class="ie-title">Travel to Arafat</div><div class="ie-desc">Arrive before Dhuhr — the greatest day</div></div></div>
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Dhuhr–Maghrib</div><div><div class="ie-title">🟢 STAND AT ARAFAT</div><div class="ie-desc">Most important moment of Hajj · intensive dua</div></div></div>
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">After Maghrib</div><div><div class="ie-title">Travel to Muzdalifah</div><div class="ie-desc">Combined Maghrib+Isha · collect 49 pebbles</div></div></div>
+        </div>
+      </div>
+      <div class="itinerary-day">
+        <div class="iday-header"><div><div class="iday-name">Day 3 · 10 Dhul Hijjah</div><div class="iday-sub">Day of Sacrifice — Eid al-Adha</div></div><span>▼</span></div>
+        <div class="iday-events">
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Dawn</div><div><div class="ie-title">Leave Muzdalifah for Mina</div><div class="ie-desc">Leave before sunrise</div></div></div>
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Morning</div><div><div class="ie-title">Stone Large Jamarat</div><div class="ie-desc">7 pebbles · Allahu Akbar with each</div></div></div>
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Afternoon</div><div><div class="ie-title">Tawaf al-Ifadah + Sai</div><div class="ie-desc">Obligatory Tawaf · 7 rounds · then Sai</div></div></div>
+        </div>
+      </div>
+      <div class="itinerary-day">
+        <div class="iday-header"><div><div class="iday-name">Days 4–5 · 11–12 Dhul Hijjah</div><div class="iday-sub">Days of Tashriq</div></div><span>▼</span></div>
+        <div class="iday-events">
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">After Dhuhr</div><div><div class="ie-title">Stone All 3 Jamarat</div><div class="ie-desc">7 pebbles each · 21 total per day</div></div></div>
+          <div class="ievent" onclick="markItin(this)"><div class="ie-time">Last day</div><div><div class="ie-title">Farewell Tawaf</div><div class="ie-desc">Final act before leaving Makkah · 7 rounds</div></div></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-full" style="margin-top:.6rem" onclick="resetItin()">↺ Reset Progress</button>
     </section>
 
-    <!-- ══ ANALYTICS ══ -->
-    <section class="scr" id="s-analytics">
-
-      <div class="scr-top-bar">
+    <!-- ANALYTICS -->
+    <section class="scr" id="s-analytics"><div class="scr-top-bar">
         <div><div class="scr-top-title">📊 Spiritual Analytics</div><div class="scr-top-sub">Worship insights · Progress · AI recommendations</div></div>
       </div>
       <div style="padding:1rem;padding-bottom:6rem">
@@ -2169,13 +1065,10 @@ img{max-width:100%;display:block;}
         <div class="sec-label">🎯 Worship Goals</div>
         <div id="worship-goals"></div>
       </div>
-    
     </section>
 
-    <!-- ══ PILGRIM MEMORIES ══ -->
-    <section class="scr" id="s-memories">
-
-      <div class="scr-top-bar">
+    <!-- MEMORIES -->
+    <section class="scr" id="s-memories"><div class="scr-top-bar">
         <div><div class="scr-top-title">📸 Pilgrim Memories</div><div class="scr-top-sub">Your spiritual journey · Private · Shareable</div></div>
         <div class="scr-top-action" onclick="shareMemories()">Share</div>
       </div>
@@ -2210,66 +1103,61 @@ img{max-width:100%;display:block;}
           </div>
         </div>
       </div>
-    
     </section>
 
-    <!-- ══ MOON SIGHTING ══ -->
+    <!-- MOON -->
     <section class="scr" id="s-moon">
-
       <div class="scr-top-bar">
-        <div><div class="scr-top-title">🌙 Moon & Islamic Calendar</div><div class="scr-top-sub">Astronomical · Country rulings · Events</div></div>
+        <div><div class="scr-top-title">Moon & Calendar</div><div class="scr-top-sub">Islamic calendar · Hijri dates · Events</div></div>
       </div>
-      <div style="padding:1rem;padding-bottom:6rem">
-
-        <!-- Moon Phase Hero -->
-        <div class="moon-hero">
-          <div class="moon-display" id="moon-phase-icon">🌕</div>
-          <div class="moon-phase-name" id="moon-phase-name">Full Moon</div>
-          <div class="moon-illumination" id="moon-illumination">Illumination: 98% · Waxing Gibbous</div>
-          <div style="margin-top:.5rem">
-            <div style="font-family:var(--dm);font-size:.52rem;color:var(--t3)">Next New Moon (Hilal)</div>
-            <div style="font-family:var(--df);font-size:1.1rem;color:var(--gold2)" id="moon-next-new">June 25, 2026</div>
-          </div>
-        </div>
-
-        <!-- Monthly Calendar -->
-        <div class="sec-label">📅 Islamic Calendar — Dhul Hijjah 1447</div>
-        <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:.8rem;margin-bottom:.6rem">
-          <div class="moon-calendar" id="moon-calendar-header" style="margin-bottom:.3rem">
-            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Sun</div>
-            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Mon</div>
-            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Tue</div>
-            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Wed</div>
-            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Thu</div>
-            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Fri</div>
-            <div style="font-family:var(--dm);font-size:.45rem;color:var(--t3);text-align:center" >Sat</div>
-          </div>
-          <div class="moon-calendar" id="moon-calendar-grid"></div>
-        </div>
-
-        <!-- Upcoming Events -->
-        <div class="sec-label">🌟 Upcoming Islamic Events</div>
-        <div id="moon-events-list"></div>
-
-        <!-- Country Settings -->
-        <div class="sec-label">🌍 Moon Sighting Method</div>
-        <div class="ibox">
-          <div style="font-size:.7rem;font-weight:700;color:var(--t1);margin-bottom:.4rem">Select your region</div>
-          <select class="fi" id="moon-method" onchange="updateMoonMethod()">
-            <option value="global">Global Moon Sighting (OIC)</option>
-            <option value="saudi">Saudi Arabia (Official)</option>
-            <option value="calc">Astronomical Calculation</option>
-            <option value="local">Local Community Sighting</option>
-          </select>
+      <div class="hero-card" style="text-align:center">
+        <div style="font-size:4.5rem;animation:splashFloat 4s ease-in-out infinite;display:block;margin-bottom:.4rem" id="moon-visual">🌙</div>
+        <div style="font-family:var(--serif);font-size:1.2rem;color:var(--gold2);margin-bottom:.2rem" id="moon-phase-name">Crescent Moon</div>
+        <div style="font-size:.52rem;color:var(--t3)" id="moon-phase-desc">New month · New intentions · New blessings</div>
+        <div style="display:flex;justify-content:center;gap:1.2rem;margin-top:.8rem">
+          <div><div style="font-family:var(--serif);font-size:1.3rem;color:var(--gold2)" id="hijri-day">--</div><div style="font-size:.44rem;color:var(--t3)">Day</div></div>
+          <div><div style="font-family:var(--serif);font-size:1.3rem;color:var(--gold2)" id="hijri-month">--</div><div style="font-size:.44rem;color:var(--t3)">Month</div></div>
+          <div><div style="font-family:var(--serif);font-size:1.3rem;color:var(--gold2)" id="hijri-year">--</div><div style="font-size:.44rem;color:var(--t3)">Year AH</div></div>
         </div>
       </div>
-    
+      <div class="tgrid">
+        <div class="card"><div style="font-size:.48rem;color:var(--t3);margin-bottom:.28rem;text-transform:uppercase;letter-spacing:.08em">Gregorian Today</div><div style="font-family:var(--serif);font-size:1rem;color:var(--t1)" id="greg-today">Loading...</div></div>
+        <div class="card card-gold"><div style="font-size:.48rem;color:var(--t3);margin-bottom:.28rem;text-transform:uppercase;letter-spacing:.08em">Hijri Today</div><div style="font-family:var(--serif);font-size:1rem;color:var(--gold2)" id="hijri-today">Loading...</div></div>
+      </div>
+      <div class="sec-label">📅 Upcoming Events</div>
+      <div class="ibox">
+        <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--bd2)">
+          <span style="font-size:1rem">🕋</span>
+          <div style="flex:1"><div style="font-size:.65rem;font-weight:600;color:var(--t1)">Day of Arafat</div><div style="font-size:.52rem;color:var(--t3)">9 Dhul Hijjah · June 17, 2026</div></div>
+          <span class="status-warn" id="arafat-days">Loading</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--bd2)">
+          <span style="font-size:1rem">🎉</span>
+          <div style="flex:1"><div style="font-size:.65rem;font-weight:600;color:var(--t1)">Eid al-Adha</div><div style="font-size:.52rem;color:var(--t3)">10 Dhul Hijjah · June 18, 2026</div></div>
+          <span class="status-ok">Soon</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0">
+          <span style="font-size:1rem">🌙</span>
+          <div style="flex:1"><div style="font-size:.65rem;font-weight:600;color:var(--t1)">Eid al-Fitr 1448</div><div style="font-size:.52rem;color:var(--t3)">March 2027 (estimated)</div></div>
+          <span style="font-size:.44rem;color:var(--t3)">2027</span>
+        </div>
+      </div>
+      <div class="sec-label">🗓️ Dhul Hijjah 1447</div>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:.18rem;margin-bottom:.4rem">
+          <div style="text-align:center;font-size:.46rem;color:var(--t3);padding:.18rem">Su</div><div style="text-align:center;font-size:.46rem;color:var(--t3);padding:.18rem">Mo</div><div style="text-align:center;font-size:.46rem;color:var(--t3);padding:.18rem">Tu</div><div style="text-align:center;font-size:.46rem;color:var(--t3);padding:.18rem">We</div><div style="text-align:center;font-size:.46rem;color:var(--t3);padding:.18rem">Th</div><div style="text-align:center;font-size:.46rem;color:var(--t3);padding:.18rem">Fr</div><div style="text-align:center;font-size:.46rem;color:var(--t3);padding:.18rem">Sa</div>
+          <div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem"></div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">1</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">2</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">3</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">4</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">5</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">6</div>
+          <div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">7</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">8</div><div style="text-align:center;font-size:.52rem;background:var(--gdim);color:var(--gold);border-radius:4px;padding:.28rem;font-weight:700">9⭐</div><div style="text-align:center;font-size:.52rem;background:var(--grndim);color:var(--grn);border-radius:4px;padding:.28rem;font-weight:700">10🎉</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">11</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">12</div><div style="text-align:center;font-size:.52rem;background:var(--bg3);color:var(--t1);border-radius:4px;padding:.28rem;font-weight:700">13</div>
+          <div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">14</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">15</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">16</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">17</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">18</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">19</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">20</div>
+          <div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">21</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">22</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">23</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">24</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">25</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">26</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">27</div>
+          <div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">28</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">29</div><div style="text-align:center;font-size:.52rem;color:var(--t2);padding:.28rem">30</div>
+        </div>
+        <div style="display:flex;gap:.7rem;font-size:.44rem;color:var(--t3)"><span>⭐ Arafat</span><span>🎉 Eid</span></div>
+      </div>
     </section>
 
-    <!-- ══ UTILITIES ══ -->
-    <section class="scr" id="s-utilities">
-
-      <div class="scr-hdr"><div><div class="scr-hdr-title">Smart Utilities</div><div class="scr-hdr-sub">Planning · Reference · Islamic Knowledge</div></div></div>
+    <!-- UTILITIES -->
+    <section class="scr" id="s-utilities"><div class="scr-hdr"><div><div class="scr-hdr-title">Smart Utilities</div><div class="scr-hdr-sub">Planning · Reference · Islamic Knowledge</div></div></div>
 
       <div class="sec-label">📋 Planning & Reference</div>
       <div class="tgrid">
@@ -2296,14 +1184,10 @@ img{max-width:100%;display:block;}
       <div class="up" id="up-ihram"><div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">👘 Ihram Guide</div></div><div id="ihram-content"></div></div>
       <div class="up" id="up-zamzam"><div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">💧 Zamzam Guide</div></div><div id="zamzam-content"></div></div>
       <div class="up" id="up-hijri"><div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">🌙 Hijri Calendar</div></div><div id="hijri-content"></div></div>
-
-    
     </section>
 
-    <!-- ══ RESELLER ══ -->
-    <section class="scr" id="s-reseller">
-
-      <div class="scr-hdr">
+    <!-- RESELLER -->
+    <section class="scr" id="s-reseller"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Reseller Hub</div><div class="scr-hdr-sub">Earn Pi · Refer pilgrims · Build your network</div></div>
         <div class="scr-hdr-action" onclick="goS('profile')">← Back</div>
       </div>
@@ -2370,14 +1254,10 @@ img{max-width:100%;display:block;}
       <!-- Payout History -->
       <div class="sec-label">💸 Payout History</div>
       <div id="payout-history"><div class="empty">No payouts yet — start referring!</div></div>
-
-    
     </section>
 
-    <!-- ══ MAILER ══ -->
-    <section class="scr" id="s-mailer">
-
-      <div class="scr-hdr">
+    <!-- MAILER -->
+    <section class="scr" id="s-mailer"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Mailing Center</div><div class="scr-hdr-sub">Compose · Templates · Outreach</div></div>
         <div class="scr-hdr-action" onclick="goS('profile')">← Back</div>
       </div>
@@ -2427,79 +1307,19 @@ img{max-width:100%;display:block;}
       <div class="ic" id="mail-drafts">
         <div class="empty">No drafts saved</div>
       </div>
-
-    
     </section>
 
-    <!-- ══ NEW: LEARNING CENTER ══ -->
+    <!-- LEARNING -->
     <section class="scr" id="s-learning">
-      <div class="scr-hdr">
-        <div><div class="scr-hdr-title">Learning Center</div><div class="scr-hdr-sub">Knowledge · Courses · Certificates</div></div>
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">Learning Center</div><div class="scr-top-sub">Courses · Progress · Certificates</div></div>
       </div>
-
-      <div class="sec-label">📚 My Courses</div>
-      <div class="course-card" onclick="startCourse('hajj')">
-        <div class="course-thumb">🕋</div>
-        <div style="flex:1">
-          <div class="course-title">Complete Hajj Guide</div>
-          <div class="course-meta">12 lessons · 45 min · Beginner</div>
-          <div class="course-progress"><div class="course-fill" style="width:40%"></div></div>
-          <div style="font-size:.48rem;color:var(--gold);margin-top:.2rem">40% complete</div>
-        </div>
-      </div>
-      <div class="course-card" onclick="startCourse('umrah')">
-        <div class="course-thumb">🌙</div>
-        <div style="flex:1">
-          <div class="course-title">Umrah Step by Step</div>
-          <div class="course-meta">8 lessons · 30 min · All levels</div>
-          <div class="course-progress"><div class="course-fill" style="width:0%"></div></div>
-          <div style="font-size:.48rem;color:var(--t3);margin-top:.2rem">Not started</div>
-        </div>
-      </div>
-      <div class="course-card" onclick="startCourse('history')">
-        <div class="course-thumb">📜</div>
-        <div style="flex:1">
-          <div class="course-title">Islamic History of Makkah</div>
-          <div class="course-meta">10 lessons · 40 min · Intermediate</div>
-          <div class="course-progress"><div class="course-fill" style="width:20%"></div></div>
-          <div style="font-size:.48rem;color:var(--gold);margin-top:.2rem">20% complete</div>
-        </div>
-      </div>
-      <div class="course-card" onclick="startCourse('etiquette')">
-        <div class="course-thumb">🕌</div>
-        <div style="flex:1">
-          <div class="course-title">Mosque Etiquette</div>
-          <div class="course-meta">5 lessons · 20 min · Beginner</div>
-          <div class="course-progress"><div class="course-fill" style="width:100%"></div></div>
-          <div style="font-size:.48rem;color:var(--grn);margin-top:.2rem">✅ Completed</div>
-        </div>
-      </div>
-      <div class="course-card" onclick="startCourse('arabic')">
-        <div class="course-thumb">🌐</div>
-        <div style="flex:1">
-          <div class="course-title">Essential Arabic Phrases</div>
-          <div class="course-meta">6 lessons · 25 min · Beginner</div>
-          <div class="course-progress"><div class="course-fill" style="width:60%"></div></div>
-          <div style="font-size:.48rem;color:var(--gold);margin-top:.2rem">60% complete</div>
-        </div>
-      </div>
-
-      <div class="sec-label">🏆 Certificates Earned</div>
-      <div class="ibox">
-        <div style="display:flex;align-items:center;gap:.7rem;padding:.4rem 0">
-          <div style="font-size:1.4rem">🏅</div>
-          <div>
-            <div style="font-size:.65rem;font-weight:600;color:var(--t1)">Mosque Etiquette</div>
-            <div style="font-family:monospace;font-size:.52rem;color:var(--gold)">CERT-HRM-00001</div>
-          </div>
-          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="shareCert('CERT-HRM-00001')">📤</button>
-        </div>
-      </div>
+      <div id="lesson-list-wrap"></div>
+      <div id="lesson-container" style="display:none"></div>
     </section>
 
-    <!-- ══ NEW: FAMILY HUB ══ -->
-    <section class="scr" id="s-family">
-      <div class="scr-hdr">
+    <!-- FAMILY -->
+    <section class="scr" id="s-family"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Family Hub</div><div class="scr-hdr-sub">Stay connected with your group</div></div>
         <div class="scr-hdr-action" onclick="createFamilyGroup()">+ Group</div>
       </div>
@@ -2554,9 +1374,8 @@ img{max-width:100%;display:block;}
       </div>
     </section>
 
-    <!-- ══ NEW: LOST & FOUND ══ -->
-    <section class="scr" id="s-lostfound">
-      <div class="scr-hdr">
+    <!-- LOST & FOUND -->
+    <section class="scr" id="s-lostfound"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Lost & Found</div><div class="scr-hdr-sub">Community assistance platform</div></div>
         <div class="scr-hdr-action" onclick="showReportLost()">+ Report</div>
       </div>
@@ -2612,9 +1431,8 @@ img{max-width:100%;display:block;}
       </div>
     </section>
 
-    <!-- ══ NEW: MARKETPLACE ══ -->
-    <section class="scr" id="s-marketplace">
-      <div class="scr-hdr">
+    <!-- MARKETPLACE -->
+    <section class="scr" id="s-marketplace"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Marketplace</div><div class="scr-hdr-sub">Pilgrimage services in Pi</div></div>
       </div>
 
@@ -2646,9 +1464,8 @@ img{max-width:100%;display:block;}
       </div>
     </section>
 
-    <!-- ══ NEW: SMART MAP ══ -->
-    <section class="scr" id="s-map">
-      <div class="scr-hdr">
+    <!-- MAP -->
+    <section class="scr" id="s-map"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Smart Map</div><div class="scr-hdr-sub">Navigate · Find · Explore</div></div>
         <div class="live-badge">LIVE</div>
       </div>
@@ -2727,94 +1544,61 @@ img{max-width:100%;display:block;}
       </div>
     </section>
 
-    <!-- ══ MORE HUB ══ -->
+    <!-- MORE HUB -->
     <section class="scr" id="s-more">
-      <div class="scr-hdr">
-        <div><div class="scr-hdr-title">More</div><div class="scr-hdr-sub">All tools and utilities</div></div>
+      <div class="scr-top-bar"><div><div class="scr-top-title">More</div><div class="scr-top-sub">All tools and utilities</div></div></div>
+      <div class="sec-label">🛡️ Safety</div>
+      <div class="hub-grid">
+        <div class="hub-item" onclick="goS('emergency')"><div class="hub-icon">🚨</div><div class="hub-name">SOS</div></div>
+        <div class="hub-item" onclick="goS('health-intel')"><div class="hub-icon">❤️</div><div class="hub-name">Health</div></div>
+        <div class="hub-item" onclick="goS('crowd')"><div class="hub-icon">🌊</div><div class="hub-name">Crowd</div></div>
+        <div class="hub-item" onclick="goS('hydration')"><div class="hub-icon">💧</div><div class="hub-name">Hydration</div></div>
+        <div class="hub-item" onclick="goS('family')"><div class="hub-icon">👨‍👩‍👧</div><div class="hub-name">Family</div></div>
+        <div class="hub-item" onclick="goS('lostfound')"><div class="hub-icon">🔍</div><div class="hub-name">Lost&Found</div></div>
       </div>
-
-      <!-- Safety & Emergency -->
-      <div class="hub-section">
-        <div class="hub-section-title">🛡️ Safety</div>
-        <div class="hub-grid">
-          <div class="hub-item" onclick="goS('emergency')"><div class="hub-icon">🚨</div><div class="hub-name">Emergency SOS</div></div>
-          <div class="hub-item" onclick="goS('health-intel')"><div class="hub-icon">❤️</div><div class="hub-name">Health Intel</div></div>
-          <div class="hub-item" onclick="goS('crowd')"><div class="hub-icon">🌊</div><div class="hub-name">Crowd Intel</div></div>
-          <div class="hub-item" onclick="goS('hydration')"><div class="hub-icon">💧</div><div class="hub-name">Hydration</div></div>
-          <div class="hub-item" onclick="goS('family')"><div class="hub-icon">👨‍👩‍👧</div><div class="hub-name">Family Hub</div></div>
-          <div class="hub-item" onclick="goS('lostfound')"><div class="hub-icon">🔍</div><div class="hub-name">Lost & Found</div></div>
-        </div>
+      <div class="sec-label">🗺️ Navigation</div>
+      <div class="hub-grid">
+        <div class="hub-item" onclick="goS('tracker')"><div class="hub-icon">📍</div><div class="hub-name">Tracker</div></div>
+        <div class="hub-item" onclick="goS('map')"><div class="hub-icon">🗺️</div><div class="hub-name">Smart Map</div></div>
+        <div class="hub-item" onclick="goS('itinerary')"><div class="hub-icon">📅</div><div class="hub-name">Itinerary</div></div>
       </div>
-
-      <!-- Navigation -->
-      <div class="hub-section">
-        <div class="hub-section-title">🗺️ Navigation</div>
-        <div class="hub-grid">
-          <div class="hub-item" onclick="goS('tracker')"><div class="hub-icon">📍</div><div class="hub-name">Live Tracker</div></div>
-          <div class="hub-item" onclick="goS('map')"><div class="hub-icon">🗺️</div><div class="hub-name">Smart Map</div></div>
-          <div class="hub-item" onclick="goS('itinerary')"><div class="hub-icon">📅</div><div class="hub-name">Itinerary</div></div>
-        </div>
+      <div class="sec-label">🕌 Islamic</div>
+      <div class="hub-grid">
+        <div class="hub-item" onclick="goS('worship')"><div class="hub-icon">🕌</div><div class="hub-name">Worship</div></div>
+        <div class="hub-item" onclick="goS('audio')"><div class="hub-icon">🎧</div><div class="hub-name">Duas</div></div>
+        <div class="hub-item" onclick="goS('moon')"><div class="hub-icon">🌙</div><div class="hub-name">Moon</div></div>
+        <div class="hub-item" onclick="goS('checklist')"><div class="hub-icon">✅</div><div class="hub-name">Checklist</div></div>
+        <div class="hub-item" onclick="goS('utilities')"><div class="hub-icon">🧰</div><div class="hub-name">Utilities</div></div>
+        <div class="hub-item" onclick="goS('learning')"><div class="hub-icon">📚</div><div class="hub-name">Learning</div></div>
       </div>
-
-      <!-- Islamic Tools -->
-      <div class="hub-section">
-        <div class="hub-section-title">🕌 Islamic Tools</div>
-        <div class="hub-grid">
-          <div class="hub-item" onclick="goS('worship')"><div class="hub-icon">🕌</div><div class="hub-name">Worship</div></div>
-          <div class="hub-item" onclick="goS('audio')"><div class="hub-icon">🎧</div><div class="hub-name">Audio Duas</div></div>
-          <div class="hub-item" onclick="goS('moon')"><div class="hub-icon">🌙</div><div class="hub-name">Moon Sight</div></div>
-          <div class="hub-item" onclick="goS('checklist')"><div class="hub-icon">✅</div><div class="hub-name">Checklist</div></div>
-          <div class="hub-item" onclick="goS('utilities')"><div class="hub-icon">🧰</div><div class="hub-name">Utilities</div></div>
-          <div class="hub-item" onclick="goS('learning')"><div class="hub-icon">📚</div><div class="hub-name">Learning</div></div>
-        </div>
+      <div class="sec-label">💰 Finance</div>
+      <div class="hub-grid">
+        <div class="hub-item" onclick="goS('payments')"><div class="hub-icon">💎</div><div class="hub-name">Payments</div></div>
+        <div class="hub-item" onclick="goS('marketplace')"><div class="hub-icon">🛒</div><div class="hub-name">Market</div></div>
+        <div class="hub-item" onclick="goS('reseller')"><div class="hub-icon">💼</div><div class="hub-name">Reseller</div></div>
       </div>
-
-      <!-- Finance & Commerce -->
-      <div class="hub-section">
-        <div class="hub-section-title">💰 Finance & Commerce</div>
-        <div class="hub-grid">
-          <div class="hub-item" onclick="goS('payments')"><div class="hub-icon">💎</div><div class="hub-name">Pi Payments</div></div>
-          <div class="hub-item" onclick="goS('marketplace')"><div class="hub-icon">🛒</div><div class="hub-name">Marketplace</div></div>
-          <div class="hub-item" onclick="goS('reseller')"><div class="hub-icon">💼</div><div class="hub-name">Reseller</div></div>
-        </div>
+      <div class="sec-label">⚙️ Platform</div>
+      <div class="hub-grid">
+        <div class="hub-item" onclick="goS('analytics')"><div class="hub-icon">📊</div><div class="hub-name">Analytics</div></div>
+        <div class="hub-item" onclick="goS('memories')"><div class="hub-icon">📸</div><div class="hub-name">Memories</div></div>
+        <div class="hub-item" onclick="goS('translation')"><div class="hub-icon">🌍</div><div class="hub-name">Translate</div></div>
+        <div class="hub-item" onclick="goS('documents')"><div class="hub-icon">📂</div><div class="hub-name">Documents</div></div>
+        <div class="hub-item" onclick="goS('mailer')"><div class="hub-icon">📧</div><div class="hub-name">Mailer</div></div>
+        <div class="hub-item" onclick="goS('notifs')"><div class="hub-icon">🔔</div><div class="hub-name">Alerts</div></div>
       </div>
-
-      <!-- Tools -->
-      <div class="hub-section">
-        <div class="hub-section-title">🌍 Communication</div>
-        <div class="hub-grid">
-          <div class="hub-item" onclick="goS('translation')"><div class="hub-icon">🌍</div><div class="hub-name">Translation</div><div class="hub-badge">NEW</div></div>
-          <div class="hub-item" onclick="goS('documents')"><div class="hub-icon">📂</div><div class="hub-name">Documents</div><div class="hub-badge">NEW</div></div>
-          <div class="hub-item" onclick="goS('mailer')"><div class="hub-icon">📧</div><div class="hub-name">Mailer</div></div>
-        </div>
-      </div>
-
-      <!-- Platform -->
-      <div class="hub-section">
-        <div class="hub-section-title">⚙️ Platform</div>
-        <div class="hub-grid">
-          <div class="hub-item" onclick="goS('analytics')"><div class="hub-icon">📊</div><div class="hub-name">Analytics</div></div>
-          <div class="hub-item" onclick="goS('memories')"><div class="hub-icon">📸</div><div class="hub-name">Memories</div></div>
-          <div class="hub-item" onclick="goS('notifs')"><div class="hub-icon">🔔</div><div class="hub-name">Notifications</div></div>
-          <div class="hub-item" onclick="goS('profile')"><div class="hub-icon">🪪</div><div class="hub-name">My Passport</div></div>
-          <div class="hub-item" onclick="goS('reseller')"><div class="hub-icon">💼</div><div class="hub-name">Reseller</div></div>
-        </div>
-      </div>
-
     </section>
 
-    <!-- ══ NOTIFICATIONS ══ -->
+    <!-- NOTIFS -->
     <section class="scr" id="s-notifs">
-
-      <div class="scr-hdr"><div><div class="scr-hdr-title">Notifications</div></div><div class="scr-hdr-action" onclick="markAllRead()">Mark All Read</div></div>
-      <div id="notif-list"><div class="empty">No notifications yet</div></div>
-    
+      <div class="scr-top-bar">
+        <div><div class="scr-top-title">Notifications</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>
+      </div>
+      <div id="notif-list"><div class="empty">No notifications</div></div>
     </section>
 
-  
-    <!-- ══ TRANSLATION ══ -->
-    <section class="scr" id="s-translation">
-      <div class="scr-hdr">
+    <!-- TRANSLATION -->
+    <section class="scr" id="s-translation"><div class="scr-hdr">
         <div><div class="scr-hdr-title">Translation</div><div class="scr-hdr-sub">7 languages · Real-time · Voice</div></div>
       </div>
 
@@ -2871,9 +1655,8 @@ img{max-width:100%;display:block;}
       </div>
     </section>
 
-    <!-- ══ DOCUMENTS ══ -->
-    <section class="scr" id="s-documents">
-      <div class="scr-hdr">
+    <!-- DOCUMENTS -->
+    <section class="scr" id="s-documents"><div class="scr-hdr">
         <div><div class="scr-hdr-title">My Documents</div><div class="scr-hdr-sub">Store · Access · Share securely</div></div>
         <div class="scr-hdr-action" onclick="addDocument()">+ Add</div>
       </div>
@@ -2933,9 +1716,9 @@ img{max-width:100%;display:block;}
       </div>
     </section>
 
-</div><!-- end #screens -->
+  </div>
 
-  <!-- BOTTOM NAV — 6 TABS -->
+  <!-- BOTTOM NAV -->
   <nav id="bnav">
     <button class="bni on" data-s="dashboard" onclick="goS('dashboard',this)">
       <span class="bni-i">🏠</span><span class="bni-l">Home</span>
@@ -2958,12 +1741,704 @@ img{max-width:100%;display:block;}
     </button>
   </nav>
 
-</div><!-- end #app -->
-
+</div>
 <div id="toast"></div>
+'''
 
+# Add CSS extras needed
+EXTRA_CSS = '''
+/* ── Extra v5 additions ── */
+.audio-player{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.2rem;margin-bottom:.6rem;text-align:center;}
+.audio-arabic{font-size:1.1rem;color:var(--gold2);direction:rtl;margin:.38rem 0;line-height:1.8;}
+.audio-trans{font-size:.58rem;color:var(--t2);margin-bottom:.8rem;line-height:1.5;}
+.audio-controls{display:flex;align-items:center;justify-content:center;gap:.8rem;}
+.audio-btn{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:all .15s;border:none;}
+.audio-btn-main{background:linear-gradient(135deg,#B8942E,var(--gold2));color:#020C07;box-shadow:0 3px 16px rgba(201,168,76,.25);width:52px;height:52px;font-size:1.2rem;}
+.audio-btn-side{background:var(--bg3);border:1px solid var(--bd);color:var(--t2);}
+.audio-btn:active{transform:scale(.91);}
+.audio-dua-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .7rem;border-radius:var(--r2);margin-bottom:.28rem;cursor:pointer;border:1px solid var(--bd2);transition:all .15s;background:var(--bg2);}
+.audio-dua-item.cur{background:var(--gdim);border-color:var(--gbrd);}
+.audio-dua-item:active{transform:scale(.97);}
+.adi-name{font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.1rem;}
+.adi-trans{font-size:.5rem;color:var(--t3);}
+.ai-chips{display:flex;gap:.32rem;flex-wrap:wrap;margin-bottom:.6rem;}
+.ai-chip{background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--pill);padding:.28rem .62rem;font-size:.55rem;color:var(--t2);cursor:pointer;transition:all .15s;}
+.ai-chip:active{background:var(--gdim);border-color:var(--gbrd);color:var(--gold);}
+.ai-msg{max-width:88%;padding:.62rem .82rem;border-radius:var(--r3);margin-bottom:.42rem;font-size:.63rem;line-height:1.55;word-break:break-word;}
+.ai-msg.bot{background:var(--bg3);border:1px solid var(--bd2);margin-right:auto;border-bottom-left-radius:4px;}
+.ai-msg.user{background:var(--bg4);border:1px solid var(--gbrd);margin-left:auto;border-bottom-right-radius:4px;}
+.ai-typing{display:flex;gap:.3rem;align-items:center;padding:.4rem .6rem;}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:aidot 1.2s infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s}.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes aidot{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+.ai-msg-who{font-size:.48rem;color:var(--t3);margin-bottom:.15rem;font-weight:600;}
+.ai-msg-text{font-size:.63rem;line-height:1.55;}
+.passport-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.2rem;margin-bottom:.65rem;position:relative;overflow:hidden;}
+.passport-card::before{content:"🕋";position:absolute;right:.8rem;top:.8rem;font-size:3rem;opacity:.07;}
+.pc-type{font-size:.46rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:.28rem;}
+.pc-name{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--t1);}
+.pc-id{font-family:monospace;font-size:.56rem;color:var(--gold2);margin:.2rem 0;}
+.pc-row{display:flex;gap:.8rem;margin-top:.75rem;}
+.pc-field label{font-size:.42rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;display:block;}
+.pc-field span{font-size:.6rem;font-weight:500;color:var(--t1);}
+.pc-qr{background:var(--bg5);border:1px solid var(--bd);border-radius:var(--r2);padding:.38rem;min-width:66px;min-height:66px;display:flex;align-items:center;justify-content:center;font-size:2rem;}
+.cert-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.4rem;text-align:center;position:relative;overflow:hidden;}
+.cert-seal{font-size:2.2rem;margin-bottom:.4rem;}
+.cert-title{font-family:var(--serif);font-size:1.1rem;color:var(--gold2);margin-bottom:.25rem;}
+.cert-name{font-size:.6rem;color:var(--t2);}
+.cert-id{font-family:monospace;font-size:.5rem;color:var(--t3);margin-top:.3rem;}
+.hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-bottom:.65rem;}
+.hub-item{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r3);padding:.8rem .5rem;display:flex;flex-direction:column;align-items:center;gap:.28rem;cursor:pointer;transition:all .18s;}
+.hub-item:active{transform:scale(.93);background:var(--gdim);border-color:var(--gbrd);}
+.hub-icon{font-size:1.5rem;}
+.hub-name{font-size:.52rem;font-weight:600;color:var(--t1);text-align:center;}
+.itinerary-day{margin-bottom:.75rem;}
+.iday-header{background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--r2);padding:.58rem .75rem;margin-bottom:.38rem;display:flex;align-items:center;justify-content:space-between;}
+.iday-name{font-size:.68rem;font-weight:700;color:var(--gold2);}
+.iday-sub{font-size:.5rem;color:var(--t3);}
+.iday-events{padding:0 .2rem;}
+.ievent{display:flex;gap:.55rem;padding:.48rem 0;border-bottom:1px solid var(--bd2);cursor:pointer;transition:background .15s;}
+.ievent:last-child{border-bottom:none;}
+.ievent.done{opacity:.5;}
+.ievent.done .ie-title{text-decoration:line-through;}
+.ie-time{font-size:.52rem;font-weight:600;color:var(--gold);min-width:40px;padding-top:.1rem;}
+.ie-title{font-size:.62rem;color:var(--t1);margin-bottom:.1rem;}
+.ie-desc{font-size:.5rem;color:var(--t3);}
+.row-between{display:flex;align-items:center;justify-content:space-between;}
+.status-ok{font-size:.44rem;background:var(--grndim);color:var(--grn);border:1px solid rgba(46,204,113,.18);border-radius:var(--pill);padding:.13rem .42rem;}
+.status-warn{font-size:.44rem;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2);border-radius:var(--pill);padding:.13rem .42rem;}
+.bni-more-dot{display:flex;gap:2px;align-items:center;margin-bottom:.08rem;}
+.bni-more-dot span{width:4px;height:4px;border-radius:50%;background:var(--t3);transition:background .15s;}
+.bni.on .bni-more-dot span{background:var(--gold);}
+@keyframes splashFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+'''
 
+# ═══ GLUE JS (new functions not in old JS) ═══
+GLUE_JS = '''
+/* ══ HARAMAIN v5.0 GLUE FUNCTIONS ══ */
+
+/* Language */
+var _lc2 = ['en','ar','ha','ur','id','tr'];
+var _li2 = 0;
+function cycleLang() {
+  _li2 = (_li2+1)%_lc2.length;
+  var c = _lc2[_li2];
+  switchLang(c);
+}
+function switchLang(code) {
+  if (typeof setLang === 'function') setLang(code);
+  var tb = document.getElementById('tb-lang');
+  if (tb) tb.textContent = code.toUpperCase();
+  var sel = document.getElementById('lang-sel');
+  if (sel) sel.value = code;
+  localStorage.setItem(K+'lang', code);
+  var names = {en:'English',ar:'Arabic',ha:'Hausa',ur:'Urdu',id:'Bahasa',tr:'Turkish'};
+  if (typeof toast === 'function') toast((names[code]||code) + ' selected');
+}
+
+/* launchApp fix — handles new login-screen ID */
+var __la_orig = launchApp;
+launchApp = function() {
+  var ls = document.getElementById('login-screen');
+  if (ls) ls.style.display = 'none';
+  var landing = document.getElementById('landing');
+  if (landing) landing.style.display = 'none';
+  var app = document.getElementById('app');
+  if (app) { app.style.display = 'flex'; app.style.flexDirection = 'column'; }
+  __la_orig();
+  /* Sync new UI */
+  syncNewUI();
+};
+
+function syncNewUI() {
+  /* Profile */
+  if (typeof user !== 'undefined' && user) {
+    var pn = document.getElementById('prof-name');
+    if (pn) pn.textContent = user.username;
+    var pu = document.getElementById('prof-user');
+    if (pu) pu.textContent = '@'+user.username;
+    var tbUser = document.getElementById('tb-user');
+    if (tbUser) tbUser.textContent = '@'+user.username;
+  }
+  /* Stats */
+  updateStatsUI();
+  /* Language */
+  var savedLang = localStorage.getItem(K+'lang');
+  if (savedLang) {
+    var tb = document.getElementById('tb-lang');
+    if (tb) tb.textContent = savedLang.toUpperCase();
+    _li2 = _lc2.indexOf(savedLang);
+    if (_li2 < 0) _li2 = 0;
+  }
+  /* Offline */
+  updateOfflineBadge();
+  /* Moon dates */
+  updateMoonDates();
+  /* Audio */
+  initAudioDuas();
+  /* Learning */
+  renderCourses();
+}
+
+function updateStatsUI() {
+  var st = JSON.parse(localStorage.getItem(K+'stats') || '{"pts":0,"streak":0,"level":1}');
+  ['st-pts','p-pts'].forEach(function(id){ var e=document.getElementById(id); if(e)e.textContent=st.pts||0; });
+  ['st-streak','p-streak'].forEach(function(id){ var e=document.getElementById(id); if(e)e.textContent=st.streak||0; });
+  ['st-level','p-level'].forEach(function(id){ var e=document.getElementById(id); if(e)e.textContent=st.level||1; });
+}
+
+function updateOfflineBadge() {
+  var b = document.getElementById('offline-badge');
+  if (b) b.style.display = navigator.onLine ? 'none' : 'block';
+}
+window.addEventListener('online', updateOfflineBadge);
+window.addEventListener('offline', updateOfflineBadge);
+
+function updateMoonDates() {
+  var d = new Date();
+  var greg = d.toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
+  var gt = document.getElementById('greg-today');
+  if (gt) gt.textContent = greg;
+  var ht = document.getElementById('hijri-today');
+  if (ht) ht.textContent = '13 Dhul Hijjah 1447';
+  var hd = document.getElementById('hijri-day');
+  if (hd) hd.textContent = '13';
+  var hm = document.getElementById('hijri-month');
+  if (hm) hm.textContent = 'Dhul Hijjah';
+  var hy = document.getElementById('hijri-year');
+  if (hy) hy.textContent = '1447';
+  /* Arafat countdown */
+  var arafat = new Date('2026-06-17');
+  var diff = Math.ceil((arafat - d) / (1000*60*60*24));
+  var ad = document.getElementById('arafat-days');
+  if (ad) ad.textContent = diff > 0 ? diff + ' days' : 'Today!';
+}
+
+/* AI */
+var _AI_HIST = [];
+var _AI_KB = {
+  tawaf:'7 counter-clockwise rounds around the Kaaba. Begin at Black Stone saying Bismillah Allahu Akbar. Men bare right shoulder first 3 rounds. Recite duas each round.',
+  ihram:'Ihram prohibitions: cutting hair/nails, perfume, marital relations, hunting, covering head (men). Men wear 2 white unstitched cloths. Women wear normal modest clothing. Say Talbiyah constantly.',
+  arafat:'Day of Arafat is the pinnacle of Hajj. Stand from Dhuhr to Maghrib in supplication. Prophet said: Hajj is Arafat. Missing this day invalidates Hajj.',
+  mina:'Mina valley - stone 3 Jamarat pillars: Small, Medium, Large. 7 pebbles each, Allahu Akbar with each throw.',
+  umrah:'Umrah: 1) Ihram at Miqat 2) Tawaf 7 rounds 3) Pray at Maqam Ibrahim 4) Drink Zamzam 5) Sai 7 times 6) Shave/trim hair.',
+  zamzam:'Zamzam water blessed by Allah. Drink facing Qibla saying Bismillah. Make dua while drinking. The Prophet said: Zamzam is for whatever it is drunk for.',
+  dua:'Key duas: Talbiyah, entering Makkah, before Tawaf, at Black Stone, Day of Arafat supplication. See Audio Duas section.',
+  pack:'Essential packing: Ihram cloths, unscented toiletries, comfortable shoes, medications, prayer mat, pocket Quran, power bank, umbrella, emergency contacts.',
+  safety:'Stay with group. Memorize hotel. Carry Hajj ID. Drink 3-5L daily. Avoid 11am-3pm heat. Emergency: 911 Saudi, 920002814 Hajj emergency.',
+  hajj:'Hajj pillars: Ihram, Arafat, Tawaf al-Ifadah, Sai. 5th pillar of Islam. Obligatory once for able Muslims.',
+  prayer:'Prayer in Masjid al-Haram = 100,000x reward. Times Makkah: Fajr ~5:15am, Dhuhr ~12:15pm, Asr ~3:30pm, Maghrib ~6:45pm, Isha ~8:15pm.',
+};
+
+function askAI(msg) {
+  if (!msg || !msg.trim()) return;
+  var chat = document.getElementById('ai-chat');
+  if (!chat) return;
+  /* Hide chips after first message */
+  var chips = document.getElementById('ai-chips');
+  if (chips) chips.style.display = 'none';
+  /* User bubble */
+  var ud = document.createElement('div');
+  ud.className = 'ai-msg user';
+  ud.innerHTML = '<div class="ai-msg-who">You</div><div class="ai-msg-text">'+escHtml(msg)+'</div>';
+  chat.appendChild(ud);
+  chat.scrollTop = chat.scrollHeight;
+  /* Thinking bubble */
+  var td = document.createElement('div');
+  td.className = 'ai-msg bot';
+  td.innerHTML = '<div class="ai-msg-who">Haramain AI</div><div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
+  chat.appendChild(td);
+  chat.scrollTop = chat.scrollHeight;
+  _AI_HIST.push({role:'user',content:msg});
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:800,
+      system:'You are Haramain AI, expert Islamic pilgrimage guide on Pi Network. Help with Hajj, Umrah, duas, safety. Be concise, compassionate, scholarly. Include relevant duas. Respond in user language.',
+      messages:_AI_HIST
+    })
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    var reply=(d.content&&d.content[0]&&d.content[0].text)||_kbReply(msg);
+    _AI_HIST.push({role:'assistant',content:reply});
+    td.innerHTML='<div class="ai-msg-who">Haramain AI \uD83D\uDD4B</div><div class="ai-msg-text">'+escHtml(reply)+'</div>';
+    chat.scrollTop=chat.scrollHeight;
+  }).catch(function(){
+    var reply=_kbReply(msg);
+    _AI_HIST.push({role:'assistant',content:reply});
+    td.innerHTML='<div class="ai-msg-who">Haramain AI \uD83D\uDD4B</div><div class="ai-msg-text">'+escHtml(reply)+'</div>';
+    chat.scrollTop=chat.scrollHeight;
+  });
+  var inp=document.getElementById('ai-input');
+  if(inp)inp.value='';
+}
+function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function _kbReply(msg){
+  var low=msg.toLowerCase();
+  for(var k in _AI_KB){if(low.indexOf(k)>-1)return String.fromCodePoint(0x1F54B)+' '+_AI_KB[k];}
+  return String.fromCodePoint(0x1F54B)+' Bismillah! Ask me about: tawaf, ihram, Arafat, Mina, Umrah, Zamzam, duas, packing, safety, prayer, or zakat.';
+}
+function sendAIMessage(){
+  var inp=document.getElementById('ai-input');
+  if(!inp||!inp.value.trim())return;
+  askAI(inp.value.trim());
+}
+function clearAIChat(){
+  var c=document.getElementById('ai-chat');
+  if(c)c.innerHTML='';
+  _AI_HIST=[];
+  var chips=document.getElementById('ai-chips');
+  if(chips)chips.style.display='flex';
+  initAIWelcome();
+}
+function initAIWelcome(){
+  var chat=document.getElementById('ai-chat');
+  if(!chat||chat.children.length>0)return;
+  var w=document.createElement('div');
+  w.className='ai-msg bot';
+  w.innerHTML='<div class="ai-msg-who">Haramain AI \uD83D\uDD4B</div><div class="ai-msg-text">Bismillah! I am your personal pilgrimage guide. Ask me anything about Hajj, Umrah, duas, or safety. May Allah bless your journey!</div>';
+  chat.appendChild(w);
+}
+
+/* Audio Duas */
+var _DUA_LIST = [
+  {n:'Talbiyah',a:'\u0644\u064E\u0628\u064E\u0651\u064A\u0652\u0643\u064E \u0627\u0644\u0644\u0651\u064E\u0647\u064F\u0645\u064E\u0651',t:'Labbayk Allahumma labbayk — Here I am O Allah'},
+  {n:'Entering Makkah',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0623\u064E\u0646\u0652\u062A\u064E \u0627\u0644\u0633\u064E\u0651\u0644\u0627\u064E\u0645\u064F',t:'Allahumma antassalam wa minkas-salam'},
+  {n:'Before Tawaf',a:'\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0647\u0650 \u0627\u0644\u0644\u0647\u064F \u0623\u064E\u0643\u0652\u0628\u064E\u0631',t:'Bismillah Allahu Akbar'},
+  {n:'Day of Arafat',a:'\u0644\u064E\u0627 \u0625\u0650\u0644\u064E\u0647\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0627\u0644\u0644\u064E\u0651\u0647\u064F \u0648\u064E\u062D\u0652\u062F\u064E\u0647\u064F',t:'La ilaha illallah wahdahu la sharika lah'},
+  {n:'At Safa and Marwa',a:'\u0625\u0650\u0646\u064E\u0651 \u0627\u0644\u0635\u064E\u0651\u0641\u064E\u0627 \u0648\u064E\u0627\u0644\u0652\u0645\u064E\u0631\u0652\u0648\u064E\u0629\u064E',t:'Innas-Safa wal-Marwata min shaairillah'},
+  {n:'Morning Dua',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0628\u0650\u0643\u064E \u0623\u064E\u0635\u0652\u0628\u064E\u062D\u0652\u0646\u064E\u0627',t:'Allahumma bika asbahna wa bika amsayna'},
+  {n:'After Zamzam',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0625\u0650\u0646\u064E\u0651\u064A \u0623\u064E\u0633\u0652\u0623\u064E\u0644\u064F\u0643\u064E',t:'Allahumma inni asaluka ilman nafian'},
+  {n:'Farewell Tawaf',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0647\u064E\u0630\u064E\u0627 \u0627\u0644\u0652\u0628\u064E\u064A\u0652\u062A\u064F',t:'Allahumma hadhal baytu baytuk'},
+];
+var _dIdx = 0;
+function initAudioDuas() {
+  _renderDuaPlayer();
+  _renderDuaList();
+}
+function _renderDuaPlayer() {
+  var d = _DUA_LIST[_dIdx];
+  if (!d) return;
+  var nm = document.getElementById('audio-now-name');
+  var ar = document.getElementById('audio-now-arabic');
+  var tr = document.getElementById('audio-now-trans');
+  if (nm) nm.textContent = d.n;
+  if (ar) { ar.textContent = d.a; ar.style.direction='rtl'; }
+  if (tr) tr.textContent = d.t;
+}
+function _renderDuaList() {
+  var list = document.getElementById('audio-dua-list');
+  if (!list) return;
+  list.innerHTML = _DUA_LIST.map(function(d,i){
+    var cls = i===_dIdx ? 'audio-dua-item cur' : 'audio-dua-item';
+    return '<div class="'+cls+'" onclick="selectDua('+i+')">' +
+      '<div style="font-size:1rem">'+(i===_dIdx?'\uD83D\uDD0A':'\uD83C\uDFB5')+'</div>' +
+      '<div><div class="adi-name">'+d.n+'</div><div class="adi-trans">'+d.t.substring(0,45)+'</div></div>' +
+      '</div>';
+  }).join('');
+}
+function selectDua(idx) {
+  _dIdx = idx; _renderDuaPlayer(); _renderDuaList();
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance(_DUA_LIST[idx].n+'. '+_DUA_LIST[idx].t);
+    utt.lang='en-US'; utt.rate=0.8;
+    speechSynthesis.speak(utt);
+    if (typeof toast === 'function') toast('\uD83D\uDD0A '+_DUA_LIST[idx].n);
+    var btn=document.getElementById('audio-play-btn');
+    if(btn)btn.textContent='\u23F8';
+  } else {
+    if (typeof toast === 'function') toast(_DUA_LIST[idx].n+': '+_DUA_LIST[idx].t);
+  }
+}
+function toggleAudioPlay() {
+  if ('speechSynthesis' in window) {
+    if (speechSynthesis.speaking && !speechSynthesis.paused) {
+      speechSynthesis.pause();
+      var b=document.getElementById('audio-play-btn'); if(b)b.textContent='\u25B6';
+    } else if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+      var b=document.getElementById('audio-play-btn'); if(b)b.textContent='\u23F8';
+    } else { selectDua(_dIdx); }
+  }
+}
+function prevDua(){_dIdx=(_dIdx-1+_DUA_LIST.length)%_DUA_LIST.length;selectDua(_dIdx);}
+function nextDua(){_dIdx=(_dIdx+1)%_DUA_LIST.length;selectDua(_dIdx);}
+
+/* Learning */
+var _CRS = {
+  hajj:{t:'Complete Hajj Guide',i:'\uD83D\uDD4B',l:[
+    {h:'What is Hajj?',b:'Hajj is the 5th pillar of Islam. Every able Muslim must perform it once in Dhul Hijjah. It is the greatest act of worship after the declaration of faith.'},
+    {h:'Preparing for Hajj',b:'Physical: walking training, vaccinations. Spiritual: repent, settle debts, write will. Financial: save, get visa. Knowledge: learn all rites, memorize key duas.'},
+    {h:'Entering Ihram',b:'Men: 2 white unstitched cloths. Women: modest clothing. Enter at Miqat. Say intention and Talbiyah: Labbayk Allahumma labbayk, labbayka la shareeka lak.'},
+    {h:'Performing Tawaf',b:'7 counter-clockwise rounds around the Kaaba. Begin at Black Stone. Men bare right shoulder first 3 rounds. Recite duas. Pray 2 rakahs at Maqam Ibrahim after.'},
+    {h:'Sai at Safa and Marwa',b:'7 trips between two hills commemorating Hajars search for water. Start at Safa, end at Marwa. Total about 3.15km. Men jog between green markers.'},
+    {h:'Day of Arafat',b:'THE MOST IMPORTANT DAY. Stand from Dhuhr to Maghrib in dua and dhikr. Prophet said: Hajj is Arafat. Missing this day completely invalidates the Hajj.'},
+    {h:'Muzdalifah Night',b:'Travel from Arafat after Maghrib. Pray combined Maghrib and Isha. Sleep under sky. Collect 49 pebbles for Jamarat. Leave for Mina after Fajr.'},
+    {h:'Stoning Jamarat',b:'Stone 3 pillars in Mina. Day 1: Large only (7 pebbles). Days 2-3: All 3 (7 each = 21/day). Say Allahu Akbar with each throw.'},
+    {h:'Farewell Tawaf',b:'Last act before leaving Makkah. 7 rounds around Kaaba. Say farewell prayers and dua. Leave with gratitude. May Allah accept your Hajj Mabroor.'},
+  ]},
+  umrah:{t:'Umrah Step by Step',i:'\uD83C\uDF19',l:[
+    {h:'What is Umrah?',b:'Umrah is the lesser pilgrimage performable any time of year. Highly recommended Sunnah. Takes 2-4 hours to complete. Called the Hajj of the poor.'},
+    {h:'Enter Ihram at Miqat',b:'Ghusl (bath), wear Ihram clothes, say intention: Labbayk Allahumma Umratan. Avoid all prohibitions. Recite Talbiyah frequently.'},
+    {h:'Tawaf',b:'7 counter-clockwise rounds around Kaaba. Start and end at Black Stone. Recite recommended duas. Pray 2 rakahs at Maqam Ibrahim after.'},
+    {h:'Sai',b:'7 trips between Safa and Marwa. Start at Safa. Make dua facing Kaaba at each hilltop. Total about 3.15km.'},
+    {h:'Shave or Trim',b:'After Sai: shave or trim hair. This exits Ihram. Men shaving is more rewarding. Women trim one fingertip length only.'},
+  ]},
+  arabic:{t:'Essential Arabic Phrases',i:'\uD83C\uDF10',l:[
+    {h:'Greetings',b:'As-salamu alaykum = Peace be upon you. Wa alaykum as-salam = And upon you peace. Marhaba = Welcome. Kayfa halak = How are you?'},
+    {h:'At the Mosque',b:'Al-masjid = mosque. Al-Kaabah = the Kaaba. Salah = prayer. Wudu = ablution. Imam = prayer leader. Qiblah = direction of prayer.'},
+    {h:'Asking for Help',b:'Musaadah = Help! Ayna al-hammam = Where is the toilet? La afham = I do not understand. Hal tatakallam Inglizi = Do you speak English?'},
+    {h:'Emergencies',b:'Al-isaaf = Ambulance! Ana marid = I am sick. Itasil bil-isaaf = Call an ambulance. Al-mustashfa ayna = Where is the hospital?'},
+    {h:'Islamic Phrases',b:'Bismillah = In the name of Allah. Alhamdulillah = All praise to Allah. Inshallah = If Allah wills. Allahu Akbar = Allah is Greatest.'},
+  ]},
+  etiquette:{t:'Mosque Etiquette',i:'\uD83D\uDD4C',l:[
+    {h:'Entering the Mosque',b:'Enter with right foot. Say: Allahumma iftah li abwaba rahmatik. Remove shoes. Be in state of wudu. Enter quietly with respect.'},
+    {h:'Inside the Mosque',b:'Pray 2 rakahs Tahiyyatul Masjid when entering. Keep voice low. Do not walk in front of praying person. Phone on silent.'},
+    {h:'Prayer Rows',b:'Stand shoulder to shoulder. Fill gaps from front. Follow imam exactly. Do not precede imam in any movement.'},
+    {h:'Leaving',b:'Leave with left foot. Say: Allahumma inni asaluka min fadlik. Give way to others. Leave peacefully.'},
+  ]},
+};
+var _cId=null, _lIdx=0;
+var _lDone=JSON.parse(localStorage.getItem(K+'ld')||'{}');
+function startCourse(id){_cId=id;_lIdx=_lDone[id]||0;_showLsn();}
+function _showLsn(){
+  var c=_CRS[_cId]; if(!c)return;
+  goS('learning');
+  var con=document.getElementById('lesson-container');
+  var lst=document.getElementById('lesson-list-wrap');
+  if(con)con.style.display='block';
+  if(lst)lst.style.display='none';
+  var l=c.l[_lIdx]; if(!l){_finishCrs();return;}
+  var tot=c.l.length;
+  var pct=Math.round(_lIdx/tot*100);
+  if(!con)return;
+  con.innerHTML=
+    '<button class="back-btn" onclick="exitLsn()">\u2190 '+c.t+'</button>'+
+    '<div class="card card-gold" style="margin-bottom:.7rem">'+
+      '<div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">'+c.i+' Lesson '+(_lIdx+1)+' / '+tot+'</div>'+
+      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--t1);margin:.3rem 0">'+l.h+'</div>'+
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'+
+    '</div>'+
+    '<div class="ibox" style="font-size:.7rem;color:var(--t1);line-height:1.8;margin-bottom:.7rem">'+l.b+'</div>'+
+    '<div style="display:flex;gap:.5rem">'+
+      (_lIdx>0?'<button class="btn btn-ghost" onclick="prevLsn()" style="flex:1">\u2190 Back</button>':'')+
+      (_lIdx<tot-1?
+        '<button class="btn btn-gold" onclick="nextLsn()" style="flex:2">Next \u2192</button>':
+        '<button class="btn btn-gold" onclick="_finishCrs()" style="flex:2">\u2705 Complete!</button>'
+      )+
+    '</div>';
+}
+function nextLsn(){_lDone[_cId]=_lIdx+1;localStorage.setItem(K+'ld',JSON.stringify(_lDone));if(typeof addPts==='function')addPts(5,'Lesson');_lIdx++;_showLsn();}
+function prevLsn(){_lIdx=Math.max(0,_lIdx-1);_showLsn();}
+function _finishCrs(){
+  var c=_CRS[_cId];
+  _lDone[_cId]=c?c.l.length:0;
+  localStorage.setItem(K+'ld',JSON.stringify(_lDone));
+  if(typeof addPts==='function')addPts(50,'Course');
+  exitLsn();
+  if(typeof toast==='function')toast('\uD83C\uDFC6 Course complete! +50 pts');
+  if(typeof addNotif==='function')addNotif('\uD83C\uDFC6','Course Done!',(c?c.t:_cId),'now');
+  renderCourses();
+}
+function exitLsn(){
+  var con=document.getElementById('lesson-container');
+  var lst=document.getElementById('lesson-list-wrap');
+  if(con)con.style.display='none';
+  if(lst)lst.style.display='block';
+  renderCourses();
+}
+function renderCourses(){
+  var w=document.getElementById('lesson-list-wrap');
+  if(!w)return;
+  w.innerHTML=Object.keys(_CRS).map(function(id){
+    var c=_CRS[id];
+    var d=_lDone[id]||0;
+    var tot=c.l.length;
+    var p=Math.round(d/tot*100);
+    var col=d>=tot?'var(--grn)':(d>0?'var(--gold)':'var(--t3)');
+    var st=d>=tot?'\u2705 Done':(d>0?d+'/'+tot+' lessons':'Start');
+    return '<div class="course-card" onclick="startCourse(\''+id+'\')">'+
+      '<div class="course-thumb">'+c.i+'</div>'+
+      '<div style="flex:1">'+
+        '<div class="course-title">'+c.t+'</div>'+
+        '<div class="course-meta">'+tot+' lessons</div>'+
+        '<div class="course-progress"><div class="course-fill" style="width:'+p+'%"></div></div>'+
+        '<div style="font-size:.48rem;color:'+col+';margin-top:.2rem">'+st+'</div>'+
+      '</div></div>';
+  }).join('');
+}
+
+/* Receipt */
+function showReceipt(txt) {
+  var rid='TXN-'+Date.now().toString(36).toUpperCase();
+  var rdate=new Date().toLocaleString();
+  var ruser=(typeof user!=='undefined'&&user)?'@'+user.username:'@pilgrim';
+  var rpid=(typeof myPilgrimId!=='undefined'&&myPilgrimId)?myPilgrimId:'HRM-00000';
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.id='receipt-modal';
+  modal.innerHTML=
+    '<div style="background:var(--bg2);border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.5rem;width:100%;max-width:300px;text-align:center">'+
+      '<div style="font-size:2.5rem;margin-bottom:.4rem">\uD83E\uDDFE</div>'+
+      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold2)">Transaction Receipt</div>'+
+      '<div style="font-family:monospace;font-size:.52rem;color:var(--t3);margin:.28rem 0 .75rem">'+rid+'</div>'+
+      '<div style="background:var(--bg3);border-radius:var(--r2);padding:.8rem;margin-bottom:.8rem;text-align:left">'+
+        '<div style="font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.38rem">'+escHtml(txt)+'</div>'+
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCC5 '+rdate+'</div>'+
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDC64 '+ruser+'</div>'+
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83E\uDEAA '+rpid+'</div>'+
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCF1 HARAMAIN \u00B7 Pi Mainnet</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:.4rem">'+
+        '<button class="btn btn-gold btn-sm" onclick="_shareRcpt()" style="flex:1">\uD83D\uDCE4 Share</button>'+
+        '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'receipt-modal\').remove()" style="flex:1">\u2715 Close</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(modal);
+  modal._d={id:rid,text:txt,date:rdate,user:ruser};
+  var recs=JSON.parse(localStorage.getItem(K+'receipts')||'[]');
+  recs.unshift({id:rid,text:txt,date:rdate});
+  if(recs.length>100)recs.pop();
+  localStorage.setItem(K+'receipts',JSON.stringify(recs));
+}
+function _shareRcpt(){
+  var m=document.getElementById('receipt-modal');
+  if(!m||!m._d)return;
+  var d=m._d;
+  var txt='HARAMAIN Receipt\n'+d.id+'\n'+d.text+'\n'+d.date+'\nharamain.pages.dev';
+  if(navigator.share){navigator.share({title:'Haramain Receipt',text:txt});}
+  else{if(typeof copyClip==='function')copyClip(txt);if(typeof toast==='function')toast('Receipt copied!');}
+}
+
+/* Tracker */
+var _twId=null;
+function startTracker(){
+  if(!navigator.geolocation){if(typeof toast==='function')toast('GPS not available');return;}
+  var btn=document.getElementById('tracker-start-btn');
+  if(btn){btn.textContent='\uD83D\uDCCD Tracking...';btn.disabled=true;}
+  if(typeof toast==='function')toast('\uD83D\uDCCD GPS started...');
+  _twId=navigator.geolocation.watchPosition(
+    function(pos){
+      var lat=pos.coords.latitude,lng=pos.coords.longitude;
+      var ce=document.getElementById('tracker-coords');
+      if(ce)ce.textContent=lat.toFixed(5)+', '+lng.toFixed(5);
+      var zone=_getZone(lat,lng);
+      var ze=document.getElementById('tracker-zone-badge');
+      if(ze)ze.textContent=zone;
+      var zi=document.getElementById('tracker-zone-info');
+      if(zi)zi.innerHTML='<div style="font-size:.68rem;font-weight:600;color:var(--t1)">'+zone+'</div>';
+    },
+    function(err){
+      var msgs=['','Permission denied — enable GPS','Position unavailable','GPS timeout'];
+      if(typeof toast==='function')toast('GPS: '+(msgs[err.code]||'Error'));
+      var b=document.getElementById('tracker-start-btn');
+      if(b){b.textContent='\uD83D\uDCCD Start Tracking';b.disabled=false;}
+    },
+    {enableHighAccuracy:true,timeout:15000}
+  );
+}
+function stopTracker(){
+  if(_twId!==null){navigator.geolocation.clearWatch(_twId);_twId=null;}
+  var b=document.getElementById('tracker-start-btn');
+  if(b){b.textContent='\uD83D\uDCCD Start Tracking';b.disabled=false;}
+  if(typeof toast==='function')toast('\u23F9 Tracking stopped');
+}
+function _getZone(lat,lng){
+  var z=[{n:'Masjid al-Haram',lat:21.4225,lng:39.8262,r:.3},{n:'Mina',lat:21.4131,lng:39.8934,r:2},{n:'Arafat',lat:21.3547,lng:39.9842,r:3},{n:'Muzdalifah',lat:21.3833,lng:39.9367,r:2.5},{n:'Makkah',lat:21.4225,lng:39.8262,r:8}];
+  for(var i=0;i<z.length;i++){var d=Math.sqrt(Math.pow((lat-z[i].lat)*111,2)+Math.pow((lng-z[i].lng)*111,2));if(d<=z[i].r)return z[i].n;}
+  return 'Outside Hajj Zones';
+}
+function shareTracker(){
+  var ce=document.getElementById('tracker-coords');
+  var ze=document.getElementById('tracker-zone-badge');
+  var msg='\uD83D\uDCCD My Haramain Location\n'+(ze?ze.textContent:'')+'\n'+(ce?ce.textContent:'')+'\nharamain.pages.dev';
+  if(navigator.share){navigator.share({title:'My Location',text:msg});}
+  else{if(typeof copyClip==='function')copyClip(msg);if(typeof toast==='function')toast('Location copied!');}
+}
+
+/* Family */
+var _fam=JSON.parse(localStorage.getItem(K+'fam3')||'null')||{id:null,name:null};
+function createFamilyGroup(){
+  var name=((typeof user!=='undefined'&&user)?user.username:'Pilgrim')+' Family';
+  var id='GRP-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  _fam={id:id,name:name};
+  localStorage.setItem(K+'fam3',JSON.stringify(_fam));
+  var gn=document.getElementById('group-name'); if(gn)gn.textContent=name;
+  var gi=document.getElementById('group-id'); if(gi)gi.textContent=id;
+  if(typeof toast==='function')toast('\u2705 Group: '+id);
+}
+function joinGroup(){
+  var code=prompt('Enter group code:'); if(!code)return;
+  _fam={id:code,name:'Group '+code};
+  localStorage.setItem(K+'fam3',JSON.stringify(_fam));
+  var gn=document.getElementById('group-name'); if(gn)gn.textContent=_fam.name;
+  var gi=document.getElementById('group-id'); if(gi)gi.textContent=code;
+  if(typeof toast==='function')toast('\u2705 Joined: '+code);
+}
+function shareGroupCode(){
+  if(!_fam.id){createFamilyGroup();return;}
+  var msg='Join my Haramain group! Code: '+_fam.id+'\nharamain.pages.dev';
+  if(navigator.share){navigator.share({title:'Join my group',text:msg});}
+  else{if(typeof copyClip==='function')copyClip(_fam.id);if(typeof toast==='function')toast('Copied: '+_fam.id);}
+}
+function setMeetingPoint(p){
+  localStorage.setItem(K+'mtg2',p);
+  var e=document.getElementById('meeting-point'); if(e)e.textContent='\uD83D\uDCCD '+p;
+  if(typeof toast==='function')toast('\u2705 Meeting: '+p);
+}
+function sendCheckin(s){
+  if(typeof addTx==='function')addTx('\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 '+s);
+  if(typeof toast==='function')toast('\uD83D\uDCE4 '+s);
+}
+
+/* Itinerary */
+var _itinDone=JSON.parse(localStorage.getItem(K+'itin')||'[]');
+function markItin(el){
+  el.classList.toggle('done');
+  _itinDone=[];
+  document.querySelectorAll('.ievent.done').forEach(function(e,i){_itinDone.push(i);});
+  localStorage.setItem(K+'itin',JSON.stringify(_itinDone));
+  var all=document.querySelectorAll('.ievent').length;
+  var done=document.querySelectorAll('.ievent.done').length;
+  var pp=document.getElementById('itin-prog');
+  if(pp)pp.style.width=Math.round(done/all*100)+'%';
+  var pt=document.getElementById('itin-pct');
+  if(pt)pt.textContent=done+' of '+all+' steps';
+}
+function resetItin(){
+  document.querySelectorAll('.ievent').forEach(function(e){e.classList.remove('done');});
+  _itinDone=[];
+  localStorage.setItem(K+'itin',JSON.stringify(_itinDone));
+  var pp=document.getElementById('itin-prog'); if(pp)pp.style.width='0%';
+  var pt=document.getElementById('itin-pct'); if(pt)pt.textContent='0 of 13 steps';
+  if(typeof toast==='function')toast('\u21BA Progress reset');
+}
+function initItin(){
+  var events=document.querySelectorAll('.ievent');
+  var savedDone=JSON.parse(localStorage.getItem(K+'itin')||'[]');
+  savedDone.forEach(function(idx){if(events[idx])events[idx].classList.add('done');});
+  var done=document.querySelectorAll('.ievent.done').length;
+  var all=events.length;
+  var pp=document.getElementById('itin-prog'); if(pp)pp.style.width=Math.round(done/all*100)+'%';
+  var pt=document.getElementById('itin-pct'); if(pt)pt.textContent=done+' of '+all+' steps';
+}
+
+/* Smart Map */
+function initSmartMap(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var zone=_getZone(pos.coords.latitude,pos.coords.longitude);
+    if(typeof toast==='function')toast('\uD83D\uDCCD You are in: '+zone);
+  });
+}
+function filterMap(t){if(typeof toast==='function')toast('Showing: '+(t==='all'?'All places':t));}
+
+/* GoS + screen init */
+var __goS2 = goS;
+goS = function(id, btn) {
+  __goS2(id, btn);
+  setTimeout(function(){
+    if(id==='ai') initAIWelcome();
+    if(id==='audio') initAudioDuas();
+    if(id==='learning') renderCourses();
+    if(id==='map') initSmartMap();
+    if(id==='itinerary') initItin();
+    if(id==='family'){
+      if(_fam.id){var gn=document.getElementById('group-name');var gi=document.getElementById('group-id');if(gn)gn.textContent=_fam.name;if(gi)gi.textContent=_fam.id;}
+      var mp=localStorage.getItem(K+'mtg2');if(mp){var e=document.getElementById('meeting-point');if(e)e.textContent='\uD83D\uDCCD '+mp;}
+    }
+  },80);
+};
+
+/* Crowd data animation */
+function refreshCrowdData(){
+  document.querySelectorAll('.crowd-bar').forEach(function(bar){
+    var p=bar.getAttribute('data-pct')||50;
+    bar.style.width='0%';
+    setTimeout(function(){bar.style.transition='width 1.2s ease';bar.style.width=p+'%';},100);
+  });
+  if(typeof toast==='function')toast('\uD83D\uDD04 Crowd data refreshed');
+}
+
+/* Health log */
+function logHealth(status){
+  var msgs={great:'Great! Stay hydrated and keep moving.',ok:'Alright. Remember to rest and drink water.',tired:'Rest when you can. Drink water and seek shade.',sick:'Please rest and drink fluids. If serious, visit the medical tent.',dizzy:'Sit down immediately, drink water, seek shade. Call for help if needed.'};
+  if(typeof toast==='function')toast('\u2764\uFE0F '+msgs[status]);
+  if(typeof addNotif==='function')addNotif('\u2764\uFE0F','Health Log','Feeling: '+status,'now');
+}
+function addMedication(){
+  var name=prompt('Medication name:'); if(!name)return;
+  var time=prompt('Time to take (e.g. 8am, 2pm):'); if(!time)return;
+  var ml=document.getElementById('med-list');
+  if(ml){
+    var empty=ml.querySelector('.empty');
+    if(empty)empty.remove();
+    var div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:.6rem;padding:.52rem 0;border-bottom:1px solid var(--bd2)';
+    div.innerHTML='<span style="font-size:1rem">\uD83D\uDC8A</span><div style="flex:1"><div style="font-size:.65rem;font-weight:500;color:var(--t1)">'+escHtml(name)+'</div><div style="font-size:.52rem;color:var(--t3)">'+escHtml(time)+'</div></div>';
+    ml.appendChild(div);
+    if(typeof toast==='function')toast('\u2705 Medication added: '+name);
+  }
+}
+
+/* Override addTx for receipts on Pi payments */
+var __addTxV5=typeof addTx==='function'?addTx:function(){};
+addTx=function(text){
+  __addTxV5(text);
+  var isPay=text.indexOf('\u03C0')>-1||text.indexOf('Paid')>-1||text.indexOf('Sent')>-1||text.indexOf('Zakat')>-1||text.indexOf('Qurbani')>-1||text.indexOf('Sadaqah')>-1;
+  if(isPay)setTimeout(function(){showReceipt(text);},800);
+};
+
+/* DOM ready */
+document.addEventListener('DOMContentLoaded', function(){
+  updateOfflineBadge();
+  updateMoonDates();
+  renderCourses();
+  initAudioDuas();
+  /* Restore lang */
+  var sl=localStorage.getItem(K+'lang');
+  if(sl){var tb=document.getElementById('tb-lang');if(tb)tb.textContent=sl.toUpperCase();}
+  /* Restore family */
+  if(_fam.id){var gn=document.getElementById('group-name');var gi=document.getElementById('group-id');if(gn)gn.textContent=_fam.name;if(gi)gi.textContent=_fam.id;}
+  /* Restore meeting point */
+  var mp=localStorage.getItem(K+'mtg2');if(mp){var e=document.getElementById('meeting-point');if(e)e.textContent='\uD83D\uDCCD '+mp;}
+  /* Animate crowd bars */
+  setTimeout(refreshCrowdData, 500);
+  /* Splash out */
+  setTimeout(function(){var s=document.getElementById('splash');if(s)s.classList.add('out');setTimeout(function(){if(s)s.style.display='none';},600);},2000);
+});
+'''
+
+# Get the CSS from old v4 (has all the design tokens we need)
+old_css = old_html[old_html.find('<style>')+7:old_html.find('</style>')]
+
+# Build final HTML
+FINAL = HTML  # CSS already in HTML template
+
+# Add JS
+FINAL = FINAL.replace('</body>', '\n<script>\n' + JS + '\n\n' + GLUE_JS + '\n</script>\n</body>')
+
+# Syntax check JS
+import subprocess, tempfile, os
+combined_js = JS + '\n\n' + GLUE_JS
+tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.js', delete=False, encoding='utf-8', errors='replace')
+tmp.write(combined_js); tmp.close()
+r = subprocess.run(['node','--check',tmp.name], capture_output=True, text=True)
+os.unlink(tmp.name)
+print(f"JS Syntax: {'OK' if r.returncode==0 else 'ERROR: '+r.stderr[:300]}")
+
+if r.returncode == 0:
+    with open('/mnt/user-data/outputs/haramain-v4/index.html', 'w') as f:
+        f.write(FINAL)
+    print(f"FINAL: {len(FINAL)//1024}KB")
+    screens = re.findall(r'id="s-([^"]+)"', FINAL)
+    print(f"Screens: {len(screens)} — {screens}")
+    print(f"Pi.createPayment: {FINAL.count('Pi.createPayment(')}")
+    print(f"sandbox:false: {'sandbox: false' in FINAL}")
 <script>
+
 
 /* ════════════════════════════════════════════════════════════
    HARAMAIN PAYMENT SYSTEM — Pi Network Mainnet
@@ -5148,154 +4623,7 @@ function openTracker() {
 }
 
 /* ── START TRACKER ── */
-/* old startTracker removed */function startTracker() {
-  if (!navigator.geolocation) { toast('GPS not available on this device'); return; }
-
-  trackerSessionId = 'HM-TRK-' + Date.now().toString(36).toUpperCase();
-  trackerActive = true;
-  trackerTrail = [];
-  trackerStartTime = Date.now();
-  trackerTotalDist = 0;
-  trackerLastPos = null;
-  trackerUpdateCount = 0;
-  _zoneAlerts = {};
-
-  var startBtn = document.getElementById('trk-start-btn');
-  var stopBtn  = document.getElementById('trk-stop-btn');
-  if (startBtn) startBtn.style.display = 'none';
-  if (stopBtn)  stopBtn.style.display  = 'block';
-
-  var statusDot = document.getElementById('trk-status-dot');
-  var statusTxt = document.getElementById('trk-status-txt');
-  var sessionEl = document.getElementById('trk-session');
-  if (statusDot) { statusDot.style.background = 'var(--grn)'; statusDot.style.animation = 'pulse 2s infinite'; }
-  if (statusTxt) statusTxt.textContent = 'LIVE · Updating every 15s';
-  if (sessionEl) sessionEl.textContent = 'Session: ' + trackerSessionId;
-
-  function updateLocation() {
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      var lat = pos.coords.latitude;
-      var lng = pos.coords.longitude;
-      var acc = Math.round(pos.coords.accuracy);
-      var speed = pos.coords.speed ? (pos.coords.speed * 3.6).toFixed(1) : 0; // m/s → km/h
-      var now = new Date();
-      var nowStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-
-      trackerLat = lat.toFixed(6);
-      trackerLng = lng.toFixed(6);
-      trackerUpdateCount++;
-
-      // Add to trail
-      trackerTrail.push({ lat: lat, lng: lng, time: nowStr, acc: acc });
-      if (trackerTrail.length > 50) trackerTrail.shift(); // Keep last 50 points
-
-      // Distance calculation
-      if (trackerLastPos) {
-        var segDist = haversineKm(trackerLastPos.lat, trackerLastPos.lng, lat, lng);
-        if (segDist < 0.5) { // Filter GPS jumps > 500m
-          trackerTotalDist += segDist;
-        }
-      }
-      trackerLastPos = { lat: lat, lng: lng };
-
-      // Duration
-      var dur = Date.now() - trackerStartTime;
-      var durStr = fmtDuration(dur);
-
-      // Distance display
-      var distStr = trackerTotalDist > 1 ?
-        trackerTotalDist.toFixed(2) + 'km' :
-        Math.round(trackerTotalDist * 1000) + 'm';
-
-      // Update map
-      var mapEl = document.getElementById('trk-map');
-      if (mapEl) mapEl.innerHTML = buildMapSVG(trackerTrail, lat, lng);
-
-      // Update stats
-      var el = function(id,v){ var e=document.getElementById(id); if(e)e.textContent=v; };
-      el('trk-stat-dist', distStr);
-      el('trk-stat-dur', durStr);
-      el('trk-stat-spd', speed || '0');
-      el('trk-stat-pts', trackerUpdateCount * 2);
-      el('trk-coords', '📍 ' + lat.toFixed(5) + ', ' + lng.toFixed(5));
-      el('trk-time', nowStr);
-      el('trk-acc', '±' + acc + 'm');
-
-      // Zone detection
-      var zone = checkZoneAlert(lat, lng);
-      var zoneEl = document.getElementById('trk-zone');
-      if (zoneEl) {
-        if (zone) {
-          zoneEl.style.display = 'block';
-          zoneEl.textContent = zone.icon + ' You are in: ' + zone.name;
-        } else {
-          zoneEl.style.display = 'none';
-        }
-      }
-
-      // Build shareable link
-      var makkahDist = haversineKm(lat, lng, 21.3891, 39.8579);
-      var gmapsUrl = 'https://www.google.com/maps?q=' + lat.toFixed(5) + ',' + lng.toFixed(5) +
-        '&label=' + encodeURIComponent((user?user.username:'Pilgrim') + ' (HARAMAIN)');
-      var zoneInfo = zone ? zone.icon + ' ' + zone.name : Math.round(makkahDist) + 'km from Makkah';
-
-      var shareText =
-        '🕋 HARAMAIN · Live Pilgrim Tracker\n' +
-        '━━━━━━━━━━━━━━━━━━━\n' +
-        '👤 Pilgrim: ' + (user?user.username:'Pilgrim') + '\n' +
-        '🆔 ID: ' + myPilgrimId + '\n' +
-        '📍 Location: ' + zoneInfo + '\n' +
-        '🗺️ View on map:\n' + gmapsUrl + '\n' +
-        '🕐 Updated: ' + nowStr + '\n' +
-        '📏 Distance walked: ' + distStr + '\n' +
-        '⏱ Duration: ' + durStr + '\n' +
-        '━━━━━━━━━━━━━━━━━━━\n' +
-        'Powered by Haramain.pi · Pi Network';
-
-      window._trackerShareText = shareText;
-      window._trackerGmapsUrl = gmapsUrl;
-      window._trackerZoneInfo = zoneInfo;
-
-      // Show link box
-      var linkBox = document.getElementById('trk-link-box');
-      var linkEl  = document.getElementById('trk-link');
-      if (linkBox) linkBox.style.display = 'block';
-      if (linkEl)  linkEl.textContent = gmapsUrl;
-
-      // Update trail list
-      var trailBox  = document.getElementById('trk-trail-box');
-      var trailList = document.getElementById('trk-trail-list');
-      if (trailBox) trailBox.style.display = 'block';
-      if (trailList && trackerTrail.length > 0) {
-        var recent = trackerTrail.slice(-5).reverse();
-        trailList.innerHTML = recent.map(function(p, i) {
-          return '<div style="display:flex;justify-content:space-between;padding:.18rem 0;border-bottom:1px solid rgba(201,168,76,.05);font-family:var(--dm);font-size:.48rem">' +
-            '<span style="color:' + (i===0?'var(--grn)':'var(--t3)') + '">' + (i===0?'📍 NOW':'◦') + ' ' + p.lat.toFixed(4) + ', ' + p.lng.toFixed(4) + '</span>' +
-            '<span style="color:var(--t4)">' + p.time + ' ±' + p.acc + 'm</span>' +
-          '</div>';
-        }).join('');
-      }
-
-      // Award tracker points
-      if (trackerUpdateCount % 5 === 0) {
-        addPts(2, '📍 Live tracking (' + trackerUpdateCount + ' updates)');
-      }
-
-    }, function(err) {
-      var coordsEl = document.getElementById('trk-coords');
-      if (coordsEl) coordsEl.textContent = '⚠️ GPS error: ' + err.message;
-      var statusTxt = document.getElementById('trk-status-txt');
-      if (statusTxt) statusTxt.textContent = 'GPS error — retrying...';
-    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 10000 });
-  }
-
-  // Start immediately then every 15 seconds
-  updateLocation();
-  trackerInterval = setInterval(updateLocation, 15000);
-
-  toast('📍 Live tracking started! Share link with family.');
-  addNotif('📍', 'Live Tracker Active', 'ID: ' + trackerSessionId + ' · Updating every 15s · Share link with family.', 'now');
-}
+/* old startTracker removed */
 
 /* ── STOP TRACKER ── */
 function stopTracker() {
@@ -7598,6 +6926,575 @@ window.addEventListener('load', function() {
     }
 });
 
+
+
+
+/* HARAMAIN v4.1 PRODUCTION FIXES */
+
+/* ══ LANGUAGE ══ */
+var _langCodes2 = ['en','ar','ha','ur','id','tr'];
+var _langIdx2 = 0;
+
+function cycleLang() {
+  _langIdx2 = (_langIdx2 + 1) % _langCodes2.length;
+  var code = _langCodes2[_langIdx2];
+  if (typeof setLang === 'function') setLang(code);
+  var tbLang = document.getElementById('tb-lang');
+  if (tbLang) tbLang.textContent = code.toUpperCase();
+  var langSel = document.getElementById('lang-sel');
+  if (langSel) langSel.value = code;
+  var names = {en:'English',ar:'Arabic',ha:'Hausa',ur:'Urdu',id:'Bahasa',tr:'Turkish'};
+  if (typeof toast === 'function') toast((names[code]||code) + ' selected');
+}
+
+/* ══ AI ══ */
+var AI_HISTORY_V4 = [];
+var AI_KB = {
+  tawaf: '7 counter-clockwise rounds around the Kaaba. Begin at the Black Stone saying Bismillah Allahu Akbar. Men bare right shoulder for first 3 rounds. Recite recommended duas each round.',
+  ihram: 'Ihram prohibitions: cutting hair or nails, perfume, marital relations, hunting, covering head (men). Men wear 2 white unstitched cloths. Women wear normal modest clothing. Say Talbiyah constantly.',
+  arafat: 'Day of Arafat (9 Dhul Hijjah) is the pinnacle of Hajj. Stand from Dhuhr to Maghrib in supplication. The Prophet said: Hajj is Arafat. Missing this day invalidates Hajj.',
+  mina: 'Mina valley where pilgrims stay days 8-13 of Dhul Hijjah. Stone the 3 Jamarat pillars: Small, Medium, Large. Throw 7 pebbles each, say Allahu Akbar with each throw.',
+  umrah: 'Umrah steps: 1) Enter Ihram at Miqat 2) Tawaf 7 rounds 3) Pray at Maqam Ibrahim 4) Drink Zamzam 5) Sai 7 times between Safa and Marwa 6) Shave or trim hair.',
+  zamzam: 'Zamzam water blessed by Allah. Drink facing Qibla. Say Bismillah. Make dua while drinking. The Prophet said: Zamzam is for whatever it is drunk for.',
+  dua: 'Key Hajj duas: Talbiyah, Entering Makkah dua, Before Tawaf, At Black Stone, Day of Arafat supplication. See the Audio Duas section for full collection.',
+  pack: 'Essential Hajj packing: Ihram cloths, unscented toiletries, comfortable shoes, medications, prayer mat, pocket Quran, power bank, umbrella, emergency contacts.',
+  safety: 'Stay with group. Memorize hotel address. Carry Hajj ID always. Stay hydrated (3-5L daily). Rest during peak heat. Emergency: 911 (Saudi), 920002814 (Hajj emergency).',
+  hajj: 'Hajj pillars: 1) Ihram 2) Standing at Arafat 3) Tawaf al-Ifadah 4) Sai. Hajj is the 5th pillar of Islam. Obligatory once in lifetime for able Muslims.',
+  prayer: 'Prayer in Masjid al-Haram = 100,000x reward. Times: Fajr ~5:15am, Dhuhr ~12:15pm, Asr ~3:30pm, Maghrib ~6:45pm, Isha ~8:15pm.',
+  zakat: 'Zakat is 2.5% of savings above Nisab held for one lunar year. Calculate in Finance section. Zakat al-Fitr due before Eid prayer.',
+};
+
+function askAI(msg) {
+  if (!msg || !msg.trim()) return;
+  var chat = document.getElementById('ai-chat');
+  if (!chat) return;
+
+  var userDiv = document.createElement('div');
+  userDiv.className = 'ai-bubble user';
+  userDiv.textContent = msg;
+  chat.appendChild(userDiv);
+  chat.scrollTop = chat.scrollHeight;
+
+  var thinkDiv = document.createElement('div');
+  thinkDiv.className = 'ai-bubble bot';
+  thinkDiv.innerHTML = '<div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
+  chat.appendChild(thinkDiv);
+  chat.scrollTop = chat.scrollHeight;
+
+  AI_HISTORY_V4.push({ role: 'user', content: msg });
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 800,
+      system: 'You are Haramain AI, an expert Islamic pilgrimage guide on Pi Network. Help pilgrims with Hajj, Umrah, Islamic rituals, duas, and safety. Be concise, compassionate, scholarly. Respond in the user language.',
+      messages: AI_HISTORY_V4
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var reply = (d.content && d.content[0] && d.content[0].text) || getKBReply(msg);
+    AI_HISTORY_V4.push({ role: 'assistant', content: reply });
+    thinkDiv.innerHTML = '';
+    thinkDiv.textContent = reply;
+    chat.scrollTop = chat.scrollHeight;
+  })
+  .catch(function() {
+    thinkDiv.innerHTML = '';
+    thinkDiv.textContent = getKBReply(msg);
+    chat.scrollTop = chat.scrollHeight;
+  });
+
+  var inp = document.getElementById('ai-input');
+  if (inp) inp.value = '';
+}
+
+function getKBReply(msg) {
+  var lower = msg.toLowerCase();
+  for (var key in AI_KB) {
+    if (lower.indexOf(key) > -1) return String.fromCodePoint(0x1F54B) + ' ' + AI_KB[key];
+  }
+  return String.fromCodePoint(0x1F54B) + ' Bismillah! Ask me about: tawaf, ihram, Arafat, Mina, Umrah, Zamzam, duas, packing, safety, prayer, or zakat. May Allah bless your pilgrimage!';
+}
+
+function sendAIMessage() {
+  var inp = document.getElementById('ai-input');
+  if (!inp || !inp.value.trim()) return;
+  askAI(inp.value.trim());
+  inp.value = '';
+}
+
+function initAIScreen() {
+  var chat = document.getElementById('ai-chat');
+  if (!chat || chat.children.length > 0) return;
+  var welcome = document.createElement('div');
+  welcome.className = 'ai-bubble bot';
+  welcome.textContent = String.fromCodePoint(0x1F54B) + ' Bismillah! I am Haramain AI - your personal pilgrimage guide. Ask me anything about Hajj, Umrah, duas, or safety. How can I help?';
+  chat.appendChild(welcome);
+}
+
+/* ══ AUDIO DUAS ══ */
+var DUA_ITEMS = [
+  { n:'Talbiyah', t:'Labbayk Allahumma labbayk - Here I am O Allah', a:'\u0644\u064E\u0628\u064E\u0651\u064A\u0652\u0643\u064E \u0627\u0644\u0644\u0651\u064E\u0647\u064F\u0645\u064E\u0651' },
+  { n:'Entering Makkah', t:'Allahumma antassalam wa minkas-salam', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0623\u064E\u0646\u0652\u062A\u064E \u0627\u0644\u0633\u064E\u0651\u0644\u0627\u064E\u0645\u064F' },
+  { n:'Before Tawaf', t:'Bismillah Allahu Akbar', a:'\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0647\u0650 \u0627\u0644\u0644\u0647\u064F \u0623\u064E\u0643\u0652\u0628\u064E\u0631' },
+  { n:'Day of Arafat', t:'La ilaha illallah wahdahu la sharika lah', a:'\u0644\u064E\u0627 \u0625\u0650\u0644\u064E\u0647\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0627\u0644\u0644\u064E\u0651\u0647\u064F \u0648\u064E\u062D\u0652\u062F\u064E\u0647\u064F' },
+  { n:'At Safa and Marwa', t:'Innas-Safa wal-Marwata min shaairillah', a:'\u0625\u0650\u0646\u064E\u0651 \u0627\u0644\u0635\u064E\u0651\u0641\u064E\u0627 \u0648\u064E\u0627\u0644\u0652\u0645\u064E\u0631\u0652\u0648\u064E\u0629\u064E' },
+  { n:'Morning Dua', t:'Allahumma bika asbahna wa bika amsayna', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0628\u0650\u0643\u064E \u0623\u064E\u0635\u0652\u0628\u064E\u062D\u0652\u0646\u064E\u0627' },
+  { n:'After Zamzam', t:'Allahumma inni asaluka ilman nafian', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0625\u0650\u0646\u064E\u0651\u064A \u0623\u064E\u0633\u0652\u0623\u064E\u0644\u064F\u0643\u064E' },
+  { n:'Farewell Tawaf', t:'Allahumma hadhal baytu baytuk', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0647\u064E\u0630\u064E\u0627 \u0627\u0644\u0652\u0628\u064E\u064A\u0652\u062A\u064F' },
+];
+var curDuaIdx = 0;
+
+function initAudioDuas() {
+  renderDuaPlayer();
+  renderDuaList();
+}
+
+function renderDuaPlayer() {
+  var dua = DUA_ITEMS[curDuaIdx];
+  if (!dua) return;
+  var nameEl = document.getElementById('audio-now-name');
+  var arabicEl = document.getElementById('audio-now-arabic');
+  var transEl = document.getElementById('audio-now-trans');
+  if (nameEl) nameEl.textContent = dua.n;
+  if (arabicEl) { arabicEl.textContent = dua.a; arabicEl.style.direction = 'rtl'; arabicEl.style.fontSize = '1.1rem'; arabicEl.style.color = 'var(--gold2)'; }
+  if (transEl) transEl.textContent = dua.t;
+}
+
+function renderDuaList() {
+  var list = document.getElementById('audio-dua-list');
+  if (!list) return;
+  list.innerHTML = DUA_ITEMS.map(function(d, i) {
+    var s = i === curDuaIdx ? 'background:var(--gdim);border-color:var(--gbrd);' : '';
+    return '<div style="display:flex;align-items:center;gap:.6rem;padding:.65rem;' + s + 'border-radius:var(--r2);margin-bottom:.3rem;cursor:pointer;border:1px solid var(--bd2);transition:all .15s" onclick="selectDuaItem(' + i + ')">' +
+      '<div style="font-size:1.1rem">' + (i === curDuaIdx ? '\uD83D\uDD0A' : '\uD83C\uDFB5') + '</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-size:.65rem;font-weight:600;color:var(--t1)">' + d.n + '</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">' + d.t.substring(0,45) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function selectDuaItem(idx) {
+  curDuaIdx = idx;
+  renderDuaPlayer();
+  renderDuaList();
+  speakDuaNow();
+}
+
+function speakDuaNow() {
+  var dua = DUA_ITEMS[curDuaIdx];
+  if (!dua) return;
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance(dua.n + '. ' + dua.t);
+    utt.lang = 'en-US'; utt.rate = 0.8;
+    speechSynthesis.speak(utt);
+    if (typeof toast === 'function') toast('\uD83D\uDD0A ' + dua.n);
+    var btn = document.getElementById('audio-play-btn');
+    if (btn) btn.textContent = '\u23F8';
+  } else {
+    if (typeof toast === 'function') toast(dua.n + ': ' + dua.t);
+  }
+}
+
+function toggleAudioPlay() {
+  if ('speechSynthesis' in window) {
+    if (speechSynthesis.speaking && !speechSynthesis.paused) {
+      speechSynthesis.pause();
+      var btn = document.getElementById('audio-play-btn');
+      if (btn) btn.textContent = '\u25B6';
+    } else if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+      var btn = document.getElementById('audio-play-btn');
+      if (btn) btn.textContent = '\u23F8';
+    } else { speakDuaNow(); }
+  }
+}
+
+function prevDua() { curDuaIdx = (curDuaIdx - 1 + DUA_ITEMS.length) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
+function nextDua() { curDuaIdx = (curDuaIdx + 1) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
+
+/* ══ LEARNING CENTER ══ */
+var COURSES2 = {
+  hajj:      { t:'Complete Hajj Guide', i:'\u{1F54B}', l:[
+    { h:'What is Hajj?', b:'Hajj is the 5th pillar of Islam. Every able Muslim must perform it once. Takes place in Dhul Hijjah. It is the greatest act of worship.' },
+    { h:'Preparing for Hajj', b:'Physical: walking training, vaccination. Spiritual: repent, settle debts. Financial: save, get visa. Knowledge: learn rites, memorize duas.' },
+    { h:'Entering Ihram', b:'Men wear 2 white unstitched cloths. Women wear modest clothing. Enter at Miqat. Say intention and Talbiyah: Labbayk Allahumma labbayk.' },
+    { h:'Performing Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Begin at Black Stone. Men bare right shoulder first 3 rounds. Pray 2 rakahs at Maqam Ibrahim after.' },
+    { h:'Sai at Safa and Marwa', b:'7 trips between the two hills. Commemorates Hajars search for water. Start at Safa, end at Marwa. Total about 3.15km.' },
+    { h:'Day of Arafat', b:'The most important day of Hajj. Stand from Dhuhr to Maghrib in dua and dhikr. The Prophet said: Hajj is Arafat. Missing invalidates Hajj.' },
+    { h:'Muzdalifah Night', b:'Travel from Arafat after Maghrib. Pray combined Maghrib and Isha. Sleep under sky. Collect 49 pebbles for Jamarat. Leave for Mina after Fajr.' },
+    { h:'Stoning Jamarat', b:'Stone 3 Jamarat pillars. Day 1: Large Jamarat only (7 pebbles). Days 2-3: All 3 (7 each). Say Allahu Akbar with each throw.' },
+    { h:'Farewell Tawaf', b:'Last act before leaving Makkah. 7 rounds around Kaaba. Say farewell prayers and dua. Leave with gratitude and hope.' },
+  ]},
+  umrah: { t:'Umrah Step by Step', i:'\uD83C\uDF19', l:[
+    { h:'What is Umrah?', b:'Umrah is the lesser pilgrimage. Performable any time of year. Highly recommended Sunnah. Takes 2-4 hours to complete.' },
+    { h:'Entering Ihram', b:'Enter at Miqat for your direction. Ghusl (bath), wear Ihram. Say intention and Talbiyah. Avoid all Ihram prohibitions.' },
+    { h:'Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Start and end at Black Stone. Recite duas. Pray 2 rakahs at Maqam Ibrahim after.' },
+    { h:'Sai', b:'7 trips between Safa and Marwa. Start at Safa. Make dua facing Kaaba at each hilltop. Total about 3.15km.' },
+    { h:'Shave or Trim', b:'After Sai: shave or trim hair. This exits the state of Ihram. Men shaving is more rewarding. Women trim one fingertip length only.' },
+  ]},
+  arabic: { t:'Essential Arabic Phrases', i:'\uD83C\uDF10', l:[
+    { h:'Greetings', b:'As-salamu alaykum = Peace be upon you. Wa alaykum as-salam = And upon you peace. Marhaba = Welcome. Kayfa halak = How are you.' },
+    { h:'At the Mosque', b:'Al-masjid = mosque. Al-Kaabah = the Kaaba. Salah = prayer. Wudu = ablution. Imam = prayer leader. Qiblah = direction of prayer.' },
+    { h:'Asking for Help', b:'Musaadah = Help! Ayna al-hammam = Where is the toilet? La afham = I do not understand. Hal tatakallam Inglizi = Do you speak English?' },
+    { h:'Emergencies', b:'Al-isaaf = Ambulance! Ana marid = I am sick. Itasil bil-isaaf = Call ambulance. Al-mustashfa ayna = Where is the hospital?' },
+    { h:'Islamic Phrases', b:'Bismillah = In the name of Allah. Alhamdulillah = All praise to Allah. Inshallah = If Allah wills. Allahu Akbar = Allah is Greatest.' },
+  ]},
+  etiquette: { t:'Mosque Etiquette', i:'\uD83D\uDD4C', l:[
+    { h:'Entering', b:'Enter with right foot. Say: Allahumma iftah li abwaba rahmatik. Remove shoes. Be in state of wudu. Be quiet and respectful.' },
+    { h:'Inside', b:'Pray 2 rakahs when entering. Keep voice low. Do not walk in front of praying person. Phone on silent. Face Qiblah when making dua.' },
+    { h:'Prayer Rows', b:'Stand shoulder to shoulder. Fill gaps from front. Follow imam exactly. Do not precede imam in any movement.' },
+    { h:'Leaving', b:'Leave with left foot. Say: Allahumma inni asaluka min fadlik. Give way to others. Leave peacefully and quietly.' },
+  ]},
+  history: { t:'Islamic History of Makkah', i:'\uD83D\uDCDC', l:[
+    { h:'Origin of Makkah', b:'Built by Prophet Ibrahim and his son Ismail. Ibrahim received divine command to build the Kaaba. Black Stone brought from Paradise by Angel Jibreel.' },
+    { h:'The Kaaba', b:'First house of worship built for mankind (Quran 3:96). Measures 13.1m x 11.03m x 13.1m. Kiswah cloth changed annually. Black Stone embedded in corner.' },
+    { h:'Zamzam Well', b:'Appeared miraculously for Ismail when Hajar searched for water. Over 3,500 years old. Produces 11-18.5 liters per second. Most blessed water.' },
+    { h:'Birth of Prophet Muhammad', b:'Born in Makkah 570 CE. Received first revelation in Cave Hira at age 40. Migrated to Madinah 622 CE. Returned 630 CE for Conquest of Makkah.' },
+  ]},
+};
+var curCId = null, curLIdx = 0;
+var lDone = JSON.parse(localStorage.getItem(K+'ld') || '{}');
+
+function startCourse(id) {
+  curCId = id;
+  curLIdx = lDone[id] || 0;
+  showLsn();
+}
+
+function showLsn() {
+  var c = COURSES2[curCId];
+  if (!c) return;
+  goS('learning');
+  var con = document.getElementById('lesson-container');
+  var lst = document.getElementById('lesson-list-wrap');
+  if (con) con.style.display = 'block';
+  if (lst) lst.style.display = 'none';
+  var l = c.l[curLIdx];
+  if (!l) { finishCrs(); return; }
+  var total = c.l.length;
+  var pct = Math.round(curLIdx/total*100);
+  if (!con) return;
+  con.innerHTML =
+    '<button class="back-btn" onclick="exitLsn()">\u2190 ' + c.t + '</button>' +
+    '<div class="card card-gold" style="margin-bottom:.7rem">' +
+      '<div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">' + c.i + ' Lesson ' + (curLIdx+1) + ' / ' + total + '</div>' +
+      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--t1);margin:.3rem 0">' + l.h + '</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+    '</div>' +
+    '<div class="ibox" style="font-size:.72rem;color:var(--t1);line-height:1.8;margin-bottom:.7rem">' + l.b + '</div>' +
+    '<div style="display:flex;gap:.5rem">' +
+      (curLIdx > 0 ? '<button class="btn btn-ghost" onclick="prevLsn()" style="flex:1">\u2190 Back</button>' : '') +
+      (curLIdx < total-1 ?
+        '<button class="btn btn-gold" onclick="nextLsn()" style="flex:2">Next \u2192</button>' :
+        '<button class="btn btn-gold" onclick="finishCrs()" style="flex:2">\u2705 Complete!</button>'
+      ) +
+    '</div>';
+}
+
+function nextLsn() {
+  lDone[curCId] = curLIdx + 1;
+  localStorage.setItem(K+'ld', JSON.stringify(lDone));
+  if (typeof addPts === 'function') addPts(5, 'Lesson');
+  curLIdx++;
+  showLsn();
+}
+
+function prevLsn() { curLIdx = Math.max(0, curLIdx-1); showLsn(); }
+
+function finishCrs() {
+  var c = COURSES2[curCId];
+  lDone[curCId] = c ? c.l.length : 0;
+  localStorage.setItem(K+'ld', JSON.stringify(lDone));
+  if (typeof addPts === 'function') addPts(50, 'Course');
+  exitLsn();
+  if (typeof toast === 'function') toast('\uD83C\uDFC6 Course completed! +50 pts');
+  if (typeof addNotif === 'function') addNotif('\uD83C\uDFC6','Course Done!',(c?c.t:curCId),'now');
+  renderCourses();
+}
+
+function exitLsn() {
+  var con = document.getElementById('lesson-container');
+  var lst = document.getElementById('lesson-list-wrap');
+  if (con) con.style.display = 'none';
+  if (lst) lst.style.display = 'block';
+  renderCourses();
+}
+
+function renderCourses() {
+  var w = document.getElementById('lesson-list-wrap');
+  if (!w) return;
+  w.innerHTML = Object.keys(COURSES2).map(function(id) {
+    var c = COURSES2[id];
+    var d = lDone[id] || 0;
+    var tot = c.l.length;
+    var p = Math.round(d/tot*100);
+    var col = d >= tot ? 'var(--grn)' : (d > 0 ? 'var(--gold)' : 'var(--t3)');
+    var st = d >= tot ? '\u2705 Done' : (d > 0 ? d+'/'+tot+' lessons' : 'Start');
+    return '<div class="course-card" onclick="startCourse(\''+id+'\')">' +
+      '<div class="course-thumb">'+c.i+'</div>' +
+      '<div style="flex:1">' +
+        '<div class="course-title">'+c.t+'</div>' +
+        '<div class="course-meta">'+tot+' lessons</div>' +
+        '<div class="course-progress"><div class="course-fill" style="width:'+p+'%"></div></div>' +
+        '<div style="font-size:.48rem;color:'+col+';margin-top:.2rem">'+st+'</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+/* ══ TRANSACTION RECEIPT ══ */
+function showReceipt(txText) {
+  var rid = 'TXN-' + Date.now().toString(36).toUpperCase();
+  var rdate = new Date().toLocaleString();
+  var ruser = (typeof user !== 'undefined' && user) ? '@'+user.username : '@pilgrim';
+  var rpid = (typeof myPilgrimId !== 'undefined' && myPilgrimId) ? myPilgrimId : 'HRM-00000';
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.id = 'receipt-modal';
+  var rtext = txText.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&apos;');
+  modal.innerHTML =
+    '<div style="background:var(--bg2);border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.5rem;width:100%;max-width:300px;text-align:center">' +
+      '<div style="font-size:2.5rem;margin-bottom:.4rem">\uD83E\uDDFE</div>' +
+      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold2)">Transaction Receipt</div>' +
+      '<div style="font-family:monospace;font-size:.52rem;color:var(--t3);margin:.3rem 0 .8rem">'+rid+'</div>' +
+      '<div style="background:var(--bg3);border-radius:var(--r2);padding:.8rem;margin-bottom:.8rem;text-align:left">' +
+        '<div style="font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.4rem">'+rtext+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCC5 '+rdate+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDC64 '+ruser+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83E\uDEAA '+rpid+'</div>' +
+        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCF1 HARAMAIN \u00B7 Pi Mainnet</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:.4rem">' +
+        '<button class="btn btn-gold btn-sm" onclick="shareRcpt()" style="flex:1">\uD83D\uDCE4 Share</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'receipt-modal\').remove()" style="flex:1">\u2715 Close</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  modal._data = { id:rid, text:txText, date:rdate, user:ruser, pid:rpid };
+  var recs = JSON.parse(localStorage.getItem(K+'receipts') || '[]');
+  recs.unshift({ id:rid, text:txText, date:rdate });
+  if (recs.length > 100) recs.pop();
+  localStorage.setItem(K+'receipts', JSON.stringify(recs));
+}
+
+function shareRcpt() {
+  var modal = document.getElementById('receipt-modal');
+  if (!modal || !modal._data) return;
+  var d = modal._data;
+  var text = 'HARAMAIN Receipt\n' + d.id + '\n' + d.text + '\n' + d.date + '\nharamain.pages.dev';
+  if (navigator.share) { navigator.share({ title: 'Haramain Receipt', text: text }); }
+  else { if (typeof copyClip === 'function') copyClip(text); if (typeof toast === 'function') toast('Receipt copied!'); }
+}
+
+/* ══ LIVE TRACKER ══ */
+var _tWatchId = null;
+
+function startTracker() {
+  if (!navigator.geolocation) { if (typeof toast === 'function') toast('GPS not available'); return; }
+  var btn = document.getElementById('tracker-start-btn');
+  if (btn) { btn.textContent = '\uD83D\uDCCD Tracking...'; btn.disabled = true; }
+  if (typeof toast === 'function') toast('\uD83D\uDCCD GPS started...');
+  _tWatchId = navigator.geolocation.watchPosition(
+    function(pos) {
+      var lat = pos.coords.latitude, lng = pos.coords.longitude;
+      var el = document.getElementById('tracker-coords');
+      if (el) el.textContent = lat.toFixed(5) + ', ' + lng.toFixed(5);
+      var zone = getHajjZone(lat, lng);
+      var zEl = document.getElementById('tracker-zone-badge');
+      if (zEl) zEl.textContent = zone;
+      var zi = document.getElementById('tracker-zone-info');
+      if (zi) zi.innerHTML = '<div style="font-size:.68rem;font-weight:600;color:var(--t1)">' + zone + '</div>';
+      updateMapSvgDot(lat, lng, 'tracker-dot', 'tracker-dot-inner');
+    },
+    function(err) {
+      var msgs = ['','Permission denied - enable GPS in browser','Position unavailable','GPS timeout'];
+      if (typeof toast === 'function') toast('GPS: ' + (msgs[err.code] || 'Error'));
+      var btn2 = document.getElementById('tracker-start-btn');
+      if (btn2) { btn2.textContent = '\uD83D\uDCCD Start Tracking'; btn2.disabled = false; }
+    },
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
+
+function stopTracker() {
+  if (_tWatchId !== null) { navigator.geolocation.clearWatch(_tWatchId); _tWatchId = null; }
+  var btn = document.getElementById('tracker-start-btn');
+  if (btn) { btn.textContent = '\uD83D\uDCCD Start Tracking'; btn.disabled = false; }
+  if (typeof toast === 'function') toast('\u23F9 Tracking stopped');
+}
+
+function getHajjZone(lat, lng) {
+  var zones = [
+    { n:'Masjid al-Haram', lat:21.4225, lng:39.8262, r:0.3 },
+    { n:'Mina', lat:21.4131, lng:39.8934, r:2.0 },
+    { n:'Arafat', lat:21.3547, lng:39.9842, r:3.0 },
+    { n:'Muzdalifah', lat:21.3833, lng:39.9367, r:2.5 },
+    { n:'Makkah', lat:21.4225, lng:39.8262, r:8.0 },
+  ];
+  for (var i=0; i<zones.length; i++) {
+    var z = zones[i];
+    var d = Math.sqrt(Math.pow((lat-z.lat)*111,2)+Math.pow((lng-z.lng)*111,2));
+    if (d <= z.r) return z.n;
+  }
+  return 'Outside Hajj Zones';
+}
+
+function updateMapSvgDot(lat, lng, dotId, innerId) {
+  var dot = document.getElementById(dotId);
+  var inner = document.getElementById(innerId);
+  if (!dot || !inner) return;
+  var x = Math.max(10, Math.min(330, 170 + (lng - 39.8262) * 800));
+  var y = Math.max(10, Math.min(210, 110 - (lat - 21.4225) * 800));
+  dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+  inner.setAttribute('cx', x); inner.setAttribute('cy', y);
+}
+
+function shareTracker() {
+  var el = document.getElementById('tracker-coords');
+  var zEl = document.getElementById('tracker-zone-badge');
+  var msg = '\uD83D\uDCCD My Haramain Location\n' + (zEl ? zEl.textContent : '') + '\n' + (el ? el.textContent : '') + '\nharamain.pages.dev';
+  if (navigator.share) { navigator.share({ title:'My Location', text:msg }); }
+  else { if (typeof copyClip === 'function') copyClip(msg); if (typeof toast === 'function') toast('Location copied!'); }
+}
+
+/* ══ FAMILY HUB ══ */
+var famData = JSON.parse(localStorage.getItem(K+'fam2') || 'null') || { id:null, name:null };
+
+function createFamilyGroup() {
+  var name = ((typeof user !== 'undefined' && user) ? user.username : 'Pilgrim') + ' Family';
+  var id = 'GRP-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  famData = { id:id, name:name };
+  localStorage.setItem(K+'fam2', JSON.stringify(famData));
+  var gn = document.getElementById('group-name');
+  var gi = document.getElementById('group-id');
+  if (gn) gn.textContent = name;
+  if (gi) gi.textContent = id;
+  if (typeof toast === 'function') toast('\u2705 Group created: ' + id);
+}
+
+function joinGroup() {
+  var code = prompt('Enter group code:');
+  if (!code) return;
+  famData.id = code;
+  famData.name = 'Group ' + code;
+  localStorage.setItem(K+'fam2', JSON.stringify(famData));
+  var gn = document.getElementById('group-name');
+  var gi = document.getElementById('group-id');
+  if (gn) gn.textContent = famData.name;
+  if (gi) gi.textContent = code;
+  if (typeof toast === 'function') toast('\u2705 Joined: ' + code);
+}
+
+function shareGroupCode() {
+  if (!famData.id) { createFamilyGroup(); return; }
+  var msg = 'Join my Haramain family group! Code: ' + famData.id + '\nharamain.pages.dev';
+  if (navigator.share) { navigator.share({ title:'Join my group', text:msg }); }
+  else { if (typeof copyClip === 'function') copyClip(famData.id); if (typeof toast === 'function') toast('Copied: ' + famData.id); }
+}
+
+function setMeetingPoint(p) {
+  localStorage.setItem(K+'mtg', p);
+  var el = document.getElementById('meeting-point');
+  if (el) el.textContent = '\uD83D\uDCCD ' + p;
+  if (typeof toast === 'function') toast('\u2705 Meeting: ' + p);
+}
+
+function sendCheckin(s) {
+  if (typeof addTx === 'function') addTx('\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 ' + s);
+  if (typeof toast === 'function') toast('\uD83D\uDCE4 ' + s);
+}
+
+/* ══ SMART MAP ══ */
+function initSmartMap() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var zone = getHajjZone(pos.coords.latitude, pos.coords.longitude);
+    if (typeof toast === 'function') toast('\uD83D\uDCCD You are in: ' + zone);
+    updateMapSvgDot(pos.coords.latitude, pos.coords.longitude, 'tracker-dot', 'tracker-dot-inner');
+  });
+}
+
+function filterMap(t) {
+  if (typeof toast === 'function') toast('Showing: ' + (t === 'all' ? 'All places' : t));
+}
+
+/* ══ SCREEN INIT ON NAVIGATE ══ */
+var __goSv4 = goS;
+goS = function(id, btn) {
+  __goSv4(id, btn);
+  setTimeout(function() {
+    if (id === 'audio') initAudioDuas();
+    if (id === 'learning') renderCourses();
+    if (id === 'family') {
+      if (famData.id) {
+        var gn = document.getElementById('group-name');
+        var gi = document.getElementById('group-id');
+        if (gn) gn.textContent = famData.name;
+        if (gi) gi.textContent = famData.id;
+      }
+    }
+    if (id === 'map') initSmartMap();
+    if (id === 'ai') initAIScreen();
+  }, 100);
+};
+
+/* ══ DOM READY SETUP ══ */
+document.addEventListener('DOMContentLoaded', function() {
+  /* Setup lesson container in learning screen */
+  var ls = document.getElementById('s-learning');
+  if (ls) {
+    if (!document.getElementById('lesson-container')) {
+      var c = document.createElement('div');
+      c.id = 'lesson-container';
+      c.style.display = 'none';
+      ls.appendChild(c);
+    }
+    if (!document.getElementById('lesson-list-wrap')) {
+      var w = document.createElement('div');
+      w.id = 'lesson-list-wrap';
+      ls.appendChild(w);
+    }
+  }
+  renderCourses();
+  initAudioDuas();
+
+  /* Load language preference */
+  var savedLang = localStorage.getItem(K+'lang');
+  if (savedLang && typeof setLang === 'function') {
+    setLang(savedLang);
+    var tbLang = document.getElementById('tb-lang');
+    if (tbLang) tbLang.textContent = savedLang.toUpperCase();
+    _langIdx2 = _langCodes2.indexOf(savedLang);
+  }
+
+  /* Load meeting point */
+  var mp = localStorage.getItem(K+'mtg');
+  if (mp) { var mpEl = document.getElementById('meeting-point'); if (mpEl) mpEl.textContent = '\uD83D\uDCCD ' + mp; }
+
+  /* Load family group */
+  if (famData.id) {
+    var gn = document.getElementById('group-name');
+    var gi = document.getElementById('group-id');
+    if (gn) gn.textContent = famData.name;
+    if (gi) gi.textContent = famData.id;
+  }
+});
+
+/* ══ OVERRIDE addTx FOR RECEIPT ══ */
+var __addTxV4 = typeof addTx === 'function' ? addTx : function(){};
+addTx = function(text) {
+  __addTxV4(text);
+  var isPayment = text.indexOf('\u03C0') > -1 || text.indexOf('Paid') > -1 || text.indexOf('Sent') > -1 || text.indexOf('Zakat') > -1 || text.indexOf('Qurbani') > -1 || text.indexOf('Sadaqah') > -1;
+  if (isPayment) {
+    setTimeout(function() { showReceipt(text); }, 1000);
+  }
+};
 
 
 
