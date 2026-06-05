@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -1041,8 +1042,6 @@ select.fi{cursor:pointer;}
   border:1px solid rgba(46,204,113,.25);border-radius:var(--pill);
   padding:.1rem .4rem;}
 
-/* === v5 additions === */
-.hub-section{margin-bottom:.9rem;}
 .hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.42rem;margin-bottom:.55rem;}
 .hub-item{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r3);padding:.75rem .42rem;display:flex;flex-direction:column;align-items:center;gap:.25rem;cursor:pointer;transition:all .18s;}
 .hub-item:active{transform:scale(.92);background:var(--gdim);border-color:var(--gbrd);}
@@ -1069,6 +1068,8 @@ select.fi{cursor:pointer;}
 .course-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:var(--pill);}
 .row-between{display:flex;align-items:center;justify-content:space-between;}
 .divider{height:1px;background:var(--bd2);margin:.62rem 0;}
+.empty-icon{font-size:2rem;display:block;margin-bottom:.5rem;opacity:.4;}
+#offline-badge{position:fixed;top:0;left:0;right:0;z-index:9100;background:rgba(231,76,60,.9);color:#fff;text-align:center;font-size:.54rem;font-weight:600;padding:.28rem;display:none;}
 </style>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
@@ -2629,9 +2630,7 @@ select.fi{cursor:pointer;}
   
     <!-- LEARNING -->
     <section class="scr" id="s-learning">
-      <div class="scr-top-bar">
-        <div><div class="scr-top-title">Learning Center</div><div class="scr-top-sub">Courses · Progress · Certificates</div></div>
-      </div>
+      <div class="scr-top-bar"><div><div class="scr-top-title">Learning Center</div><div class="scr-top-sub">Courses · Progress · Certificates</div></div></div>
       <div id="lesson-list-wrap"></div>
       <div id="lesson-container" style="display:none"></div>
     </section>
@@ -2639,14 +2638,14 @@ select.fi{cursor:pointer;}
     <!-- FAMILY HUB -->
     <section class="scr" id="s-family">
       <div class="scr-top-bar">
-        <div><div class="scr-top-title">Family Hub</div><div class="scr-top-sub">Stay connected with your group</div></div>
+        <div><div class="scr-top-title">Family Hub</div><div class="scr-top-sub">Stay connected · Share location</div></div>
         <span class="scr-top-action" onclick="createFamilyGroup()">+ Group</span>
       </div>
       <div class="hero-card">
-        <div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.25rem">Your Group</div>
+        <div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem">Your Group</div>
         <div style="font-family:var(--serif);font-size:1.2rem;font-weight:600;color:var(--t1)" id="group-name">No Group Yet</div>
-        <div style="font-family:monospace;font-size:.55rem;color:var(--gold2);margin:.2rem 0" id="group-id"></div>
-        <div style="display:flex;gap:.4rem;margin-top:.7rem">
+        <div style="font-family:monospace;font-size:.52rem;color:var(--gold2);margin:.15rem 0" id="group-id"></div>
+        <div style="display:flex;gap:.38rem;margin-top:.7rem">
           <button class="btn btn-gold btn-sm" onclick="shareGroupCode()">📤 Share Code</button>
           <button class="btn btn-ghost btn-sm" onclick="joinGroup()">🔗 Join Group</button>
         </div>
@@ -2664,9 +2663,9 @@ select.fi{cursor:pointer;}
       <div class="ibox">
         <div style="font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.35rem" id="meeting-point">Not set</div>
         <div style="display:flex;gap:.38rem;flex-wrap:wrap">
-          <button class="btn btn-gold btn-sm" onclick="setMeetingPoint('Masjid al-Haram Gate 1')">🕋 Masjid al-Haram</button>
+          <button class="btn btn-gold btn-sm" onclick="setMeetingPoint('Masjid al-Haram Gate 1')">🕋 Al-Haram</button>
           <button class="btn btn-ghost btn-sm" onclick="setMeetingPoint('Zamzam Tower Lobby')">🏢 Zamzam Tower</button>
-          <button class="btn btn-ghost btn-sm" onclick="setCustomMeeting()">📝 Custom</button>
+          <button class="btn btn-ghost btn-sm" onclick="setMeetingPoint(prompt('Enter location:'))">📝 Custom</button>
         </div>
       </div>
       <div class="sec-label">✅ Check-ins</div>
@@ -2683,68 +2682,57 @@ select.fi{cursor:pointer;}
     <!-- LOST & FOUND -->
     <section class="scr" id="s-lostfound">
       <div class="scr-top-bar">
-        <div><div class="scr-top-title">Lost &amp; Found</div><div class="scr-top-sub">Community assistance platform</div></div>
-        <span class="scr-top-action" onclick="showLfForm('lost')">+ Report</span>
+        <div><div class="scr-top-title">Lost &amp; Found</div><div class="scr-top-sub">Community assistance</div></div>
+        <span class="scr-top-action" onclick="document.getElementById('lf-form').style.display='block'">+ Report</span>
       </div>
       <div class="tgrid" style="margin-bottom:.6rem">
-        <div class="tc tc-red" onclick="showLfForm('lost')"><span class="tc-icon">📢</span><div class="tc-name">Report Lost</div><div class="tc-desc">Item or person</div></div>
-        <div class="tc tc-green" onclick="showLfForm('found')"><span class="tc-icon">🤝</span><div class="tc-name">Report Found</div><div class="tc-desc">Help others</div></div>
+        <div class="tc tc-red" onclick="document.getElementById('lf-form').setAttribute('data-m','lost');document.getElementById('lf-form').style.display='block'"><span class="tc-icon">📢</span><div class="tc-name">Report Lost</div></div>
+        <div class="tc tc-green" onclick="document.getElementById('lf-form').setAttribute('data-m','found');document.getElementById('lf-form').style.display='block'"><span class="tc-icon">🤝</span><div class="tc-name">Report Found</div></div>
       </div>
-      <div class="ibox" id="lf-form" style="display:none">
-        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem">
-          <button class="back-btn" onclick="document.getElementById('lf-form').style.display='none'" style="margin:0">← Back</button>
-          <div style="font-size:.72rem;font-weight:600;color:var(--t1)" id="lf-form-title">Report Lost</div>
-        </div>
-        <div class="fg"><label class="flbl">What was lost/found?</label><input class="fi" id="lf-item" placeholder="e.g. Green bag, passport, child..."></div>
-        <div class="fg"><label class="flbl">Description</label><textarea class="fi" id="lf-desc" rows="2" placeholder="Color, size, location last seen..."></textarea></div>
+      <div class="ibox" id="lf-form" style="display:none;margin-bottom:.5rem">
+        <div style="font-size:.7rem;font-weight:600;color:var(--t1);margin-bottom:.5rem">📢 Report</div>
+        <div class="fg"><label class="flbl">What was lost/found?</label><input class="fi" id="lf-item" placeholder="e.g. Green bag, passport..."></div>
+        <div class="fg"><label class="flbl">Description</label><textarea class="fi" id="lf-desc" rows="2" placeholder="Color, location last seen..."></textarea></div>
         <div class="fg"><label class="flbl">Contact</label><input class="fi" id="lf-contact" placeholder="Pi username or phone"></div>
-        <button class="btn btn-gold btn-full" onclick="submitLfReport()">📢 Submit Report</button>
+        <div style="display:flex;gap:.38rem">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('lf-form').style.display='none'" style="flex:1">Cancel</button>
+          <button class="btn btn-gold btn-sm" onclick="submitLfReport()" style="flex:2">📢 Submit</button>
+        </div>
       </div>
-      <div class="sec-label">🔴 Active — Lost</div>
+      <div class="sec-label">🔴 Lost</div>
       <div id="lf-lost-list">
-        <div class="lf-item"><div class="lf-badge lf-lost">LOST</div><div class="lf-title">Green travel bag</div><div class="lf-desc">Near Gate 5, Masjid al-Haram. Contains documents.</div><div style="display:flex;justify-content:space-between"><span style="font-size:.48rem;color:var(--t3)">2 hours ago</span><span style="font-size:.48rem;color:var(--gold);cursor:pointer">📞 Contact</span></div></div>
+        <div class="lf-item"><div class="lf-badge lf-lost">LOST</div><div class="lf-title">Green travel bag</div><div class="lf-desc">Near Gate 5, Masjid al-Haram</div><div style="font-size:.48rem;color:var(--t3)">2 hours ago</div></div>
       </div>
-      <div class="sec-label">🟢 Found — Waiting Owner</div>
+      <div class="sec-label">🟢 Found</div>
       <div id="lf-found-list">
-        <div class="lf-item"><div class="lf-badge lf-found">FOUND</div><div class="lf-title">Black iPhone</div><div class="lf-desc">Near Zamzam Well. At security booth 12.</div><div style="display:flex;justify-content:space-between"><span style="font-size:.48rem;color:var(--t3)">1 hour ago</span><span style="font-size:.48rem;color:var(--grn)">📍 Booth 12</span></div></div>
+        <div class="lf-item"><div class="lf-badge lf-found">FOUND</div><div class="lf-title">Black iPhone</div><div class="lf-desc">Near Zamzam Well. Security booth 12.</div><div style="font-size:.48rem;color:var(--t3)">1 hour ago</div></div>
       </div>
     </section>
 
     <!-- MARKETPLACE -->
     <section class="scr" id="s-marketplace">
-      <div class="scr-top-bar">
-        <div><div class="scr-top-title">Marketplace</div><div class="scr-top-sub">Pilgrimage services in Pi</div></div>
-      </div>
-      <div class="tgrid" style="margin-bottom:.6rem">
-        <div class="tc tc-gold" onclick="toast('All services')"><span class="tc-icon">🛒</span><div class="tc-name">All Services</div></div>
+      <div class="scr-top-bar"><div><div class="scr-top-title">Marketplace</div><div class="scr-top-sub">Pilgrimage services in Pi</div></div></div>
+      <div class="tgrid" style="margin-bottom:.5rem">
+        <div class="tc tc-gold" onclick="toast('All services')"><span class="tc-icon">🛒</span><div class="tc-name">All</div></div>
         <div class="tc tc-blue" onclick="toast('Transport')"><span class="tc-icon">🚌</span><div class="tc-name">Transport</div></div>
         <div class="tc tc-green" onclick="toast('Food')"><span class="tc-icon">🍽️</span><div class="tc-name">Food</div></div>
         <div class="tc tc-purple" onclick="toast('Guides')"><span class="tc-icon">👨‍🏫</span><div class="tc-name">Guides</div></div>
       </div>
       <div class="sec-label">🔥 Featured</div>
-      <div class="ibox" style="margin-bottom:.45rem">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.35rem">
-          <div style="font-size:.68rem;font-weight:600;color:var(--t1)">🚌 Makkah ↔ Madinah Transfer</div>
-          <div style="font-size:.68rem;font-weight:700;color:var(--gold2)">5π</div>
-        </div>
-        <div style="font-size:.52rem;color:var(--t3);margin-bottom:.45rem">⭐ 4.9 · 234 bookings · AC coach</div>
-        <button class="btn btn-gold btn-sm btn-full" onclick="sendSadaqah('Transport',5)">Book for 5π</button>
+      <div class="ibox" style="margin-bottom:.42rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.28rem"><div style="font-size:.68rem;font-weight:600;color:var(--t1)">🚌 Makkah ↔ Madinah</div><div style="font-size:.7rem;font-weight:700;color:var(--gold2)">5π</div></div>
+        <div style="font-size:.52rem;color:var(--t3);margin-bottom:.42rem">⭐ 4.9 · 234 bookings · AC</div>
+        <button class="btn btn-gold btn-sm btn-full" onclick="sendSadaqah('Transport',5)">Book 5π</button>
       </div>
-      <div class="ibox" style="margin-bottom:.45rem">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.35rem">
-          <div style="font-size:.68rem;font-weight:600;color:var(--t1)">👨‍🏫 Licensed Hajj Guide</div>
-          <div style="font-size:.68rem;font-weight:700;color:var(--gold2)">10π/day</div>
-        </div>
-        <div style="font-size:.52rem;color:var(--t3);margin-bottom:.45rem">⭐ 5.0 · 89 bookings · Multilingual</div>
-        <button class="btn btn-ghost btn-sm btn-full" onclick="toast('Contact guide via Pi Browser')">Contact Guide</button>
+      <div class="ibox" style="margin-bottom:.42rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.28rem"><div style="font-size:.68rem;font-weight:600;color:var(--t1)">👨‍🏫 Licensed Hajj Guide</div><div style="font-size:.7rem;font-weight:700;color:var(--gold2)">10π</div></div>
+        <div style="font-size:.52rem;color:var(--t3);margin-bottom:.42rem">⭐ 5.0 · Multilingual</div>
+        <button class="btn btn-ghost btn-sm btn-full" onclick="toast('Contact via Pi Browser')">Contact</button>
       </div>
       <div class="ibox">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.35rem">
-          <div style="font-size:.68rem;font-weight:600;color:var(--t1)">🍽️ Halal Meal Delivery</div>
-          <div style="font-size:.68rem;font-weight:700;color:var(--gold2)">1π/meal</div>
-        </div>
-        <div style="font-size:.52rem;color:var(--t3);margin-bottom:.45rem">⭐ 4.7 · 30 min delivery</div>
-        <button class="btn btn-gold btn-sm btn-full" onclick="sendSadaqah('Meal',1)">Order for 1π</button>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.28rem"><div style="font-size:.68rem;font-weight:600;color:var(--t1)">🍽️ Halal Meal Delivery</div><div style="font-size:.7rem;font-weight:700;color:var(--gold2)">1π</div></div>
+        <div style="font-size:.52rem;color:var(--t3);margin-bottom:.42rem">⭐ 4.7 · 30 min</div>
+        <button class="btn btn-gold btn-sm btn-full" onclick="sendSadaqah('Meal',1)">Order 1π</button>
       </div>
     </section>
 
@@ -2754,25 +2742,15 @@ select.fi{cursor:pointer;}
         <div><div class="scr-top-title">Smart Map</div><div class="scr-top-sub">Navigate · Find · Explore</div></div>
         <span class="live-badge">LIVE</span>
       </div>
-      <div style="display:flex;gap:.35rem;overflow-x:auto;padding-bottom:.38rem;margin-bottom:.55rem;scrollbar-width:none">
-        <button class="btn btn-gold btn-sm" onclick="toast('All places')">All</button>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Hotels')">🏨 Hotels</button>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Food')">🍽️ Food</button>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Pharmacy')">💊 Pharmacy</button>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Hospital')">🏥 Hospital</button>
-      </div>
       <div class="crowd-map">
         <svg viewBox="0 0 340 200" width="100%" xmlns="http://www.w3.org/2000/svg">
           <rect width="340" height="200" fill="#040E07"/>
-          <line x1="0" y1="100" x2="340" y2="100" stroke="rgba(201,168,76,.08)" stroke-width="1"/>
-          <line x1="170" y1="0" x2="170" y2="200" stroke="rgba(201,168,76,.08)" stroke-width="1"/>
           <ellipse cx="170" cy="100" rx="55" ry="45" fill="rgba(231,76,60,.12)" stroke="rgba(231,76,60,.4)" stroke-width="1.5"/>
           <text x="170" y="97" text-anchor="middle" font-size="9" fill="rgba(201,168,76,.9)">🕋</text>
           <text x="170" y="110" text-anchor="middle" font-size="6" fill="rgba(201,168,76,.7)">Masjid al-Haram</text>
           <circle cx="80" cy="60" r="8" fill="rgba(52,152,219,.2)" stroke="rgba(52,152,219,.5)" stroke-width="1"/><text x="80" y="64" text-anchor="middle" font-size="8">🏨</text>
           <circle cx="265" cy="75" r="8" fill="rgba(52,152,219,.2)" stroke="rgba(52,152,219,.5)" stroke-width="1"/><text x="265" y="79" text-anchor="middle" font-size="8">🏨</text>
           <circle cx="60" cy="155" r="7" fill="rgba(46,204,113,.15)" stroke="rgba(46,204,113,.4)" stroke-width="1"/><text x="60" y="159" text-anchor="middle" font-size="7">🍽️</text>
-          <circle cx="285" cy="148" r="7" fill="rgba(46,204,113,.15)" stroke="rgba(46,204,113,.4)" stroke-width="1"/><text x="285" y="152" text-anchor="middle" font-size="7">💊</text>
           <circle cx="290" cy="185" r="7" fill="rgba(231,76,60,.15)" stroke="rgba(231,76,60,.4)" stroke-width="1"/><text x="290" y="189" text-anchor="middle" font-size="7">🏥</text>
           <circle cx="170" cy="100" r="10" fill="rgba(231,76,60,.2)"><animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite"/></circle>
           <circle cx="170" cy="100" r="5" fill="#E74C3C"/>
@@ -2781,57 +2759,43 @@ select.fi{cursor:pointer;}
       </div>
       <div class="sec-label">📍 Nearby</div>
       <div class="ibox">
-        <div class="fam-member" onclick="toast('Directions to Zamzam Hotel')">
-          <div class="fam-av">🏨</div>
-          <div><div class="fam-name">Zamzam Towers Hotel</div><div class="fam-status" style="color:var(--blue)">Hotel · 200m</div></div>
-          <div class="fam-safe" style="background:rgba(52,152,219,.1);color:var(--blue);border-color:rgba(52,152,219,.2)">→</div>
-        </div>
-        <div class="fam-member" onclick="toast('Directions to pharmacy')">
-          <div class="fam-av">💊</div>
-          <div><div class="fam-name">Al-Nahdi Pharmacy</div><div class="fam-status" style="color:var(--grn)">Pharmacy · 350m</div></div>
-          <div class="fam-safe">Open</div>
-        </div>
-        <div class="fam-member" onclick="toast('Directions to hospital')">
-          <div class="fam-av">🏥</div>
-          <div><div class="fam-name">Al-Noor Specialist Hospital</div><div class="fam-status" style="color:var(--red)">Emergency · 800m</div></div>
-          <div class="fam-safe" style="background:rgba(231,76,60,.1);color:var(--red);border-color:rgba(231,76,60,.2)">24/7</div>
-        </div>
+        <div class="fam-member" onclick="toast('Zamzam Hotel: 200m')"><div class="fam-av">🏨</div><div><div class="fam-name">Zamzam Towers Hotel</div><div class="fam-status" style="color:var(--blue)">Hotel · 200m</div></div><div class="fam-safe" style="background:rgba(52,152,219,.1);color:var(--blue);border-color:rgba(52,152,219,.2)">→</div></div>
+        <div class="fam-member" onclick="toast('Al-Nahdi Pharmacy: 350m')"><div class="fam-av">💊</div><div><div class="fam-name">Al-Nahdi Pharmacy</div><div class="fam-status" style="color:var(--grn)">Pharmacy · 350m</div></div><div class="fam-safe">Open</div></div>
+        <div class="fam-member" onclick="toast('Al-Noor Hospital: 800m')"><div class="fam-av">🏥</div><div><div class="fam-name">Al-Noor Specialist Hospital</div><div class="fam-status" style="color:var(--red)">Emergency · 800m</div></div><div class="fam-safe" style="background:rgba(231,76,60,.1);color:var(--red);border-color:rgba(231,76,60,.2)">24/7</div></div>
       </div>
+      <button class="btn btn-ghost btn-sm btn-full" style="margin-top:.5rem" onclick="toast('GPS: '+('geolocation' in navigator ? 'Available' : 'Not available'))">📍 My Location</button>
     </section>
 
     <!-- TRANSLATION -->
     <section class="scr" id="s-translation">
-      <div class="scr-top-bar">
-        <div><div class="scr-top-title">Translation</div><div class="scr-top-sub">7 languages · Real-time · Voice</div></div>
+      <div class="scr-top-bar"><div><div class="scr-top-title">Translation</div><div class="scr-top-sub">7 languages · Voice · Instant</div></div></div>
+      <div style="display:flex;gap:.32rem;overflow-x:auto;padding-bottom:.35rem;margin-bottom:.5rem;scrollbar-width:none">
+        <button class="btn btn-gold btn-sm" onclick="setTrLang('ar')" style="white-space:nowrap">🇸🇦 Arabic</button>
+        <button class="btn btn-ghost btn-sm" onclick="setTrLang('ha')" style="white-space:nowrap">🇳🇬 Hausa</button>
+        <button class="btn btn-ghost btn-sm" onclick="setTrLang('ur')" style="white-space:nowrap">🇵🇰 Urdu</button>
+        <button class="btn btn-ghost btn-sm" onclick="setTrLang('id')" style="white-space:nowrap">🇮🇩 Bahasa</button>
+        <button class="btn btn-ghost btn-sm" onclick="setTrLang('fr')" style="white-space:nowrap">🇫🇷 French</button>
       </div>
-      <div style="display:flex;gap:.35rem;overflow-x:auto;padding-bottom:.38rem;margin-bottom:.55rem;scrollbar-width:none">
-        <button class="btn btn-gold btn-sm" onclick="setTransLang('ar')">🇸🇦 Arabic</button>
-        <button class="btn btn-ghost btn-sm" onclick="setTransLang('en')">🇬🇧 English</button>
-        <button class="btn btn-ghost btn-sm" onclick="setTransLang('ha')">🇳🇬 Hausa</button>
-        <button class="btn btn-ghost btn-sm" onclick="setTransLang('ur')">🇵🇰 Urdu</button>
-        <button class="btn btn-ghost btn-sm" onclick="setTransLang('id')">🇮🇩 Bahasa</button>
-        <button class="btn btn-ghost btn-sm" onclick="setTransLang('fr')">🇫🇷 French</button>
-      </div>
-      <div class="ibox" style="margin-bottom:.55rem">
-        <div class="flbl">Type phrase to translate</div>
-        <textarea class="fi" id="trans-input" rows="3" placeholder="e.g. Where is the nearest hotel?"></textarea>
-        <div style="display:flex;gap:.38rem;margin-top:.45rem">
-          <button class="btn btn-gold btn-sm" onclick="doTranslate()" style="flex:1">🌍 Translate</button>
-          <button class="btn btn-ghost btn-sm" onclick="speakTrans()">🔊 Speak</button>
+      <div class="ibox" style="margin-bottom:.5rem">
+        <label class="flbl">Type to translate</label>
+        <textarea class="fi" id="tr-inp" rows="3" placeholder="e.g. Where is the toilet?"></textarea>
+        <div style="display:flex;gap:.38rem;margin-top:.42rem">
+          <button class="btn btn-gold btn-sm" onclick="doTr()" style="flex:1">🌍 Translate</button>
+          <button class="btn btn-ghost btn-sm" onclick="speakTr()">🔊</button>
         </div>
       </div>
-      <div class="ibox" id="trans-output" style="display:none;margin-bottom:.55rem">
-        <div style="font-size:.49rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem" id="trans-lang-lbl">TRANSLATION</div>
-        <div style="font-size:.78rem;color:var(--t1);line-height:1.6" id="trans-result">--</div>
+      <div class="ibox" id="tr-out" style="display:none;margin-bottom:.5rem">
+        <div style="font-size:.48rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.32rem" id="tr-lbl">TRANSLATION</div>
+        <div style="font-size:.78rem;color:var(--t1);line-height:1.6" id="tr-res">--</div>
       </div>
       <div class="sec-label">💬 Common Phrases</div>
       <div class="ibox">
-        <div style="display:flex;flex-direction:column;gap:.35rem" id="common-phrases">
-          <div onclick="quickTranslate('Where is the toilet?')" style="display:flex;align-items:center;gap:.55rem;padding:.45rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>🚻</span><span style="font-size:.63rem;color:var(--t1)">Where is the toilet?</span></div>
-          <div onclick="quickTranslate('I need help')" style="display:flex;align-items:center;gap:.55rem;padding:.45rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>🆘</span><span style="font-size:.63rem;color:var(--t1)">I need help</span></div>
-          <div onclick="quickTranslate('Where is Masjid al-Haram?')" style="display:flex;align-items:center;gap:.55rem;padding:.45rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>🕌</span><span style="font-size:.63rem;color:var(--t1)">Where is Masjid al-Haram?</span></div>
-          <div onclick="quickTranslate('I am lost, please help')" style="display:flex;align-items:center;gap:.55rem;padding:.45rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>😟</span><span style="font-size:.63rem;color:var(--t1)">I am lost, please help</span></div>
-          <div onclick="quickTranslate('How much does this cost?')" style="display:flex;align-items:center;gap:.55rem;padding:.45rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>💰</span><span style="font-size:.63rem;color:var(--t1)">How much does this cost?</span></div>
+        <div style="display:flex;flex-direction:column;gap:.32rem">
+          <div onclick="quickTr('Where is the toilet?')" style="display:flex;align-items:center;gap:.5rem;padding:.42rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>🚻</span><span style="font-size:.62rem;color:var(--t1)">Where is the toilet?</span></div>
+          <div onclick="quickTr('I need help')" style="display:flex;align-items:center;gap:.5rem;padding:.42rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>🆘</span><span style="font-size:.62rem;color:var(--t1)">I need help</span></div>
+          <div onclick="quickTr('Where is Masjid al-Haram?')" style="display:flex;align-items:center;gap:.5rem;padding:.42rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>🕌</span><span style="font-size:.62rem;color:var(--t1)">Where is Masjid al-Haram?</span></div>
+          <div onclick="quickTr('I am lost, please help')" style="display:flex;align-items:center;gap:.5rem;padding:.42rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>😟</span><span style="font-size:.62rem;color:var(--t1)">I am lost, please help</span></div>
+          <div onclick="quickTr('How much does this cost?')" style="display:flex;align-items:center;gap:.5rem;padding:.42rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer"><span>💰</span><span style="font-size:.62rem;color:var(--t1)">How much does this cost?</span></div>
         </div>
       </div>
     </section>
@@ -2839,41 +2803,35 @@ select.fi{cursor:pointer;}
     <!-- DOCUMENTS -->
     <section class="scr" id="s-documents">
       <div class="scr-top-bar">
-        <div><div class="scr-top-title">My Documents</div><div class="scr-top-sub">Store · Access · Share securely</div></div>
-        <span class="scr-top-action" onclick="showDocForm()">+ Add</span>
+        <div><div class="scr-top-title">My Documents</div><div class="scr-top-sub">Stored locally · Never uploaded</div></div>
+        <span class="scr-top-action" onclick="document.getElementById('doc-add').style.display='block'">+ Add</span>
       </div>
-      <div class="card card-gold" style="margin-bottom:.55rem">
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="font-size:1.3rem">🔒</span>
-          <div><div style="font-size:.63rem;font-weight:600;color:var(--gold2)">Stored Locally &amp; Securely</div>
-          <div style="font-size:.5rem;color:var(--t3)">Documents saved on your device. Never uploaded to servers.</div></div></div>
+      <div class="card card-gold" style="margin-bottom:.5rem">
+        <div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.3rem">🔒</span><div><div style="font-size:.62rem;font-weight:600;color:var(--gold2)">Stored Locally &amp; Securely</div><div style="font-size:.5rem;color:var(--t3)">Saved on your device. Never uploaded to servers.</div></div></div>
       </div>
-      <div class="ugrid ugrid-2" style="margin-bottom:.55rem">
-        <div class="uc" onclick="toast('Passport documents')"><div class="uc-icon">🛂</div><div class="uc-name">Passport</div></div>
-        <div class="uc" onclick="toast('Visa documents')"><div class="uc-icon">📋</div><div class="uc-name">Visa</div></div>
-        <div class="uc" onclick="toast('Hotel bookings')"><div class="uc-icon">🏨</div><div class="uc-name">Hotel</div></div>
-        <div class="uc" onclick="toast('Medical records')"><div class="uc-icon">💉</div><div class="uc-name">Medical</div></div>
+      <div class="ugrid ugrid-2" style="margin-bottom:.5rem">
+        <div class="uc" onclick="toast('Passport')"><div class="uc-icon">🛂</div><div class="uc-name">Passport</div></div>
+        <div class="uc" onclick="toast('Visa')"><div class="uc-icon">📋</div><div class="uc-name">Visa</div></div>
+        <div class="uc" onclick="toast('Hotel')"><div class="uc-icon">🏨</div><div class="uc-name">Hotel</div></div>
+        <div class="uc" onclick="toast('Medical')"><div class="uc-icon">💉</div><div class="uc-name">Medical</div></div>
       </div>
-      <div class="ibox" id="doc-form" style="display:none;margin-bottom:.5rem">
-        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem">
-          <button class="back-btn" onclick="document.getElementById('doc-form').style.display='none'" style="margin:0">← Back</button>
-          <div style="font-size:.7rem;font-weight:600;color:var(--t1)">Add Document</div>
+      <div class="ibox" id="doc-add" style="display:none;margin-bottom:.5rem">
+        <div style="font-size:.7rem;font-weight:600;color:var(--t1);margin-bottom:.5rem">Add Document</div>
+        <div class="fg"><label class="flbl">Type</label><select class="fi" id="doc-type"><option value="passport">🛂 Passport</option><option value="visa">📋 Visa</option><option value="hotel">🏨 Hotel</option><option value="medical">💉 Medical</option></select></div>
+        <div class="fg"><label class="flbl">Title</label><input class="fi" id="doc-title" placeholder="e.g. Passport No. A1234567"></div>
+        <div class="fg"><label class="flbl">Notes</label><textarea class="fi" id="doc-notes" rows="2" placeholder="Expiry, booking ref..."></textarea></div>
+        <div style="display:flex;gap:.38rem">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('doc-add').style.display='none'" style="flex:1">Cancel</button>
+          <button class="btn btn-gold btn-sm" onclick="saveDoc()" style="flex:2">💾 Save</button>
         </div>
-        <div class="fg"><label class="flbl">Document Type</label>
-          <select class="fi" id="doc-type"><option value="passport">🛂 Passport</option><option value="visa">📋 Visa</option><option value="hotel">🏨 Hotel Booking</option><option value="flight">✈️ Flight Ticket</option><option value="medical">💉 Medical Record</option></select></div>
-        <div class="fg"><label class="flbl">Title / Reference</label><input class="fi" id="doc-title" placeholder="e.g. Passport No. A1234567"></div>
-        <div class="fg"><label class="flbl">Notes</label><textarea class="fi" id="doc-notes" rows="2" placeholder="Expiry date, booking ref..."></textarea></div>
-        <button class="btn btn-gold btn-full" onclick="saveDoc()">💾 Save Document</button>
       </div>
       <div class="sec-label">📂 Saved Documents</div>
-      <div id="doc-list"><div class="empty">No documents saved yet. Tap + Add to get started.</div></div>
+      <div id="doc-list"><div class="empty"><span class="empty-icon">📂</span>No documents yet</div></div>
     </section>
 
     <!-- MORE HUB -->
     <section class="scr" id="s-more">
-      <div class="scr-top-bar">
-        <div><div class="scr-top-title">More</div><div class="scr-top-sub">All tools · haramain.pi</div></div>
-      </div>
-
+      <div class="scr-top-bar"><div><div class="scr-top-title">More</div><div class="scr-top-sub">All tools · haramain.pi</div></div></div>
       <div class="sec-label">🛡️ Safety</div>
       <div class="hub-grid">
         <div class="hub-item" onclick="goS('emergency')"><div class="hub-icon">🚨</div><div class="hub-name">Emergency</div></div>
@@ -2883,68 +2841,64 @@ select.fi{cursor:pointer;}
         <div class="hub-item" onclick="goS('family')"><div class="hub-icon">👨‍👩‍👧</div><div class="hub-name">Family</div></div>
         <div class="hub-item" onclick="goS('lostfound')"><div class="hub-icon">🔍</div><div class="hub-name">Lost&amp;Found</div></div>
       </div>
-
       <div class="sec-label">🗺️ Navigation</div>
       <div class="hub-grid">
         <div class="hub-item" onclick="goS('tracker')"><div class="hub-icon">📍</div><div class="hub-name">Tracker</div></div>
         <div class="hub-item" onclick="goS('map')"><div class="hub-icon">🗺️</div><div class="hub-name">Smart Map</div></div>
         <div class="hub-item" onclick="goS('itinerary')"><div class="hub-icon">📅</div><div class="hub-name">Itinerary</div></div>
       </div>
-
-      <div class="sec-label">🕌 Islamic</div>
+      <div class="sec-label">🕌 Worship</div>
       <div class="hub-grid">
-        <div class="hub-item" onclick="goS('worship')"><div class="hub-icon">🕌</div><div class="hub-name">Worship</div></div>
+        <div class="hub-item" onclick="goS('worship')"><div class="hub-icon">🕌</div><div class="hub-name">Prayer</div></div>
         <div class="hub-item" onclick="goS('audio')"><div class="hub-icon">🎧</div><div class="hub-name">Audio Duas</div></div>
         <div class="hub-item" onclick="goS('moon')"><div class="hub-icon">🌙</div><div class="hub-name">Calendar</div></div>
         <div class="hub-item" onclick="goS('checklist')"><div class="hub-icon">✅</div><div class="hub-name">Checklist</div></div>
         <div class="hub-item" onclick="goS('guide')"><div class="hub-icon">📖</div><div class="hub-name">Guide</div></div>
         <div class="hub-item" onclick="goS('learning')"><div class="hub-icon">📚</div><div class="hub-name">Learning</div></div>
       </div>
-
       <div class="sec-label">🧰 Utilities</div>
       <div class="hub-grid">
-        <div class="hub-item" onclick="goS('documents')"><div class="hub-icon">📂</div><div class="hub-name">Documents</div></div>
         <div class="hub-item" onclick="goS('translation')"><div class="hub-icon">🌍</div><div class="hub-name">Translator</div></div>
+        <div class="hub-item" onclick="goS('documents')"><div class="hub-icon">📂</div><div class="hub-name">Documents</div></div>
         <div class="hub-item" onclick="goS('utilities')"><div class="hub-icon">🧰</div><div class="hub-name">Tools</div></div>
         <div class="hub-item" onclick="goS('memories')"><div class="hub-icon">📸</div><div class="hub-name">Memories</div></div>
         <div class="hub-item" onclick="goS('analytics')"><div class="hub-icon">📊</div><div class="hub-name">Analytics</div></div>
       </div>
-
       <div class="sec-label">💰 Commerce</div>
       <div class="hub-grid">
         <div class="hub-item" onclick="goS('payments')"><div class="hub-icon">💎</div><div class="hub-name">Payments</div></div>
         <div class="hub-item" onclick="goS('marketplace')"><div class="hub-icon">🛒</div><div class="hub-name">Market</div></div>
         <div class="hub-item" onclick="goS('reseller')"><div class="hub-icon">💼</div><div class="hub-name">Reseller</div></div>
       </div>
-
       <div class="sec-label">👤 Profile</div>
       <div class="hub-grid">
         <div class="hub-item" onclick="goS('profile')"><div class="hub-icon">🪪</div><div class="hub-name">Passport</div></div>
         <div class="hub-item" onclick="goS('notifs')"><div class="hub-icon">🔔</div><div class="hub-name">Alerts</div></div>
         <div class="hub-item" onclick="goS('mailer')"><div class="hub-icon">📧</div><div class="hub-name">Mailer</div></div>
       </div>
-
       <div class="divider"></div>
       <div class="ibox">
-        <div class="row-between" style="padding:.4rem 0;border-bottom:1px solid var(--bd2);cursor:pointer">
-          <span style="font-size:.63rem;color:var(--t2)">Privacy Policy</span>
-          <a href="/privacy-policy" style="font-size:.63rem;color:var(--t3);text-decoration:none">›</a>
+        <div class="row-between" style="padding:.38rem 0;border-bottom:1px solid var(--bd2)">
+          <span style="font-size:.62rem;color:var(--t2)">Privacy Policy</span>
+          <a href="/privacy-policy" style="font-size:.62rem;color:var(--gold);text-decoration:none">View ›</a>
         </div>
-        <div class="row-between" style="padding:.4rem 0;border-bottom:1px solid var(--bd2);cursor:pointer">
-          <span style="font-size:.63rem;color:var(--t2)">Terms of Service</span>
-          <a href="/terms-of-service" style="font-size:.63rem;color:var(--t3);text-decoration:none">›</a>
+        <div class="row-between" style="padding:.38rem 0;border-bottom:1px solid var(--bd2)">
+          <span style="font-size:.62rem;color:var(--t2)">Terms of Service</span>
+          <a href="/terms-of-service" style="font-size:.62rem;color:var(--gold);text-decoration:none">View ›</a>
         </div>
-        <div class="row-between" style="padding:.4rem 0">
-          <span style="font-size:.63rem;color:var(--t2)">Partners &amp; Collaborations</span>
-          <span style="font-size:.63rem;color:var(--t3)">›</span>
+        <div class="row-between" style="padding:.38rem 0;border-bottom:1px solid var(--bd2)">
+          <span style="font-size:.62rem;color:var(--t2)">Contact</span>
+          <a href="mailto:support.haramain@gmail.com" style="font-size:.62rem;color:var(--gold);text-decoration:none">support.haramain@gmail.com</a>
+        </div>
+        <div class="row-between" style="padding:.38rem 0">
+          <span style="font-size:.62rem;color:var(--t2)">Partners &amp; Collaborations</span>
+          <span style="font-size:.62rem;color:var(--t3)">Contact us</span>
         </div>
       </div>
-
-      <div style="text-align:center;padding:1.2rem 0">
-        <div style="font-family:var(--serif);font-size:1.2rem;color:var(--gold2);letter-spacing:.12em;margin-bottom:.2rem">HARAMAIN</div>
-        <div style="font-size:.52rem;color:var(--gold);letter-spacing:.1em;margin-bottom:.15rem">haramain.pi</div>
-        <div style="font-size:.46rem;color:var(--t3)">The Web3 Pilgrimage Platform</div>
-        <div style="font-size:.43rem;color:var(--t4);margin-top:.25rem">© 2026 HARAMAIN · Pi Network Mainnet</div>
+      <div style="text-align:center;padding:1rem 0 .5rem">
+        <div style="font-family:var(--serif);font-size:1.1rem;color:var(--gold2);letter-spacing:.12em">HARAMAIN</div>
+        <div style="font-size:.5rem;color:var(--gold);letter-spacing:.1em;margin:.15rem 0">haramain.pi</div>
+        <div style="font-size:.44rem;color:var(--t4)">© 2026 HARAMAIN · Pi Network Mainnet</div>
       </div>
     </section>
 
@@ -2963,7 +2917,6 @@ select.fi{cursor:pointer;}
 
 <!-- ✅ HARAMAIN SCRIPT — MAINNET · sandbox:false · All inline -->
 <script>
-
 /* ════════════════════════════════════════════════════════════
    HARAMAIN PAYMENT SYSTEM — Pi Network Mainnet
    Platform: Cloudflare Pages
@@ -3508,11 +3461,10 @@ function renderHijriWidget(){
 
 /* ══ NAVIGATION ══ */
 function goS(id, btn) {
-  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('on'); s.classList.remove('active'); });
-  document.querySelectorAll('.bni').forEach(function(b){ b.classList.remove('on'); });
-  var sc = document.getElementById('s-'+id);
-  if (sc) { sc.classList.add('on'); sc.classList.add('active'); }
-  if (btn) btn.classList.add('on');
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.bni').forEach(function(b){b.classList.remove('on');});
+  var sc=document.getElementById('s-'+id); if(sc)sc.classList.add('on');
+  if(btn)btn.classList.add('on');
   else{ var b=document.querySelector('[data-s="'+id+'"]'); if(b)b.classList.add('on'); }
   // Refresh content
   if(id==='dashboard'){renderWeatherWidget();startHajjCountdown();}
@@ -3610,9 +3562,8 @@ function piLogin() {
 
 function launchApp() {
   // WorldCup exact: hide landing, show app
-  var _ld=document.getElementById('landing');if(_ld)_ld.style.display='none';
-  var _ls=document.getElementById('login-screen');if(_ls)_ls.style.display='none';
-  var _ap=document.getElementById('app');if(_ap){_ap.style.display='flex';_ap.style.flexDirection='column';}
+  ['landing','login-screen'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
+  var ap=document.getElementById('app');if(ap){ap.style.display='block';}
 
   // Sync language
   var sel = document.getElementById('hdr-lang');
@@ -4694,7 +4645,7 @@ function sendAI() {
   askAI(msg);
 }
 
-/* askAI handled by v4 below */
+
 
 /* ══ HEALTH ══ */
 function saveHealth(){
@@ -5148,7 +5099,7 @@ function openTracker() {
 }
 
 /* ── START TRACKER ── */
-/* old startTracker removed */
+
 
 /* ── STOP TRACKER ── */
 function stopTracker() {
@@ -5298,7 +5249,7 @@ function sendAI() {
   askAI(msg);
 }
 
-/* old askAI removed */
+
 
 /* ══════════════════════════════════════════════════════════════
    LIVE TRACKER — Quick access from Dashboard
@@ -5311,7 +5262,24 @@ function openLiveTracker() {
    RECEIPT HOOK — Called after successful payments
    Hooks into addTx to show receipt for Pi transactions
    DOES NOT MODIFY PAYMENT LOGIC
-═══════/* askAI handled by v4 below */;
+══════════════════════════════════════════════════════════════ */
+var _origAddTx = addTx;
+addTx = function(text) {
+  _origAddTx(text);
+  // If it's a real Pi transaction (has txid), auto-show receipt option
+  if (text && text.indexOf('txid:') !== -1 && text.indexOf('π') !== -1) {
+    var amt = (text.match(/(\d+\.?\d*)π/) || [])[1] || '?';
+    var txid = (text.match(/txid:([a-zA-Z0-9]+)/) || [])[1] || '';
+    // Show receipt toast with action button
+    var t = document.getElementById('toast');
+    if (t) {
+      t.innerHTML = '✅ Payment complete · <span onclick="showTxReceipt(\'' + text.replace(/'/g,"\\'").slice(0,80) + '\',\'now\')" style="color:var(--gold);cursor:pointer;text-decoration:underline">View Receipt</span>';
+      t.classList.add('on');
+      clearTimeout(toastT);
+      toastT = setTimeout(function(){ t.classList.remove('on'); t.textContent=''; }, 5000);
+    }
+  }
+};
 
 /* ══════════════════════════════════════════════════════════════
    WINDOW LOAD INIT — EXACT WORLDCUP PATTERN
@@ -5752,7 +5720,23 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* ── UPGRADE 17: SMOOTH SCROLL to sections ── */
-/* old goS removed */
+function goS(id, btn) {
+  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('on'); });
+  document.querySelectorAll('.bni').forEach(function(b){ b.classList.remove('on'); });
+  var sc = document.getElementById('s-'+id); if(sc) sc.classList.add('on');
+  if (btn) btn.classList.add('on');
+  else { var b = document.querySelector('[data-s="'+id+'"]'); if(b) b.classList.add('on'); }
+  if (id==='dashboard') { renderWeatherWidget(); startHajjCountdown(); updateDashboardStreak(); }
+  if (id==='worship') { fetchPrayer(); }
+  if (id==='guide') renderGuide('hajj');
+  if (id==='notifs') markAllRead();
+  if (id==='profile') { syncUI(); enhanceProfilePage(); }
+  if (id==='payments') syncWalletUI();
+  cUtil();
+  var main = document.getElementById('main');
+  if (main) main.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
 
 /* ── UPGRADE 18: SHARE PROFILE ── */
 function shareProfile() {
@@ -7454,1218 +7438,446 @@ window.addEventListener('load', function() {
 
 
 
-/* HARAMAIN v4.1 PRODUCTION FIXES */
+/* ═══ HARAMAIN v5 NEW FUNCTIONS ═══ */
 
-/* ══ LANGUAGE ══ */
-var _langCodes2 = ['en','ar','ha','ur','id','tr'];
-var _langIdx2 = 0;
-
-function cycleLang() {
-  _langIdx2 = (_langIdx2 + 1) % _langCodes2.length;
-  var code = _langCodes2[_langIdx2];
-  if (typeof setLang === 'function') setLang(code);
-  var tbLang = document.getElementById('tb-lang');
-  if (tbLang) tbLang.textContent = code.toUpperCase();
-  var langSel = document.getElementById('lang-sel');
-  if (langSel) langSel.value = code;
-  var names = {en:'English',ar:'Arabic',ha:'Hausa',ur:'Urdu',id:'Bahasa',tr:'Turkish'};
-  if (typeof toast === 'function') toast((names[code]||code) + ' selected');
+/* Language fix - updates both hdr-lang and tb-lang */
+var _lc5=['en','ar','ha','ur','id','tr'];
+var _li5=0;
+function cycleLang(){
+  _li5=(_li5+1)%_lc5.length;
+  var c=_lc5[_li5];
+  if(typeof setLang==='function')setLang(c,null);
+  var nm={en:'EN',ar:'AR',ha:'HA',ur:'UR',id:'ID',tr:'TR'};
+  var fn={en:'English',ar:'Arabic',ha:'Hausa',ur:'Urdu',id:'Bahasa',tr:'Turkish'};
+  var hdrLang=document.getElementById('hdr-lang');if(hdrLang)hdrLang.value=c;
+  var hdrBtn=document.getElementById('lang-btn');if(hdrBtn)hdrBtn.textContent=nm[c]||c.toUpperCase();
+  if(typeof toast==='function')toast((fn[c]||c)+' selected');
 }
 
-/* ══ AI ══ */
-var AI_HISTORY_V4 = [];
-var AI_KB = {
-  tawaf: '7 counter-clockwise rounds around the Kaaba. Begin at the Black Stone saying Bismillah Allahu Akbar. Men bare right shoulder for first 3 rounds. Recite recommended duas each round.',
-  ihram: 'Ihram prohibitions: cutting hair or nails, perfume, marital relations, hunting, covering head (men). Men wear 2 white unstitched cloths. Women wear normal modest clothing. Say Talbiyah constantly.',
-  arafat: 'Day of Arafat (9 Dhul Hijjah) is the pinnacle of Hajj. Stand from Dhuhr to Maghrib in supplication. The Prophet said: Hajj is Arafat. Missing this day invalidates Hajj.',
-  mina: 'Mina valley where pilgrims stay days 8-13 of Dhul Hijjah. Stone the 3 Jamarat pillars: Small, Medium, Large. Throw 7 pebbles each, say Allahu Akbar with each throw.',
-  umrah: 'Umrah steps: 1) Enter Ihram at Miqat 2) Tawaf 7 rounds 3) Pray at Maqam Ibrahim 4) Drink Zamzam 5) Sai 7 times between Safa and Marwa 6) Shave or trim hair.',
-  zamzam: 'Zamzam water blessed by Allah. Drink facing Qibla. Say Bismillah. Make dua while drinking. The Prophet said: Zamzam is for whatever it is drunk for.',
-  dua: 'Key Hajj duas: Talbiyah, Entering Makkah dua, Before Tawaf, At Black Stone, Day of Arafat supplication. See the Audio Duas section for full collection.',
-  pack: 'Essential Hajj packing: Ihram cloths, unscented toiletries, comfortable shoes, medications, prayer mat, pocket Quran, power bank, umbrella, emergency contacts.',
-  safety: 'Stay with group. Memorize hotel address. Carry Hajj ID always. Stay hydrated (3-5L daily). Rest during peak heat. Emergency: 911 (Saudi), 920002814 (Hajj emergency).',
-  hajj: 'Hajj pillars: 1) Ihram 2) Standing at Arafat 3) Tawaf al-Ifadah 4) Sai. Hajj is the 5th pillar of Islam. Obligatory once in lifetime for able Muslims.',
-  prayer: 'Prayer in Masjid al-Haram = 100,000x reward. Times: Fajr ~5:15am, Dhuhr ~12:15pm, Asr ~3:30pm, Maghrib ~6:45pm, Isha ~8:15pm.',
-  zakat: 'Zakat is 2.5% of savings above Nisab held for one lunar year. Calculate in Finance section. Zakat al-Fitr due before Eid prayer.',
-};
-
-function askAI(msg) {
-  if (!msg || !msg.trim()) return;
-  var chat = document.getElementById('ai-chat');
-  if (!chat) return;
-
-  var userDiv = document.createElement('div');
-  userDiv.className = 'ai-bubble user';
-  userDiv.textContent = msg;
-  chat.appendChild(userDiv);
-  chat.scrollTop = chat.scrollHeight;
-
-  var thinkDiv = document.createElement('div');
-  thinkDiv.className = 'ai-bubble bot';
-  thinkDiv.innerHTML = '<div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
-  chat.appendChild(thinkDiv);
-  chat.scrollTop = chat.scrollHeight;
-
-  AI_HISTORY_V4.push({ role: 'user', content: msg });
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 800,
-      system: 'You are Haramain AI, an expert Islamic pilgrimage guide on Pi Network. Help pilgrims with Hajj, Umrah, Islamic rituals, duas, and safety. Be concise, compassionate, scholarly. Respond in the user language.',
-      messages: AI_HISTORY_V4
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var reply = (d.content && d.content[0] && d.content[0].text) || getKBReply(msg);
-    AI_HISTORY_V4.push({ role: 'assistant', content: reply });
-    thinkDiv.innerHTML = '';
-    thinkDiv.textContent = reply;
-    chat.scrollTop = chat.scrollHeight;
-  })
-  .catch(function() {
-    thinkDiv.innerHTML = '';
-    thinkDiv.textContent = getKBReply(msg);
-    chat.scrollTop = chat.scrollHeight;
-  });
-
-  var inp = document.getElementById('ai-input');
-  if (inp) inp.value = '';
-}
-
-function getKBReply(msg) {
-  var lower = msg.toLowerCase();
-  for (var key in AI_KB) {
-    if (lower.indexOf(key) > -1) return String.fromCodePoint(0x1F54B) + ' ' + AI_KB[key];
-  }
-  return String.fromCodePoint(0x1F54B) + ' Bismillah! Ask me about: tawaf, ihram, Arafat, Mina, Umrah, Zamzam, duas, packing, safety, prayer, or zakat. May Allah bless your pilgrimage!';
-}
-
-function sendAIMessage() {
-  var inp = document.getElementById('ai-input');
-  if (!inp || !inp.value.trim()) return;
-  askAI(inp.value.trim());
-  inp.value = '';
-}
-
-function initAIScreen() {
-  var chat = document.getElementById('ai-chat');
-  if (!chat || chat.children.length > 0) return;
-  var welcome = document.createElement('div');
-  welcome.className = 'ai-bubble bot';
-  welcome.textContent = String.fromCodePoint(0x1F54B) + ' Bismillah! I am Haramain AI - your personal pilgrimage guide. Ask me anything about Hajj, Umrah, duas, or safety. How can I help?';
-  chat.appendChild(welcome);
-}
-
-/* ══ AUDIO DUAS ══ */
-var DUA_ITEMS = [
-  { n:'Talbiyah', t:'Labbayk Allahumma labbayk - Here I am O Allah', a:'\u0644\u064E\u0628\u064E\u0651\u064A\u0652\u0643\u064E \u0627\u0644\u0644\u0651\u064E\u0647\u064F\u0645\u064E\u0651' },
-  { n:'Entering Makkah', t:'Allahumma antassalam wa minkas-salam', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0623\u064E\u0646\u0652\u062A\u064E \u0627\u0644\u0633\u064E\u0651\u0644\u0627\u064E\u0645\u064F' },
-  { n:'Before Tawaf', t:'Bismillah Allahu Akbar', a:'\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0647\u0650 \u0627\u0644\u0644\u0647\u064F \u0623\u064E\u0643\u0652\u0628\u064E\u0631' },
-  { n:'Day of Arafat', t:'La ilaha illallah wahdahu la sharika lah', a:'\u0644\u064E\u0627 \u0625\u0650\u0644\u064E\u0647\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0627\u0644\u0644\u064E\u0651\u0647\u064F \u0648\u064E\u062D\u0652\u062F\u064E\u0647\u064F' },
-  { n:'At Safa and Marwa', t:'Innas-Safa wal-Marwata min shaairillah', a:'\u0625\u0650\u0646\u064E\u0651 \u0627\u0644\u0635\u064E\u0651\u0641\u064E\u0627 \u0648\u064E\u0627\u0644\u0652\u0645\u064E\u0631\u0652\u0648\u064E\u0629\u064E' },
-  { n:'Morning Dua', t:'Allahumma bika asbahna wa bika amsayna', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0628\u0650\u0643\u064E \u0623\u064E\u0635\u0652\u0628\u064E\u062D\u0652\u0646\u064E\u0627' },
-  { n:'After Zamzam', t:'Allahumma inni asaluka ilman nafian', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0625\u0650\u0646\u064E\u0651\u064A \u0623\u064E\u0633\u0652\u0623\u064E\u0644\u064F\u0643\u064E' },
-  { n:'Farewell Tawaf', t:'Allahumma hadhal baytu baytuk', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0647\u064E\u0630\u064E\u0627 \u0627\u0644\u0652\u0628\u064E\u064A\u0652\u062A\u064F' },
-];
-var curDuaIdx = 0;
-
-function initAudioDuas() {
-  renderDuaPlayer();
-  renderDuaList();
-}
-
-function renderDuaPlayer() {
-  var dua = DUA_ITEMS[curDuaIdx];
-  if (!dua) return;
-  var nameEl = document.getElementById('audio-now-name');
-  var arabicEl = document.getElementById('audio-now-arabic');
-  var transEl = document.getElementById('audio-now-trans');
-  if (nameEl) nameEl.textContent = dua.n;
-  if (arabicEl) { arabicEl.textContent = dua.a; arabicEl.style.direction = 'rtl'; arabicEl.style.fontSize = '1.1rem'; arabicEl.style.color = 'var(--gold2)'; }
-  if (transEl) transEl.textContent = dua.t;
-}
-
-function renderDuaList() {
-  var list = document.getElementById('audio-dua-list');
-  if (!list) return;
-  list.innerHTML = DUA_ITEMS.map(function(d, i) {
-    var s = i === curDuaIdx ? 'background:var(--gdim);border-color:var(--gbrd);' : '';
-    return '<div style="display:flex;align-items:center;gap:.6rem;padding:.65rem;' + s + 'border-radius:var(--r2);margin-bottom:.3rem;cursor:pointer;border:1px solid var(--bd2);transition:all .15s" onclick="selectDuaItem(' + i + ')">' +
-      '<div style="font-size:1.1rem">' + (i === curDuaIdx ? '\uD83D\uDD0A' : '\uD83C\uDFB5') + '</div>' +
-      '<div style="flex:1">' +
-        '<div style="font-size:.65rem;font-weight:600;color:var(--t1)">' + d.n + '</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">' + d.t.substring(0,45) + '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-function selectDuaItem(idx) {
-  curDuaIdx = idx;
-  renderDuaPlayer();
-  renderDuaList();
-  speakDuaNow();
-}
-
-function speakDuaNow() {
-  var dua = DUA_ITEMS[curDuaIdx];
-  if (!dua) return;
-  if ('speechSynthesis' in window) {
-    speechSynthesis.cancel();
-    var utt = new SpeechSynthesisUtterance(dua.n + '. ' + dua.t);
-    utt.lang = 'en-US'; utt.rate = 0.8;
-    speechSynthesis.speak(utt);
-    if (typeof toast === 'function') toast('\uD83D\uDD0A ' + dua.n);
-    var btn = document.getElementById('audio-play-btn');
-    if (btn) btn.textContent = '\u23F8';
-  } else {
-    if (typeof toast === 'function') toast(dua.n + ': ' + dua.t);
-  }
-}
-
-function toggleAudioPlay() {
-  if ('speechSynthesis' in window) {
-    if (speechSynthesis.speaking && !speechSynthesis.paused) {
-      speechSynthesis.pause();
-      var btn = document.getElementById('audio-play-btn');
-      if (btn) btn.textContent = '\u25B6';
-    } else if (speechSynthesis.paused) {
-      speechSynthesis.resume();
-      var btn = document.getElementById('audio-play-btn');
-      if (btn) btn.textContent = '\u23F8';
-    } else { speakDuaNow(); }
-  }
-}
-
-function prevDua() { curDuaIdx = (curDuaIdx - 1 + DUA_ITEMS.length) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
-function nextDua() { curDuaIdx = (curDuaIdx + 1) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
-
-/* ══ LEARNING CENTER ══ */
-var COURSES2 = {
-  hajj:      { t:'Complete Hajj Guide', i:'\u{1F54B}', l:[
-    { h:'What is Hajj?', b:'Hajj is the 5th pillar of Islam. Every able Muslim must perform it once. Takes place in Dhul Hijjah. It is the greatest act of worship.' },
-    { h:'Preparing for Hajj', b:'Physical: walking training, vaccination. Spiritual: repent, settle debts. Financial: save, get visa. Knowledge: learn rites, memorize duas.' },
-    { h:'Entering Ihram', b:'Men wear 2 white unstitched cloths. Women wear modest clothing. Enter at Miqat. Say intention and Talbiyah: Labbayk Allahumma labbayk.' },
-    { h:'Performing Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Begin at Black Stone. Men bare right shoulder first 3 rounds. Pray 2 rakahs at Maqam Ibrahim after.' },
-    { h:'Sai at Safa and Marwa', b:'7 trips between the two hills. Commemorates Hajars search for water. Start at Safa, end at Marwa. Total about 3.15km.' },
-    { h:'Day of Arafat', b:'The most important day of Hajj. Stand from Dhuhr to Maghrib in dua and dhikr. The Prophet said: Hajj is Arafat. Missing invalidates Hajj.' },
-    { h:'Muzdalifah Night', b:'Travel from Arafat after Maghrib. Pray combined Maghrib and Isha. Sleep under sky. Collect 49 pebbles for Jamarat. Leave for Mina after Fajr.' },
-    { h:'Stoning Jamarat', b:'Stone 3 Jamarat pillars. Day 1: Large Jamarat only (7 pebbles). Days 2-3: All 3 (7 each). Say Allahu Akbar with each throw.' },
-    { h:'Farewell Tawaf', b:'Last act before leaving Makkah. 7 rounds around Kaaba. Say farewell prayers and dua. Leave with gratitude and hope.' },
+/* Learning */
+var _CR5={
+  hajj:{t:'Complete Hajj Guide',i:'??',l:[
+    {h:'What is Hajj?',b:'Hajj is the 5th pillar of Islam. Every able Muslim performs it once in Dhul Hijjah. It is the greatest act of worship after the declaration of faith.'},
+    {h:'Preparing for Hajj',b:'Physical: walking training, vaccinations. Spiritual: repent, settle debts. Financial: save, get visa. Learn all rites and memorize key duas.'},
+    {h:'Entering Ihram',b:'Men: 2 white unstitched cloths. Women: modest clothing. Enter at Miqat. Say intention and Talbiyah: Labbayk Allahumma labbayk.'},
+    {h:'Performing Tawaf',b:'7 counter-clockwise rounds around Kaaba. Begin at Black Stone. Men bare right shoulder first 3 rounds. Pray 2 rakahs at Maqam Ibrahim after.'},
+    {h:'Sai at Safa and Marwa',b:'7 trips between hills. Starts at Safa, ends at Marwa. Commemorates Hajars search for water. Total about 3.15km.'},
+    {h:'Day of Arafat',b:'THE MOST IMPORTANT DAY. Stand from Dhuhr to Maghrib in dua. Prophet said: Hajj is Arafat. Missing this day invalidates Hajj.'},
+    {h:'Muzdalifah Night',b:'Travel from Arafat after Maghrib. Pray combined Maghrib and Isha. Sleep under sky. Collect 49 pebbles for Jamarat.'},
+    {h:'Stoning Jamarat',b:'Stone 3 pillars in Mina. Day 1: Large only (7 pebbles). Days 2-3: All 3 pillars (7 each). Allahu Akbar with each throw.'},
+    {h:'Farewell Tawaf',b:'Last act before leaving Makkah. 7 rounds around Kaaba. Farewell prayers and dua. May Allah accept your Hajj Mabroor.'},
   ]},
-  umrah: { t:'Umrah Step by Step', i:'\uD83C\uDF19', l:[
-    { h:'What is Umrah?', b:'Umrah is the lesser pilgrimage. Performable any time of year. Highly recommended Sunnah. Takes 2-4 hours to complete.' },
-    { h:'Entering Ihram', b:'Enter at Miqat for your direction. Ghusl (bath), wear Ihram. Say intention and Talbiyah. Avoid all Ihram prohibitions.' },
-    { h:'Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Start and end at Black Stone. Recite duas. Pray 2 rakahs at Maqam Ibrahim after.' },
-    { h:'Sai', b:'7 trips between Safa and Marwa. Start at Safa. Make dua facing Kaaba at each hilltop. Total about 3.15km.' },
-    { h:'Shave or Trim', b:'After Sai: shave or trim hair. This exits the state of Ihram. Men shaving is more rewarding. Women trim one fingertip length only.' },
+  umrah:{t:'Umrah Step by Step',i:'??',l:[
+    {h:'What is Umrah?',b:'Lesser pilgrimage performable any time. Highly recommended Sunnah. Takes 2-4 hours to complete.'},
+    {h:'Enter Ihram',b:'Ghusl, wear Ihram, say intention, recite Talbiyah. Avoid all prohibitions.'},
+    {h:'Tawaf',b:'7 rounds around Kaaba. Start and end at Black Stone. Pray 2 rakahs at Maqam Ibrahim.'},
+    {h:'Sai',b:'7 trips between Safa and Marwa. Start at Safa. Make dua at each hilltop.'},
+    {h:'Shave or Trim',b:'After Sai: shave or trim hair. This exits Ihram. Men shaving is more rewarding.'},
   ]},
-  arabic: { t:'Essential Arabic Phrases', i:'\uD83C\uDF10', l:[
-    { h:'Greetings', b:'As-salamu alaykum = Peace be upon you. Wa alaykum as-salam = And upon you peace. Marhaba = Welcome. Kayfa halak = How are you.' },
-    { h:'At the Mosque', b:'Al-masjid = mosque. Al-Kaabah = the Kaaba. Salah = prayer. Wudu = ablution. Imam = prayer leader. Qiblah = direction of prayer.' },
-    { h:'Asking for Help', b:'Musaadah = Help! Ayna al-hammam = Where is the toilet? La afham = I do not understand. Hal tatakallam Inglizi = Do you speak English?' },
-    { h:'Emergencies', b:'Al-isaaf = Ambulance! Ana marid = I am sick. Itasil bil-isaaf = Call ambulance. Al-mustashfa ayna = Where is the hospital?' },
-    { h:'Islamic Phrases', b:'Bismillah = In the name of Allah. Alhamdulillah = All praise to Allah. Inshallah = If Allah wills. Allahu Akbar = Allah is Greatest.' },
+  arabic:{t:'Essential Arabic Phrases',i:'??',l:[
+    {h:'Greetings',b:'As-salamu alaykum = Peace. Marhaba = Welcome. Kayfa halak = How are you?'},
+    {h:'At the Mosque',b:'Masjid = mosque. Salah = prayer. Wudu = ablution. Qiblah = direction of prayer.'},
+    {h:'Getting Help',b:'Musaadah = Help! Ayna al-hammam = Where is toilet? Hal tatakallam Inglizi = Do you speak English?'},
+    {h:'Emergencies',b:'Al-isaaf = Ambulance! Ana marid = I am sick. Al-mustashfa ayna = Where is hospital?'},
+    {h:'Islamic Phrases',b:'Bismillah. Alhamdulillah. Inshallah. Mashallah. Subhanallah. Allahu Akbar.'},
   ]},
-  etiquette: { t:'Mosque Etiquette', i:'\uD83D\uDD4C', l:[
-    { h:'Entering', b:'Enter with right foot. Say: Allahumma iftah li abwaba rahmatik. Remove shoes. Be in state of wudu. Be quiet and respectful.' },
-    { h:'Inside', b:'Pray 2 rakahs when entering. Keep voice low. Do not walk in front of praying person. Phone on silent. Face Qiblah when making dua.' },
-    { h:'Prayer Rows', b:'Stand shoulder to shoulder. Fill gaps from front. Follow imam exactly. Do not precede imam in any movement.' },
-    { h:'Leaving', b:'Leave with left foot. Say: Allahumma inni asaluka min fadlik. Give way to others. Leave peacefully and quietly.' },
-  ]},
-  history: { t:'Islamic History of Makkah', i:'\uD83D\uDCDC', l:[
-    { h:'Origin of Makkah', b:'Built by Prophet Ibrahim and his son Ismail. Ibrahim received divine command to build the Kaaba. Black Stone brought from Paradise by Angel Jibreel.' },
-    { h:'The Kaaba', b:'First house of worship built for mankind (Quran 3:96). Measures 13.1m x 11.03m x 13.1m. Kiswah cloth changed annually. Black Stone embedded in corner.' },
-    { h:'Zamzam Well', b:'Appeared miraculously for Ismail when Hajar searched for water. Over 3,500 years old. Produces 11-18.5 liters per second. Most blessed water.' },
-    { h:'Birth of Prophet Muhammad', b:'Born in Makkah 570 CE. Received first revelation in Cave Hira at age 40. Migrated to Madinah 622 CE. Returned 630 CE for Conquest of Makkah.' },
+  etiquette:{t:'Mosque Etiquette',i:'??',l:[
+    {h:'Entering',b:'Enter with right foot. Remove shoes. Be in wudu. Enter quietly and respectfully.'},
+    {h:'Inside',b:'Pray 2 rakahs when entering. Keep voice low. Phone silent. Do not walk in front of praying person.'},
+    {h:'Prayer Rows',b:'Stand shoulder to shoulder. Fill gaps from front. Follow imam exactly.'},
+    {h:'Leaving',b:'Leave with left foot. Say: Allahumma inni asaluka min fadlik. Leave peacefully.'},
   ]},
 };
-var curCId = null, curLIdx = 0;
-var lDone = JSON.parse(localStorage.getItem(K+'ld') || '{}');
+var _cId5=null,_lI5=0;
+var _lD5=JSON.parse(localStorage.getItem(K+'ld5')||'{}');
 
-function startCourse(id) {
-  curCId = id;
-  curLIdx = lDone[id] || 0;
-  showLsn();
-}
-
-function showLsn() {
-  var c = COURSES2[curCId];
-  if (!c) return;
+function startCourse(id){_cId5=id;_lI5=_lD5[id]||0;_showL5();}
+function _showL5(){
+  var c=_CR5[_cId5];if(!c)return;
   goS('learning');
-  var con = document.getElementById('lesson-container');
-  var lst = document.getElementById('lesson-list-wrap');
-  if (con) con.style.display = 'block';
-  if (lst) lst.style.display = 'none';
-  var l = c.l[curLIdx];
-  if (!l) { finishCrs(); return; }
-  var total = c.l.length;
-  var pct = Math.round(curLIdx/total*100);
-  if (!con) return;
-  con.innerHTML =
-    '<button class="back-btn" onclick="exitLsn()">\u2190 ' + c.t + '</button>' +
-    '<div class="card card-gold" style="margin-bottom:.7rem">' +
-      '<div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">' + c.i + ' Lesson ' + (curLIdx+1) + ' / ' + total + '</div>' +
-      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--t1);margin:.3rem 0">' + l.h + '</div>' +
-      '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
-    '</div>' +
-    '<div class="ibox" style="font-size:.72rem;color:var(--t1);line-height:1.8;margin-bottom:.7rem">' + l.b + '</div>' +
-    '<div style="display:flex;gap:.5rem">' +
-      (curLIdx > 0 ? '<button class="btn btn-ghost" onclick="prevLsn()" style="flex:1">\u2190 Back</button>' : '') +
-      (curLIdx < total-1 ?
-        '<button class="btn btn-gold" onclick="nextLsn()" style="flex:2">Next \u2192</button>' :
-        '<button class="btn btn-gold" onclick="finishCrs()" style="flex:2">\u2705 Complete!</button>'
-      ) +
+  var con=document.getElementById('lesson-container');
+  var lst=document.getElementById('lesson-list-wrap');
+  if(con)con.style.display='block';if(lst)lst.style.display='none';
+  var l=c.l[_lI5];if(!l){_finC5();return;}
+  var tot=c.l.length,pct=Math.round(_lI5/tot*100);
+  if(!con)return;
+  con.innerHTML=
+    '<button class="back-btn" onclick="exitL5()">← '+c.t+'</button>'+
+    '<div class="card card-gold" style="margin-bottom:.65rem">'+
+      '<div style="font-size:.49rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">'+c.i+' Lesson '+(_lI5+1)+'/'+tot+'</div>'+
+      '<div style="font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--t1);margin:.25rem 0">'+l.h+'</div>'+
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'+
+    '</div>'+
+    '<div class="ibox" style="font-size:.68rem;color:var(--t1);line-height:1.75;margin-bottom:.65rem">'+l.b+'</div>'+
+    '<div style="display:flex;gap:.42rem">'+
+      (_lI5>0?'<button class="btn btn-ghost" onclick="prevL5()" style="flex:1">←</button>':'')+
+      (_lI5<tot-1?
+        '<button class="btn btn-gold" onclick="nextL5()" style="flex:2">Next →</button>':
+        '<button class="btn btn-gold" onclick="_finC5()" style="flex:2">✅ Complete!</button>'
+      )+
     '</div>';
 }
-
-function nextLsn() {
-  lDone[curCId] = curLIdx + 1;
-  localStorage.setItem(K+'ld', JSON.stringify(lDone));
-  if (typeof addPts === 'function') addPts(5, 'Lesson');
-  curLIdx++;
-  showLsn();
+function nextL5(){_lD5[_cId5]=_lI5+1;localStorage.setItem(K+'ld5',JSON.stringify(_lD5));if(typeof addPts==='function')addPts(5,'Lesson');_lI5++;_showL5();}
+function prevL5(){_lI5=Math.max(0,_lI5-1);_showL5();}
+function _finC5(){
+  var c=_CR5[_cId5];_lD5[_cId5]=c?c.l.length:0;
+  localStorage.setItem(K+'ld5',JSON.stringify(_lD5));
+  if(typeof addPts==='function')addPts(50,'Course');
+  exitL5();
+  if(typeof toast==='function')toast('?? Course complete! +50 pts');
+  if(typeof addNotif==='function')addNotif('??','Done!',(c?c.t:_cId5),'now');
+  renderCourses5();
+}
+function exitL5(){
+  var con=document.getElementById('lesson-container');
+  var lst=document.getElementById('lesson-list-wrap');
+  if(con)con.style.display='none';if(lst)lst.style.display='block';
+  renderCourses5();
+}
+function renderCourses5(){
+  var w=document.getElementById('lesson-list-wrap');if(!w)return;
+  w.innerHTML='';
+  Object.keys(_CR5).forEach(function(id){
+    var c=_CR5[id],d=_lD5[id]||0,tot=c.l.length,p=Math.round(d/tot*100);
+    var col=d>=tot?'var(--grn)':(d>0?'var(--gold)':'var(--t3)');
+    var st=d>=tot?'✅ Done':(d>0?d+'/'+tot+' lessons':'Tap to start');
+    var div=document.createElement('div');
+    div.className='course-card';
+    div.innerHTML='<div class="course-thumb">'+c.i+'</div>'+
+      '<div style="flex:1"><div class="course-title">'+c.t+'</div>'+
+      '<div class="course-meta">'+tot+' lessons</div>'+
+      '<div class="course-progress"><div class="course-fill" style="width:'+p+'%"></div></div>'+
+      '<div style="font-size:.47rem;color:'+col+';margin-top:.18rem">'+st+'</div></div>';
+    div.onclick=function(){startCourse(id);};
+    w.appendChild(div);
+  });
 }
 
-function prevLsn() { curLIdx = Math.max(0, curLIdx-1); showLsn(); }
-
-function finishCrs() {
-  var c = COURSES2[curCId];
-  lDone[curCId] = c ? c.l.length : 0;
-  localStorage.setItem(K+'ld', JSON.stringify(lDone));
-  if (typeof addPts === 'function') addPts(50, 'Course');
-  exitLsn();
-  if (typeof toast === 'function') toast('\uD83C\uDFC6 Course completed! +50 pts');
-  if (typeof addNotif === 'function') addNotif('\uD83C\uDFC6','Course Done!',(c?c.t:curCId),'now');
-  renderCourses();
+/* Audio Duas */
+var _DL5=[
+  {n:'Talbiyah',a:'لَبَّيْكَ اللَّهُمَّ',t:'Labbayk Allahumma labbayk'},
+  {n:'Entering Makkah',a:'اللَّهُمَّ أَنْتَ السَّلاَمُ',t:'Allahumma antassalam'},
+  {n:'Before Tawaf',a:'بِسْمِ اللهِ اللهُ أَكْبَر',t:'Bismillah Allahu Akbar'},
+  {n:'Day of Arafat',a:'لَا إِلَهَ إِلَّا اللَّهُ',t:'La ilaha illallah wahdahu'},
+  {n:'At Safa and Marwa',a:'إِنَّ الصَّفَا وَالْمَرْوَةَ',t:'Innas-Safa wal-Marwata'},
+  {n:'Morning Dua',a:'اللَّهُمَّ بِكَ أَصْبَحْنَا',t:'Allahumma bika asbahna'},
+  {n:'After Zamzam',a:'اللَّهُمَّ إِنَّي أَسْأَلُكَ',t:'Allahumma inni asaluka'},
+  {n:'Farewell Tawaf',a:'اللَّهُمَّ هَذَا الْبَيْتُ',t:'Allahumma hadhal baytu baytuk'},
+];
+var _di5=0;
+function initAudioDuas(){_rdp5();_rdl5();}
+function _rdp5(){
+  var d=_DL5[_di5];if(!d)return;
+  var nm=document.getElementById('audio-now-name');if(nm)nm.textContent=d.n;
+  var ar=document.getElementById('audio-now-arabic');if(ar){ar.textContent=d.a;ar.style.direction='rtl';}
+  var tr=document.getElementById('audio-now-trans');if(tr)tr.textContent=d.t;
 }
-
-function exitLsn() {
-  var con = document.getElementById('lesson-container');
-  var lst = document.getElementById('lesson-list-wrap');
-  if (con) con.style.display = 'none';
-  if (lst) lst.style.display = 'block';
-  renderCourses();
-}
-
-function renderCourses() {
-  var w = document.getElementById('lesson-list-wrap');
-  if (!w) return;
-  w.innerHTML = Object.keys(COURSES2).map(function(id) {
-    var c = COURSES2[id];
-    var d = lDone[id] || 0;
-    var tot = c.l.length;
-    var p = Math.round(d/tot*100);
-    var col = d >= tot ? 'var(--grn)' : (d > 0 ? 'var(--gold)' : 'var(--t3)');
-    var st = d >= tot ? '\u2705 Done' : (d > 0 ? d+'/'+tot+' lessons' : 'Start');
-    return '<div class="course-card" onclick="startCourse(\''+id+'\')">' +
-      '<div class="course-thumb">'+c.i+'</div>' +
-      '<div style="flex:1">' +
-        '<div class="course-title">'+c.t+'</div>' +
-        '<div class="course-meta">'+tot+' lessons</div>' +
-        '<div class="course-progress"><div class="course-fill" style="width:'+p+'%"></div></div>' +
-        '<div style="font-size:.48rem;color:'+col+';margin-top:.2rem">'+st+'</div>' +
-      '</div></div>';
+function _rdl5(){
+  var list=document.getElementById('audio-dua-list');if(!list)return;
+  list.innerHTML=_DL5.map(function(d,i){
+    return '<div class="audio-dua-item'+(i===_di5?' cur':'')+'" onclick="selectDua5('+i+')">'+
+      '<span style="font-size:1rem">'+(i===_di5?'??':'??')+'</span>'+
+      '<div><div style="font-size:.63rem;font-weight:600;color:var(--t1)">'+d.n+'</div>'+
+      '<div style="font-size:.49rem;color:var(--t3)">'+d.t+'</div></div></div>';
   }).join('');
 }
+function selectDua5(idx){
+  _di5=idx;_rdp5();_rdl5();
+  if('speechSynthesis' in window){
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(_DL5[idx].n+'. '+_DL5[idx].t);
+    u.lang='en-US';u.rate=0.82;speechSynthesis.speak(u);
+    if(typeof toast==='function')toast('?? '+_DL5[idx].n);
+    var btn=document.getElementById('audio-play-btn');if(btn)btn.textContent='⏸';
+  }else{if(typeof toast==='function')toast(_DL5[idx].n);}
+}
+function toggleAudioPlay(){
+  if('speechSynthesis' in window){
+    if(speechSynthesis.speaking&&!speechSynthesis.paused){speechSynthesis.pause();var b=document.getElementById('audio-play-btn');if(b)b.textContent='▶';}
+    else if(speechSynthesis.paused){speechSynthesis.resume();var b=document.getElementById('audio-play-btn');if(b)b.textContent='⏸';}
+    else{selectDua5(_di5);}
+  }
+}
+function prevDua(){_di5=(_di5-1+_DL5.length)%_DL5.length;selectDua5(_di5);}
+function nextDua(){_di5=(_di5+1)%_DL5.length;selectDua5(_di5);}
 
-/* ══ TRANSACTION RECEIPT ══ */
-function showReceipt(txText) {
-  var rid = 'TXN-' + Date.now().toString(36).toUpperCase();
-  var rdate = new Date().toLocaleString();
-  var ruser = (typeof user !== 'undefined' && user) ? '@'+user.username : '@pilgrim';
-  var rpid = (typeof myPilgrimId !== 'undefined' && myPilgrimId) ? myPilgrimId : 'HRM-00000';
-  var modal = document.createElement('div');
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:1rem;';
-  modal.id = 'receipt-modal';
-  var rtext = txText.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&apos;');
-  modal.innerHTML =
-    '<div style="background:var(--bg2);border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.5rem;width:100%;max-width:300px;text-align:center">' +
-      '<div style="font-size:2.5rem;margin-bottom:.4rem">\uD83E\uDDFE</div>' +
-      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold2)">Transaction Receipt</div>' +
-      '<div style="font-family:monospace;font-size:.52rem;color:var(--t3);margin:.3rem 0 .8rem">'+rid+'</div>' +
-      '<div style="background:var(--bg3);border-radius:var(--r2);padding:.8rem;margin-bottom:.8rem;text-align:left">' +
-        '<div style="font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.4rem">'+rtext+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCC5 '+rdate+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDC64 '+ruser+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83E\uDEAA '+rpid+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCF1 HARAMAIN \u00B7 Pi Mainnet</div>' +
-      '</div>' +
-      '<div style="display:flex;gap:.4rem">' +
-        '<button class="btn btn-gold btn-sm" onclick="shareRcpt()" style="flex:1">\uD83D\uDCE4 Share</button>' +
-        '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'receipt-modal\').remove()" style="flex:1">\u2715 Close</button>' +
-      '</div>' +
-    '</div>';
+/* AI */
+var _AIH5=[];
+var _AIK5={
+  tawaf:'7 counter-clockwise rounds around the Kaaba. Begin at Black Stone saying Bismillah Allahu Akbar. Men bare right shoulder first 3 rounds.',
+  ihram:'Prohibitions: cutting hair/nails, perfume, marital relations, covering head (men). Men wear 2 white unstitched cloths. Women wear modest clothing.',
+  arafat:'The pillar of Hajj. Stand from Dhuhr to Maghrib. Prophet said: Hajj is Arafat. Missing this day invalidates Hajj.',
+  mina:'Stone 3 Jamarat pillars: Small, Medium, Large. 7 pebbles each. Allahu Akbar with every throw.',
+  umrah:'1) Ihram at Miqat 2) Tawaf 7 rounds 3) Pray at Maqam Ibrahim 4) Zamzam 5) Sai 7 times 6) Shave or trim.',
+  zamzam:'Blessed water. Drink facing Qibla, say Bismillah, make dua while drinking.',
+  dua:'Key duas: Talbiyah, Entering Makkah, Before Tawaf, Day of Arafat. See Audio Duas for full collection.',
+  pack:'Ihram cloths, unscented toiletries, shoes, medications, prayer mat, Quran, power bank, umbrella, contacts.',
+  safety:'Stay with group. Memorize hotel. Carry ID. Drink 3-5L daily. Avoid 11am-3pm heat. Emergency: 911.',
+  hajj:'5th pillar of Islam. Pillars: Ihram, Arafat, Tawaf al-Ifadah, Sai. Obligatory once for able Muslims.',
+  prayer:'Masjid al-Haram = 100,000x reward. Fajr ~5:15, Dhuhr ~12:15, Asr ~3:30, Maghrib ~6:45, Isha ~8:15.',
+};
+function askAI(msg){
+  if(!msg||!msg.trim())return;
+  var chat=document.getElementById('ai-chat');if(!chat)return;
+  var chips=document.getElementById('ai-chips');if(chips)chips.style.display='none';
+  var ud=document.createElement('div');
+  ud.className='ai-msg user';
+  ud.innerHTML='<div class="ai-msg-who">You</div><div class="ai-msg-text">'+String(msg).replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+  chat.appendChild(ud);chat.scrollTop=chat.scrollHeight;
+  var td=document.createElement('div');
+  td.className='ai-msg bot';
+  td.innerHTML='<div class="ai-msg-who">Haramain AI</div><div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
+  chat.appendChild(td);chat.scrollTop=chat.scrollHeight;
+  _AIH5.push({role:'user',content:msg});
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,
+      system:'You are Haramain AI, expert Islamic pilgrimage guide on haramain.pi (Pi Network). Help with Hajj, Umrah, duas, safety. Be concise, compassionate. Respond in user language.',
+      messages:_AIH5})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    var reply=(d.content&&d.content[0]&&d.content[0].text)||_kbR5(msg);
+    _AIH5.push({role:'assistant',content:reply});
+    td.innerHTML='<div class="ai-msg-who">Haramain AI ??</div><div class="ai-msg-text">'+String(reply).replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    chat.scrollTop=chat.scrollHeight;
+  }).catch(function(){
+    var r=_kbR5(msg);_AIH5.push({role:'assistant',content:r});
+    td.innerHTML='<div class="ai-msg-who">Haramain AI ??</div><div class="ai-msg-text">'+r+'</div>';
+    chat.scrollTop=chat.scrollHeight;
+  });
+  var inp=document.getElementById('ai-input');if(inp)inp.value='';
+}
+function _kbR5(msg){
+  var l=msg.toLowerCase();
+  for(var k in _AIK5){if(l.indexOf(k)>-1)return '?? '+_AIK5[k];}
+  return '?? Bismillah! Ask about: tawaf, ihram, Arafat, Mina, Umrah, Zamzam, duas, packing, safety, or prayer. haramain.pi';
+}
+function sendAIMessage(){var inp=document.getElementById('ai-input');if(!inp||!inp.value.trim())return;askAI(inp.value.trim());}
+function clearAIChat(){
+  var c=document.getElementById('ai-chat');if(c)c.innerHTML='';
+  _AIH5=[];
+  var chips=document.getElementById('ai-chips');if(chips)chips.style.display='flex';
+  _aiW5();
+}
+function _aiW5(){
+  var chat=document.getElementById('ai-chat');if(!chat||chat.children.length>0)return;
+  var w=document.createElement('div');w.className='ai-msg bot';
+  w.innerHTML='<div class="ai-msg-who">Haramain AI ??</div><div class="ai-msg-text">Bismillah! I am your personal pilgrimage guide on haramain.pi. Ask me anything about Hajj, Umrah, duas, or safety!</div>';
+  chat.appendChild(w);
+}
+
+/* Receipt */
+function showReceipt(txt){
+  var rid='TXN-'+Date.now().toString(36).toUpperCase();
+  var rd=new Date().toLocaleString();
+  var ru=(typeof user!=='undefined'&&user)?'@'+user.username:'@pilgrim';
+  var rp=(typeof myPilgrimId!=='undefined'&&myPilgrimId)?myPilgrimId:'HRM-00000';
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.id='rcpt5';
+  modal.innerHTML='<div style="background:var(--bg2);border:1px solid var(--gbrd);border-radius:20px;padding:1.4rem;width:100%;max-width:300px;text-align:center">'+
+    '<div style="font-size:2.2rem;margin-bottom:.38rem">??</div>'+
+    '<div style="font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--gold2)">Transaction Receipt</div>'+
+    '<div style="font-family:monospace;font-size:.5rem;color:var(--t3);margin:.22rem 0 .68rem">'+rid+'</div>'+
+    '<div style="background:var(--bg3);border-radius:10px;padding:.75rem;margin-bottom:.72rem;text-align:left">'+
+      '<div style="font-size:.62rem;font-weight:600;color:var(--t1);margin-bottom:.32rem">'+String(txt).replace(/</g,'&lt;')+'</div>'+
+      '<div style="font-size:.49rem;color:var(--t3)">?? '+rd+'</div>'+
+      '<div style="font-size:.49rem;color:var(--t3)">?? '+ru+'</div>'+
+      '<div style="font-size:.49rem;color:var(--t3)">?? '+rp+'</div>'+
+      '<div style="font-size:.49rem;color:var(--t3)">?? haramain.pi · Pi Mainnet</div>'+
+    '</div>'+
+    '<div style="display:flex;gap:.38rem">'+
+      '<button class="btn btn-gold btn-sm" style="flex:1" onclick="_shr5()">?? Share</button>'+
+      '<button class="btn btn-ghost btn-sm" style="flex:1" onclick="docuck="_closeRcpt5()">✕ Close</button>'+
+    '</div></div>';
   document.body.appendChild(modal);
-  modal._data = { id:rid, text:txText, date:rdate, user:ruser, pid:rpid };
-  var recs = JSON.parse(localStorage.getItem(K+'receipts') || '[]');
-  recs.unshift({ id:rid, text:txText, date:rdate });
-  if (recs.length > 100) recs.pop();
-  localStorage.setItem(K+'receipts', JSON.stringify(recs));
+  modal._d={id:rid,text:txt,date:rd,user:ru};
+  var recs=JSON.parse(localStorage.getItem(K+'receipts')||'[]');
+  recs.unshift({id:rid,text:txt,date:rd});if(recs.length>100)recs.pop();
+  localStorage.setItem(K+'receipts',JSON.stringify(recs));
 }
 
-function shareRcpt() {
-  var modal = document.getElementById('receipt-modal');
-  if (!modal || !modal._data) return;
-  var d = modal._data;
-  var text = 'HARAMAIN Receipt\n' + d.id + '\n' + d.text + '\n' + d.date + '\nharamain.pages.dev';
-  if (navigator.share) { navigator.share({ title: 'Haramain Receipt', text: text }); }
-  else { if (typeof copyClip === 'function') copyClip(text); if (typeof toast === 'function') toast('Receipt copied!'); }
+function _closeRcpt5(){var m=document.getElementById('rcpt5');if(m)m.remove();}
+function _shr5(){
+  var m=document.getElementById('rcpt5');if(!m||!m._d)return;
+  var d=m._d;
+  var nl=String.fromCharCode(10);
+  var txt='HARAMAIN Receipt'+nl+d.id+nl+d.text+nl+d.date+nl+'haramain.pi';
+  if(navigator.share){navigator.share({title:'Receipt',text:txt});}
+  else{if(typeof copyClip==='function')copyClip(txt);if(typeof toast==='function')toast('Copied!');}
 }
-
-/* ══ LIVE TRACKER ══ */
-var _tWatchId = null;
-
-function startTracker() {
-  if (!navigator.geolocation) { if (typeof toast === 'function') toast('GPS not available'); return; }
-  var btn = document.getElementById('tracker-start-btn');
-  if (btn) { btn.textContent = '\uD83D\uDCCD Tracking...'; btn.disabled = true; }
-  if (typeof toast === 'function') toast('\uD83D\uDCCD GPS started...');
-  _tWatchId = navigator.geolocation.watchPosition(
-    function(pos) {
-      var lat = pos.coords.latitude, lng = pos.coords.longitude;
-      var el = document.getElementById('tracker-coords');
-      if (el) el.textContent = lat.toFixed(5) + ', ' + lng.toFixed(5);
-      var zone = getHajjZone(lat, lng);
-      var zEl = document.getElementById('tracker-zone-badge');
-      if (zEl) zEl.textContent = zone;
-      var zi = document.getElementById('tracker-zone-info');
-      if (zi) zi.innerHTML = '<div style="font-size:.68rem;font-weight:600;color:var(--t1)">' + zone + '</div>';
-      updateMapSvgDot(lat, lng, 'tracker-dot', 'tracker-dot-inner');
+function startTracker(){
+  if(!navigator.geolocation){if(typeof toast==='function')toast('GPS not available');return;}
+  var btn=document.getElementById('tracker-start-btn');if(btn){btn.textContent='?? Tracking...';btn.disabled=true;}
+  if(typeof toast==='function')toast('?? GPS started');
+  _tw5=navigator.geolocation.watchPosition(
+    function(pos){
+      var lat=pos.coords.latitude,lng=pos.coords.longitude;
+      var ce=document.getElementById('tracker-coords');if(ce)ce.textContent=lat.toFixed(5)+', '+lng.toFixed(5);
+      var zone=_gz5(lat,lng);
+      var ze=document.getElementById('tracker-zone-badge');if(ze)ze.textContent=zone;
+      var zi=document.getElementById('tracker-zone-info');if(zi)zi.innerHTML='<div style="font-size:.66rem;font-weight:600;color:var(--t1)">'+zone+'</div>';
     },
-    function(err) {
-      var msgs = ['','Permission denied - enable GPS in browser','Position unavailable','GPS timeout'];
-      if (typeof toast === 'function') toast('GPS: ' + (msgs[err.code] || 'Error'));
-      var btn2 = document.getElementById('tracker-start-btn');
-      if (btn2) { btn2.textContent = '\uD83D\uDCCD Start Tracking'; btn2.disabled = false; }
+    function(err){
+      var m=['','Permission denied','Position unavailable','Timeout'];
+      if(typeof toast==='function')toast('GPS: '+(m[err.code]||'Error'));
+      var b=document.getElementById('tracker-start-btn');if(b){b.textContent='?? Start Tracking';b.disabled=false;}
     },
-    { enableHighAccuracy: true, timeout: 15000 }
+    {enableHighAccuracy:true,timeout:15000}
   );
 }
-
-function stopTracker() {
-  if (_tWatchId !== null) { navigator.geolocation.clearWatch(_tWatchId); _tWatchId = null; }
-  var btn = document.getElementById('tracker-start-btn');
-  if (btn) { btn.textContent = '\uD83D\uDCCD Start Tracking'; btn.disabled = false; }
-  if (typeof toast === 'function') toast('\u23F9 Tracking stopped');
+function stopTracker(){
+  if(_tw5!==null){navigator.geolocation.clearWatch(_tw5);_tw5=null;}
+  var b=document.getElementById('tracker-start-btn');if(b){b.textContent='?? Start Tracking';b.disabled=false;}
+  if(typeof toast==='function')toast('⏹ Stopped');
 }
-
-function getHajjZone(lat, lng) {
-  var zones = [
-    { n:'Masjid al-Haram', lat:21.4225, lng:39.8262, r:0.3 },
-    { n:'Mina', lat:21.4131, lng:39.8934, r:2.0 },
-    { n:'Arafat', lat:21.3547, lng:39.9842, r:3.0 },
-    { n:'Muzdalifah', lat:21.3833, lng:39.9367, r:2.5 },
-    { n:'Makkah', lat:21.4225, lng:39.8262, r:8.0 },
-  ];
-  for (var i=0; i<zones.length; i++) {
-    var z = zones[i];
-    var d = Math.sqrt(Math.pow((lat-z.lat)*111,2)+Math.pow((lng-z.lng)*111,2));
-    if (d <= z.r) return z.n;
-  }
+function _gz5(lat,lng){
+  var z=[{n:'Masjid al-Haram',lat:21.4225,lng:39.8262,r:.3},{n:'Mina',lat:21.4131,lng:39.8934,r:2},{n:'Arafat',lat:21.3547,lng:39.9842,r:3},{n:'Muzdalifah',lat:21.3833,lng:39.9367,r:2.5},{n:'Makkah',lat:21.4225,lng:39.8262,r:8}];
+  for(var i=0;i<z.length;i++){var d=Math.sqrt(Math.pow((lat-z[i].lat)*111,2)+Math.pow((lng-z[i].lng)*111,2));if(d<=z[i].r)return z[i].n;}
   return 'Outside Hajj Zones';
 }
-
-function updateMapSvgDot(lat, lng, dotId, innerId) {
-  var dot = document.getElementById(dotId);
-  var inner = document.getElementById(innerId);
-  if (!dot || !inner) return;
-  var x = Math.max(10, Math.min(330, 170 + (lng - 39.8262) * 800));
-  var y = Math.max(10, Math.min(210, 110 - (lat - 21.4225) * 800));
-  dot.setAttribute('cx', x); dot.setAttribute('cy', y);
-  inner.setAttribute('cx', x); inner.setAttribute('cy', y);
+function shareTracker(){
+  var ce=document.getElementById('tracker-coords'),ze=document.getElementById('tracker-zone-badge');
+  var loc=(ze?ze.textContent:'')+' - '+(ce?ce.textContent:'');
+  var msg=String.fromCharCode(128205)+' '+loc+String.fromCharCode(10)+'haramain.pi';
+  if(navigator.share){navigator.share({title:'My Location',text:msg});}
+  else{if(typeof copyClip==='function')copyClip(msg);if(typeof toast==='function')toast('Location copied');}
+}
+function createFamilyGroup(){
+  var name=((typeof user!=='undefined'&&user)?user.username:'Pilgrim')+' Family';
+  var id='GRP-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  _fam5={id:id,name:name};localStorage.setItem(K+'fam5',JSON.stringify(_fam5));
+  var gn=document.getElementById('group-name');if(gn)gn.textContent=name;
+  var gi=document.getElementById('group-id');if(gi)gi.textContent=id;
+  if(typeof toast==='function')toast('✅ Group: '+id);
+}
+function joinGroup(){
+  var code=prompt('Enter group code:');if(!code)return;
+  _fam5={id:code,name:'Group '+code};localStorage.setItem(K+'fam5',JSON.stringify(_fam5));
+  var gn=document.getElementById('group-name');if(gn)gn.textContent=_fam5.name;
+  var gi=document.getElementById('group-id');if(gi)gi.textContent=code;
+  if(typeof toast==='function')toast('✅ Joined: '+code);
+}
+function shareGroupCode(){
+  if(!_fam5.id){createFamilyGroup();return;}
+  var nl=String.fromCharCode(10);
+  var msg='Join my Haramain group!'+nl+'Code: '+_fam5.id+nl+'haramain.pi';
+  if(navigator.share){navigator.share({title:'Join',text:msg});}
+  else{if(typeof copyClip==='function')copyClip(_fam5.id);if(typeof toast==='function')toast('Code: '+_fam5.id);}
+}
+function setMeetingPoint(p){
+  if(!p)return;
+  localStorage.setItem(K+'mtg5',p);
+  var e=document.getElementById('meeting-point');if(e)e.textContent='?? '+p;
+  if(typeof toast==='function')toast('✅ Meeting: '+p);
+}
+function sendCheckin(s){
+  if(typeof addTx==='function')addTx('??‍??‍?? '+s);
+  if(typeof toast==='function')toast('?? '+s);
 }
 
-function shareTracker() {
-  var el = document.getElementById('tracker-coords');
-  var zEl = document.getElementById('tracker-zone-badge');
-  var msg = '\uD83D\uDCCD My Haramain Location\n' + (zEl ? zEl.textContent : '') + '\n' + (el ? el.textContent : '') + '\nharamain.pages.dev';
-  if (navigator.share) { navigator.share({ title:'My Location', text:msg }); }
-  else { if (typeof copyClip === 'function') copyClip(msg); if (typeof toast === 'function') toast('Location copied!'); }
-}
-
-/* ══ FAMILY HUB ══ */
-var famData = JSON.parse(localStorage.getItem(K+'fam2') || 'null') || { id:null, name:null };
-
-function createFamilyGroup() {
-  var name = ((typeof user !== 'undefined' && user) ? user.username : 'Pilgrim') + ' Family';
-  var id = 'GRP-' + Math.random().toString(36).substr(2,6).toUpperCase();
-  famData = { id:id, name:name };
-  localStorage.setItem(K+'fam2', JSON.stringify(famData));
-  var gn = document.getElementById('group-name');
-  var gi = document.getElementById('group-id');
-  if (gn) gn.textContent = name;
-  if (gi) gi.textContent = id;
-  if (typeof toast === 'function') toast('\u2705 Group created: ' + id);
-}
-
-function joinGroup() {
-  var code = prompt('Enter group code:');
-  if (!code) return;
-  famData.id = code;
-  famData.name = 'Group ' + code;
-  localStorage.setItem(K+'fam2', JSON.stringify(famData));
-  var gn = document.getElementById('group-name');
-  var gi = document.getElementById('group-id');
-  if (gn) gn.textContent = famData.name;
-  if (gi) gi.textContent = code;
-  if (typeof toast === 'function') toast('\u2705 Joined: ' + code);
-}
-
-function shareGroupCode() {
-  if (!famData.id) { createFamilyGroup(); return; }
-  var msg = 'Join my Haramain family group! Code: ' + famData.id + '\nharamain.pages.dev';
-  if (navigator.share) { navigator.share({ title:'Join my group', text:msg }); }
-  else { if (typeof copyClip === 'function') copyClip(famData.id); if (typeof toast === 'function') toast('Copied: ' + famData.id); }
-}
-
-function setMeetingPoint(p) {
-  localStorage.setItem(K+'mtg', p);
-  var el = document.getElementById('meeting-point');
-  if (el) el.textContent = '\uD83D\uDCCD ' + p;
-  if (typeof toast === 'function') toast('\u2705 Meeting: ' + p);
-}
-
-function sendCheckin(s) {
-  if (typeof addTx === 'function') addTx('\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 ' + s);
-  if (typeof toast === 'function') toast('\uD83D\uDCE4 ' + s);
-}
-
-/* ══ SMART MAP ══ */
-function initSmartMap() {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    var zone = getHajjZone(pos.coords.latitude, pos.coords.longitude);
-    if (typeof toast === 'function') toast('\uD83D\uDCCD You are in: ' + zone);
-    updateMapSvgDot(pos.coords.latitude, pos.coords.longitude, 'tracker-dot', 'tracker-dot-inner');
-  });
-}
-
-function filterMap(t) {
-  if (typeof toast === 'function') toast('Showing: ' + (t === 'all' ? 'All places' : t));
-}
-
-/* ══ SCREEN INIT ON NAVIGATE ══ */
-var __goSv4 = goS;
-goS = function(id, btn) {
-  __goSv4(id, btn);
-  setTimeout(function() {
-    if (id === 'audio') initAudioDuas();
-    if (id === 'learning') renderCourses();
-    if (id === 'family') {
-      if (famData.id) {
-        var gn = document.getElementById('group-name');
-        var gi = document.getElementById('group-id');
-        if (gn) gn.textContent = famData.name;
-        if (gi) gi.textContent = famData.id;
-      }
-    }
-    if (id === 'map') initSmartMap();
-    if (id === 'ai') initAIScreen();
-  }, 100);
+/* Translation */
+var _trLang='ar';
+var _trMap={
+  ar:{n:'Arabic',p:{'Where is the toilet?':'أين الحمام؟','I need help':'أحتاج مساعدة','Where is Masjid al-Haram?':'أين المسجد الحرام؟','I am lost, please help':'أنا تائه ساعدني','How much does this cost?':'كم سعر هذا؟'}},
+  ha:{n:'Hausa',p:{'Where is the toilet?':'Ina ne bandaki?','I need help':'Ina bukatar taimako','I am lost, please help':'Na bace, don Allah','How much does this cost?':'Nawa ne wannan?'}},
+  ur:{n:'Urdu',p:{'Where is the toilet?':'باتھ روم کہاں ہے؟','I need help':'مجھے مدد چاہیے','I am lost, please help':'میں گم ہویا','How much does this cost?':'یہ کتنے کا ہے؟'}},
+  id:{n:'Bahasa',p:{'Where is the toilet?':'Di mana toilet?','I need help':'Saya butuh bantuan','I am lost, please help':'Saya tersesat','How much does this cost?':'Berapa harganya?'}},
+  fr:{n:'French',p:{'Where is the toilet?':'Ou sont les toilettes?','I need help':'J ai besoin d aide','I am lost, please help':'Je suis perdu','How much does this cost?':'Combien ca coute?'}},
 };
-
-/* ══ DOM READY SETUP ══ */
-document.addEventListener('DOMContentLoaded', function() {
-  /* Setup lesson container in learning screen */
-  var ls = document.getElementById('s-learning');
-  if (ls) {
-    if (!document.getElementById('lesson-container')) {
-      var c = document.createElement('div');
-      c.id = 'lesson-container';
-      c.style.display = 'none';
-      ls.appendChild(c);
-    }
-    if (!document.getElementById('lesson-list-wrap')) {
-      var w = document.createElement('div');
-      w.id = 'lesson-list-wrap';
-      ls.appendChild(w);
-    }
-  }
-  renderCourses();
-  initAudioDuas();
-
-  /* Load language preference */
-  var savedLang = localStorage.getItem(K+'lang');
-  if (savedLang && typeof setLang === 'function') {
-    setLang(savedLang);
-    var tbLang = document.getElementById('tb-lang');
-    if (tbLang) tbLang.textContent = savedLang.toUpperCase();
-    _langIdx2 = _langCodes2.indexOf(savedLang);
-  }
-
-  /* Load meeting point */
-  var mp = localStorage.getItem(K+'mtg');
-  if (mp) { var mpEl = document.getElementById('meeting-point'); if (mpEl) mpEl.textContent = '\uD83D\uDCCD ' + mp; }
-
-  /* Load family group */
-  if (famData.id) {
-    var gn = document.getElementById('group-name');
-    var gi = document.getElementById('group-id');
-    if (gn) gn.textContent = famData.name;
-    if (gi) gi.textContent = famData.id;
-  }
-});
-
-/* ══ OVERRIDE addTx FOR RECEIPT ══ */
-var __addTxV4 = typeof addTx === 'function' ? addTx : function(){};
-addTx = function(text) {
-  __addTxV4(text);
-  var isPayment = text.indexOf('\u03C0') > -1 || text.indexOf('Paid') > -1 || text.indexOf('Sent') > -1 || text.indexOf('Zakat') > -1 || text.indexOf('Qurbani') > -1 || text.indexOf('Sadaqah') > -1;
-  if (isPayment) {
-    setTimeout(function() { showReceipt(text); }, 1000);
-  }
-};
-
-
-
-/* HARAMAIN v4.1 PRODUCTION FIXES */
-
-/* ══ LANGUAGE ══ */
-var _langCodes2 = ['en','ar','ha','ur','id','tr'];
-var _langIdx2 = 0;
-
-function cycleLang() {
-  _langIdx2 = (_langIdx2 + 1) % _langCodes2.length;
-  var code = _langCodes2[_langIdx2];
-  if (typeof setLang === 'function') setLang(code);
-  var tbLang = document.getElementById('tb-lang');
-  if (tbLang) tbLang.textContent = code.toUpperCase();
-  var langSel = document.getElementById('lang-sel');
-  if (langSel) langSel.value = code;
-  var names = {en:'English',ar:'Arabic',ha:'Hausa',ur:'Urdu',id:'Bahasa',tr:'Turkish'};
-  if (typeof toast === 'function') toast((names[code]||code) + ' selected');
-}
-
-/* ══ AI ══ */
-var AI_HISTORY_V4 = [];
-var AI_KB = {
-  tawaf: '7 counter-clockwise rounds around the Kaaba. Begin at the Black Stone saying Bismillah Allahu Akbar. Men bare right shoulder for first 3 rounds. Recite recommended duas each round.',
-  ihram: 'Ihram prohibitions: cutting hair or nails, perfume, marital relations, hunting, covering head (men). Men wear 2 white unstitched cloths. Women wear normal modest clothing. Say Talbiyah constantly.',
-  arafat: 'Day of Arafat (9 Dhul Hijjah) is the pinnacle of Hajj. Stand from Dhuhr to Maghrib in supplication. The Prophet said: Hajj is Arafat. Missing this day invalidates Hajj.',
-  mina: 'Mina valley where pilgrims stay days 8-13 of Dhul Hijjah. Stone the 3 Jamarat pillars: Small, Medium, Large. Throw 7 pebbles each, say Allahu Akbar with each throw.',
-  umrah: 'Umrah steps: 1) Enter Ihram at Miqat 2) Tawaf 7 rounds 3) Pray at Maqam Ibrahim 4) Drink Zamzam 5) Sai 7 times between Safa and Marwa 6) Shave or trim hair.',
-  zamzam: 'Zamzam water blessed by Allah. Drink facing Qibla. Say Bismillah. Make dua while drinking. The Prophet said: Zamzam is for whatever it is drunk for.',
-  dua: 'Key Hajj duas: Talbiyah, Entering Makkah dua, Before Tawaf, At Black Stone, Day of Arafat supplication. See the Audio Duas section for full collection.',
-  pack: 'Essential Hajj packing: Ihram cloths, unscented toiletries, comfortable shoes, medications, prayer mat, pocket Quran, power bank, umbrella, emergency contacts.',
-  safety: 'Stay with group. Memorize hotel address. Carry Hajj ID always. Stay hydrated (3-5L daily). Rest during peak heat. Emergency: 911 (Saudi), 920002814 (Hajj emergency).',
-  hajj: 'Hajj pillars: 1) Ihram 2) Standing at Arafat 3) Tawaf al-Ifadah 4) Sai. Hajj is the 5th pillar of Islam. Obligatory once in lifetime for able Muslims.',
-  prayer: 'Prayer in Masjid al-Haram = 100,000x reward. Times: Fajr ~5:15am, Dhuhr ~12:15pm, Asr ~3:30pm, Maghrib ~6:45pm, Isha ~8:15pm.',
-  zakat: 'Zakat is 2.5% of savings above Nisab held for one lunar year. Calculate in Finance section. Zakat al-Fitr due before Eid prayer.',
-};
-
-function askAI(msg) {
-  if (!msg || !msg.trim()) return;
-  var chat = document.getElementById('ai-chat');
-  if (!chat) return;
-
-  var userDiv = document.createElement('div');
-  userDiv.className = 'ai-bubble user';
-  userDiv.textContent = msg;
-  chat.appendChild(userDiv);
-  chat.scrollTop = chat.scrollHeight;
-
-  var thinkDiv = document.createElement('div');
-  thinkDiv.className = 'ai-bubble bot';
-  thinkDiv.innerHTML = '<div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
-  chat.appendChild(thinkDiv);
-  chat.scrollTop = chat.scrollHeight;
-
-  AI_HISTORY_V4.push({ role: 'user', content: msg });
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 800,
-      system: 'You are Haramain AI, an expert Islamic pilgrimage guide on Pi Network. Help pilgrims with Hajj, Umrah, Islamic rituals, duas, and safety. Be concise, compassionate, scholarly. Respond in the user language.',
-      messages: AI_HISTORY_V4
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var reply = (d.content && d.content[0] && d.content[0].text) || getKBReply(msg);
-    AI_HISTORY_V4.push({ role: 'assistant', content: reply });
-    thinkDiv.innerHTML = '';
-    thinkDiv.textContent = reply;
-    chat.scrollTop = chat.scrollHeight;
-  })
-  .catch(function() {
-    thinkDiv.innerHTML = '';
-    thinkDiv.textContent = getKBReply(msg);
-    chat.scrollTop = chat.scrollHeight;
-  });
-
-  var inp = document.getElementById('ai-input');
-  if (inp) inp.value = '';
-}
-
-function getKBReply(msg) {
-  var lower = msg.toLowerCase();
-  for (var key in AI_KB) {
-    if (lower.indexOf(key) > -1) return String.fromCodePoint(0x1F54B) + ' ' + AI_KB[key];
-  }
-  return String.fromCodePoint(0x1F54B) + ' Bismillah! Ask me about: tawaf, ihram, Arafat, Mina, Umrah, Zamzam, duas, packing, safety, prayer, or zakat. May Allah bless your pilgrimage!';
-}
-
-function sendAIMessage() {
-  var inp = document.getElementById('ai-input');
-  if (!inp || !inp.value.trim()) return;
-  askAI(inp.value.trim());
-  inp.value = '';
-}
-
-function initAIScreen() {
-  var chat = document.getElementById('ai-chat');
-  if (!chat || chat.children.length > 0) return;
-  var welcome = document.createElement('div');
-  welcome.className = 'ai-bubble bot';
-  welcome.textContent = String.fromCodePoint(0x1F54B) + ' Bismillah! I am Haramain AI - your personal pilgrimage guide. Ask me anything about Hajj, Umrah, duas, or safety. How can I help?';
-  chat.appendChild(welcome);
-}
-
-/* ══ AUDIO DUAS ══ */
-var DUA_ITEMS = [
-  { n:'Talbiyah', t:'Labbayk Allahumma labbayk - Here I am O Allah', a:'\u0644\u064E\u0628\u064E\u0651\u064A\u0652\u0643\u064E \u0627\u0644\u0644\u0651\u064E\u0647\u064F\u0645\u064E\u0651' },
-  { n:'Entering Makkah', t:'Allahumma antassalam wa minkas-salam', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0623\u064E\u0646\u0652\u062A\u064E \u0627\u0644\u0633\u064E\u0651\u0644\u0627\u064E\u0645\u064F' },
-  { n:'Before Tawaf', t:'Bismillah Allahu Akbar', a:'\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0647\u0650 \u0627\u0644\u0644\u0647\u064F \u0623\u064E\u0643\u0652\u0628\u064E\u0631' },
-  { n:'Day of Arafat', t:'La ilaha illallah wahdahu la sharika lah', a:'\u0644\u064E\u0627 \u0625\u0650\u0644\u064E\u0647\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0627\u0644\u0644\u064E\u0651\u0647\u064F \u0648\u064E\u062D\u0652\u062F\u064E\u0647\u064F' },
-  { n:'At Safa and Marwa', t:'Innas-Safa wal-Marwata min shaairillah', a:'\u0625\u0650\u0646\u064E\u0651 \u0627\u0644\u0635\u064E\u0651\u0641\u064E\u0627 \u0648\u064E\u0627\u0644\u0652\u0645\u064E\u0631\u0652\u0648\u064E\u0629\u064E' },
-  { n:'Morning Dua', t:'Allahumma bika asbahna wa bika amsayna', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0628\u0650\u0643\u064E \u0623\u064E\u0635\u0652\u0628\u064E\u062D\u0652\u0646\u064E\u0627' },
-  { n:'After Zamzam', t:'Allahumma inni asaluka ilman nafian', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0625\u0650\u0646\u064E\u0651\u064A \u0623\u064E\u0633\u0652\u0623\u064E\u0644\u064F\u0643\u064E' },
-  { n:'Farewell Tawaf', t:'Allahumma hadhal baytu baytuk', a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0647\u064E\u0630\u064E\u0627 \u0627\u0644\u0652\u0628\u064E\u064A\u0652\u062A\u064F' },
-];
-var curDuaIdx = 0;
-
-function initAudioDuas() {
-  renderDuaPlayer();
-  renderDuaList();
-}
-
-function renderDuaPlayer() {
-  var dua = DUA_ITEMS[curDuaIdx];
-  if (!dua) return;
-  var nameEl = document.getElementById('audio-now-name');
-  var arabicEl = document.getElementById('audio-now-arabic');
-  var transEl = document.getElementById('audio-now-trans');
-  if (nameEl) nameEl.textContent = dua.n;
-  if (arabicEl) { arabicEl.textContent = dua.a; arabicEl.style.direction = 'rtl'; arabicEl.style.fontSize = '1.1rem'; arabicEl.style.color = 'var(--gold2)'; }
-  if (transEl) transEl.textContent = dua.t;
-}
-
-function renderDuaList() {
-  var list = document.getElementById('audio-dua-list');
-  if (!list) return;
-  list.innerHTML = DUA_ITEMS.map(function(d, i) {
-    var s = i === curDuaIdx ? 'background:var(--gdim);border-color:var(--gbrd);' : '';
-    return '<div style="display:flex;align-items:center;gap:.6rem;padding:.65rem;' + s + 'border-radius:var(--r2);margin-bottom:.3rem;cursor:pointer;border:1px solid var(--bd2);transition:all .15s" onclick="selectDuaItem(' + i + ')">' +
-      '<div style="font-size:1.1rem">' + (i === curDuaIdx ? '\uD83D\uDD0A' : '\uD83C\uDFB5') + '</div>' +
-      '<div style="flex:1">' +
-        '<div style="font-size:.65rem;font-weight:600;color:var(--t1)">' + d.n + '</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">' + d.t.substring(0,45) + '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-function selectDuaItem(idx) {
-  curDuaIdx = idx;
-  renderDuaPlayer();
-  renderDuaList();
-  speakDuaNow();
-}
-
-function speakDuaNow() {
-  var dua = DUA_ITEMS[curDuaIdx];
-  if (!dua) return;
-  if ('speechSynthesis' in window) {
-    speechSynthesis.cancel();
-    var utt = new SpeechSynthesisUtterance(dua.n + '. ' + dua.t);
-    utt.lang = 'en-US'; utt.rate = 0.8;
-    speechSynthesis.speak(utt);
-    if (typeof toast === 'function') toast('\uD83D\uDD0A ' + dua.n);
-    var btn = document.getElementById('audio-play-btn');
-    if (btn) btn.textContent = '\u23F8';
-  } else {
-    if (typeof toast === 'function') toast(dua.n + ': ' + dua.t);
-  }
-}
-
-function toggleAudioPlay() {
-  if ('speechSynthesis' in window) {
-    if (speechSynthesis.speaking && !speechSynthesis.paused) {
-      speechSynthesis.pause();
-      var btn = document.getElementById('audio-play-btn');
-      if (btn) btn.textContent = '\u25B6';
-    } else if (speechSynthesis.paused) {
-      speechSynthesis.resume();
-      var btn = document.getElementById('audio-play-btn');
-      if (btn) btn.textContent = '\u23F8';
-    } else { speakDuaNow(); }
-  }
-}
-
-function prevDua() { curDuaIdx = (curDuaIdx - 1 + DUA_ITEMS.length) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
-function nextDua() { curDuaIdx = (curDuaIdx + 1) % DUA_ITEMS.length; selectDuaItem(curDuaIdx); }
-
-/* ══ LEARNING CENTER ══ */
-var COURSES2 = {
-  hajj:      { t:'Complete Hajj Guide', i:'\u{1F54B}', l:[
-    { h:'What is Hajj?', b:'Hajj is the 5th pillar of Islam. Every able Muslim must perform it once. Takes place in Dhul Hijjah. It is the greatest act of worship.' },
-    { h:'Preparing for Hajj', b:'Physical: walking training, vaccination. Spiritual: repent, settle debts. Financial: save, get visa. Knowledge: learn rites, memorize duas.' },
-    { h:'Entering Ihram', b:'Men wear 2 white unstitched cloths. Women wear modest clothing. Enter at Miqat. Say intention and Talbiyah: Labbayk Allahumma labbayk.' },
-    { h:'Performing Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Begin at Black Stone. Men bare right shoulder first 3 rounds. Pray 2 rakahs at Maqam Ibrahim after.' },
-    { h:'Sai at Safa and Marwa', b:'7 trips between the two hills. Commemorates Hajars search for water. Start at Safa, end at Marwa. Total about 3.15km.' },
-    { h:'Day of Arafat', b:'The most important day of Hajj. Stand from Dhuhr to Maghrib in dua and dhikr. The Prophet said: Hajj is Arafat. Missing invalidates Hajj.' },
-    { h:'Muzdalifah Night', b:'Travel from Arafat after Maghrib. Pray combined Maghrib and Isha. Sleep under sky. Collect 49 pebbles for Jamarat. Leave for Mina after Fajr.' },
-    { h:'Stoning Jamarat', b:'Stone 3 Jamarat pillars. Day 1: Large Jamarat only (7 pebbles). Days 2-3: All 3 (7 each). Say Allahu Akbar with each throw.' },
-    { h:'Farewell Tawaf', b:'Last act before leaving Makkah. 7 rounds around Kaaba. Say farewell prayers and dua. Leave with gratitude and hope.' },
-  ]},
-  umrah: { t:'Umrah Step by Step', i:'\uD83C\uDF19', l:[
-    { h:'What is Umrah?', b:'Umrah is the lesser pilgrimage. Performable any time of year. Highly recommended Sunnah. Takes 2-4 hours to complete.' },
-    { h:'Entering Ihram', b:'Enter at Miqat for your direction. Ghusl (bath), wear Ihram. Say intention and Talbiyah. Avoid all Ihram prohibitions.' },
-    { h:'Tawaf', b:'7 counter-clockwise rounds around the Kaaba. Start and end at Black Stone. Recite duas. Pray 2 rakahs at Maqam Ibrahim after.' },
-    { h:'Sai', b:'7 trips between Safa and Marwa. Start at Safa. Make dua facing Kaaba at each hilltop. Total about 3.15km.' },
-    { h:'Shave or Trim', b:'After Sai: shave or trim hair. This exits the state of Ihram. Men shaving is more rewarding. Women trim one fingertip length only.' },
-  ]},
-  arabic: { t:'Essential Arabic Phrases', i:'\uD83C\uDF10', l:[
-    { h:'Greetings', b:'As-salamu alaykum = Peace be upon you. Wa alaykum as-salam = And upon you peace. Marhaba = Welcome. Kayfa halak = How are you.' },
-    { h:'At the Mosque', b:'Al-masjid = mosque. Al-Kaabah = the Kaaba. Salah = prayer. Wudu = ablution. Imam = prayer leader. Qiblah = direction of prayer.' },
-    { h:'Asking for Help', b:'Musaadah = Help! Ayna al-hammam = Where is the toilet? La afham = I do not understand. Hal tatakallam Inglizi = Do you speak English?' },
-    { h:'Emergencies', b:'Al-isaaf = Ambulance! Ana marid = I am sick. Itasil bil-isaaf = Call ambulance. Al-mustashfa ayna = Where is the hospital?' },
-    { h:'Islamic Phrases', b:'Bismillah = In the name of Allah. Alhamdulillah = All praise to Allah. Inshallah = If Allah wills. Allahu Akbar = Allah is Greatest.' },
-  ]},
-  etiquette: { t:'Mosque Etiquette', i:'\uD83D\uDD4C', l:[
-    { h:'Entering', b:'Enter with right foot. Say: Allahumma iftah li abwaba rahmatik. Remove shoes. Be in state of wudu. Be quiet and respectful.' },
-    { h:'Inside', b:'Pray 2 rakahs when entering. Keep voice low. Do not walk in front of praying person. Phone on silent. Face Qiblah when making dua.' },
-    { h:'Prayer Rows', b:'Stand shoulder to shoulder. Fill gaps from front. Follow imam exactly. Do not precede imam in any movement.' },
-    { h:'Leaving', b:'Leave with left foot. Say: Allahumma inni asaluka min fadlik. Give way to others. Leave peacefully and quietly.' },
-  ]},
-  history: { t:'Islamic History of Makkah', i:'\uD83D\uDCDC', l:[
-    { h:'Origin of Makkah', b:'Built by Prophet Ibrahim and his son Ismail. Ibrahim received divine command to build the Kaaba. Black Stone brought from Paradise by Angel Jibreel.' },
-    { h:'The Kaaba', b:'First house of worship built for mankind (Quran 3:96). Measures 13.1m x 11.03m x 13.1m. Kiswah cloth changed annually. Black Stone embedded in corner.' },
-    { h:'Zamzam Well', b:'Appeared miraculously for Ismail when Hajar searched for water. Over 3,500 years old. Produces 11-18.5 liters per second. Most blessed water.' },
-    { h:'Birth of Prophet Muhammad', b:'Born in Makkah 570 CE. Received first revelation in Cave Hira at age 40. Migrated to Madinah 622 CE. Returned 630 CE for Conquest of Makkah.' },
-  ]},
-};
-var curCId = null, curLIdx = 0;
-var lDone = JSON.parse(localStorage.getItem(K+'ld') || '{}');
-
-function startCourse(id) {
-  curCId = id;
-  curLIdx = lDone[id] || 0;
-  showLsn();
-}
-
-function showLsn() {
-  var c = COURSES2[curCId];
-  if (!c) return;
-  goS('learning');
-  var con = document.getElementById('lesson-container');
-  var lst = document.getElementById('lesson-list-wrap');
-  if (con) con.style.display = 'block';
-  if (lst) lst.style.display = 'none';
-  var l = c.l[curLIdx];
-  if (!l) { finishCrs(); return; }
-  var total = c.l.length;
-  var pct = Math.round(curLIdx/total*100);
-  if (!con) return;
-  con.innerHTML =
-    '<button class="back-btn" onclick="exitLsn()">\u2190 ' + c.t + '</button>' +
-    '<div class="card card-gold" style="margin-bottom:.7rem">' +
-      '<div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">' + c.i + ' Lesson ' + (curLIdx+1) + ' / ' + total + '</div>' +
-      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--t1);margin:.3rem 0">' + l.h + '</div>' +
-      '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
-    '</div>' +
-    '<div class="ibox" style="font-size:.72rem;color:var(--t1);line-height:1.8;margin-bottom:.7rem">' + l.b + '</div>' +
-    '<div style="display:flex;gap:.5rem">' +
-      (curLIdx > 0 ? '<button class="btn btn-ghost" onclick="prevLsn()" style="flex:1">\u2190 Back</button>' : '') +
-      (curLIdx < total-1 ?
-        '<button class="btn btn-gold" onclick="nextLsn()" style="flex:2">Next \u2192</button>' :
-        '<button class="btn btn-gold" onclick="finishCrs()" style="flex:2">\u2705 Complete!</button>'
-      ) +
-    '</div>';
-}
-
-function nextLsn() {
-  lDone[curCId] = curLIdx + 1;
-  localStorage.setItem(K+'ld', JSON.stringify(lDone));
-  if (typeof addPts === 'function') addPts(5, 'Lesson');
-  curLIdx++;
-  showLsn();
-}
-
-function prevLsn() { curLIdx = Math.max(0, curLIdx-1); showLsn(); }
-
-function finishCrs() {
-  var c = COURSES2[curCId];
-  lDone[curCId] = c ? c.l.length : 0;
-  localStorage.setItem(K+'ld', JSON.stringify(lDone));
-  if (typeof addPts === 'function') addPts(50, 'Course');
-  exitLsn();
-  if (typeof toast === 'function') toast('\uD83C\uDFC6 Course completed! +50 pts');
-  if (typeof addNotif === 'function') addNotif('\uD83C\uDFC6','Course Done!',(c?c.t:curCId),'now');
-  renderCourses();
-}
-
-function exitLsn() {
-  var con = document.getElementById('lesson-container');
-  var lst = document.getElementById('lesson-list-wrap');
-  if (con) con.style.display = 'none';
-  if (lst) lst.style.display = 'block';
-  renderCourses();
-}
-
-function renderCourses() {
-  var w = document.getElementById('lesson-list-wrap');
-  if (!w) return;
-  w.innerHTML = Object.keys(COURSES2).map(function(id) {
-    var c = COURSES2[id];
-    var d = lDone[id] || 0;
-    var tot = c.l.length;
-    var p = Math.round(d/tot*100);
-    var col = d >= tot ? 'var(--grn)' : (d > 0 ? 'var(--gold)' : 'var(--t3)');
-    var st = d >= tot ? '\u2705 Done' : (d > 0 ? d+'/'+tot+' lessons' : 'Start');
-    return '<div class="course-card" onclick="startCourse(\''+id+'\')">' +
-      '<div class="course-thumb">'+c.i+'</div>' +
-      '<div style="flex:1">' +
-        '<div class="course-title">'+c.t+'</div>' +
-        '<div class="course-meta">'+tot+' lessons</div>' +
-        '<div class="course-progress"><div class="course-fill" style="width:'+p+'%"></div></div>' +
-        '<div style="font-size:.48rem;color:'+col+';margin-top:.2rem">'+st+'</div>' +
-      '</div></div>';
-  }).join('');
-}
-
-/* ══ TRANSACTION RECEIPT ══ */
-function showReceipt(txText) {
-  var rid = 'TXN-' + Date.now().toString(36).toUpperCase();
-  var rdate = new Date().toLocaleString();
-  var ruser = (typeof user !== 'undefined' && user) ? '@'+user.username : '@pilgrim';
-  var rpid = (typeof myPilgrimId !== 'undefined' && myPilgrimId) ? myPilgrimId : 'HRM-00000';
-  var modal = document.createElement('div');
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:1rem;';
-  modal.id = 'receipt-modal';
-  var rtext = txText.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&apos;');
-  modal.innerHTML =
-    '<div style="background:var(--bg2);border:1px solid var(--gbrd);border-radius:var(--r4);padding:1.5rem;width:100%;max-width:300px;text-align:center">' +
-      '<div style="font-size:2.5rem;margin-bottom:.4rem">\uD83E\uDDFE</div>' +
-      '<div style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold2)">Transaction Receipt</div>' +
-      '<div style="font-family:monospace;font-size:.52rem;color:var(--t3);margin:.3rem 0 .8rem">'+rid+'</div>' +
-      '<div style="background:var(--bg3);border-radius:var(--r2);padding:.8rem;margin-bottom:.8rem;text-align:left">' +
-        '<div style="font-size:.65rem;font-weight:600;color:var(--t1);margin-bottom:.4rem">'+rtext+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCC5 '+rdate+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDC64 '+ruser+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83E\uDEAA '+rpid+'</div>' +
-        '<div style="font-size:.52rem;color:var(--t3)">\uD83D\uDCF1 HARAMAIN \u00B7 Pi Mainnet</div>' +
-      '</div>' +
-      '<div style="display:flex;gap:.4rem">' +
-        '<button class="btn btn-gold btn-sm" onclick="shareRcpt()" style="flex:1">\uD83D\uDCE4 Share</button>' +
-        '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'receipt-modal\').remove()" style="flex:1">\u2715 Close</button>' +
-      '</div>' +
-    '</div>';
-  document.body.appendChild(modal);
-  modal._data = { id:rid, text:txText, date:rdate, user:ruser, pid:rpid };
-  var recs = JSON.parse(localStorage.getItem(K+'receipts') || '[]');
-  recs.unshift({ id:rid, text:txText, date:rdate });
-  if (recs.length > 100) recs.pop();
-  localStorage.setItem(K+'receipts', JSON.stringify(recs));
-}
-
-function shareRcpt() {
-  var modal = document.getElementById('receipt-modal');
-  if (!modal || !modal._data) return;
-  var d = modal._data;
-  var text = 'HARAMAIN Receipt\n' + d.id + '\n' + d.text + '\n' + d.date + '\nharamain.pages.dev';
-  if (navigator.share) { navigator.share({ title: 'Haramain Receipt', text: text }); }
-  else { if (typeof copyClip === 'function') copyClip(text); if (typeof toast === 'function') toast('Receipt copied!'); }
-}
-
-/* ══ LIVE TRACKER ══ */
-var _tWatchId = null;
-
-function startTracker() {
-  if (!navigator.geolocation) { if (typeof toast === 'function') toast('GPS not available'); return; }
-  var btn = document.getElementById('tracker-start-btn');
-  if (btn) { btn.textContent = '\uD83D\uDCCD Tracking...'; btn.disabled = true; }
-  if (typeof toast === 'function') toast('\uD83D\uDCCD GPS started...');
-  _tWatchId = navigator.geolocation.watchPosition(
-    function(pos) {
-      var lat = pos.coords.latitude, lng = pos.coords.longitude;
-      var el = document.getElementById('tracker-coords');
-      if (el) el.textContent = lat.toFixed(5) + ', ' + lng.toFixed(5);
-      var zone = getHajjZone(lat, lng);
-      var zEl = document.getElementById('tracker-zone-badge');
-      if (zEl) zEl.textContent = zone;
-      var zi = document.getElementById('tracker-zone-info');
-      if (zi) zi.innerHTML = '<div style="font-size:.68rem;font-weight:600;color:var(--t1)">' + zone + '</div>';
-      updateMapSvgDot(lat, lng, 'tracker-dot', 'tracker-dot-inner');
-    },
-    function(err) {
-      var msgs = ['','Permission denied - enable GPS in browser','Position unavailable','GPS timeout'];
-      if (typeof toast === 'function') toast('GPS: ' + (msgs[err.code] || 'Error'));
-      var btn2 = document.getElementById('tracker-start-btn');
-      if (btn2) { btn2.textContent = '\uD83D\uDCCD Start Tracking'; btn2.disabled = false; }
-    },
-    { enableHighAccuracy: true, timeout: 15000 }
-  );
-}
-
-function stopTracker() {
-  if (_tWatchId !== null) { navigator.geolocation.clearWatch(_tWatchId); _tWatchId = null; }
-  var btn = document.getElementById('tracker-start-btn');
-  if (btn) { btn.textContent = '\uD83D\uDCCD Start Tracking'; btn.disabled = false; }
-  if (typeof toast === 'function') toast('\u23F9 Tracking stopped');
-}
-
-function getHajjZone(lat, lng) {
-  var zones = [
-    { n:'Masjid al-Haram', lat:21.4225, lng:39.8262, r:0.3 },
-    { n:'Mina', lat:21.4131, lng:39.8934, r:2.0 },
-    { n:'Arafat', lat:21.3547, lng:39.9842, r:3.0 },
-    { n:'Muzdalifah', lat:21.3833, lng:39.9367, r:2.5 },
-    { n:'Makkah', lat:21.4225, lng:39.8262, r:8.0 },
-  ];
-  for (var i=0; i<zones.length; i++) {
-    var z = zones[i];
-    var d = Math.sqrt(Math.pow((lat-z.lat)*111,2)+Math.pow((lng-z.lng)*111,2));
-    if (d <= z.r) return z.n;
-  }
-  return 'Outside Hajj Zones';
-}
-
-function updateMapSvgDot(lat, lng, dotId, innerId) {
-  var dot = document.getElementById(dotId);
-  var inner = document.getElementById(innerId);
-  if (!dot || !inner) return;
-  var x = Math.max(10, Math.min(330, 170 + (lng - 39.8262) * 800));
-  var y = Math.max(10, Math.min(210, 110 - (lat - 21.4225) * 800));
-  dot.setAttribute('cx', x); dot.setAttribute('cy', y);
-  inner.setAttribute('cx', x); inner.setAttribute('cy', y);
-}
-
-function shareTracker() {
-  var el = document.getElementById('tracker-coords');
-  var zEl = document.getElementById('tracker-zone-badge');
-  var msg = '\uD83D\uDCCD My Haramain Location\n' + (zEl ? zEl.textContent : '') + '\n' + (el ? el.textContent : '') + '\nharamain.pages.dev';
-  if (navigator.share) { navigator.share({ title:'My Location', text:msg }); }
-  else { if (typeof copyClip === 'function') copyClip(msg); if (typeof toast === 'function') toast('Location copied!'); }
-}
-
-/* ══ FAMILY HUB ══ */
-var famData = JSON.parse(localStorage.getItem(K+'fam2') || 'null') || { id:null, name:null };
-
-function createFamilyGroup() {
-  var name = ((typeof user !== 'undefined' && user) ? user.username : 'Pilgrim') + ' Family';
-  var id = 'GRP-' + Math.random().toString(36).substr(2,6).toUpperCase();
-  famData = { id:id, name:name };
-  localStorage.setItem(K+'fam2', JSON.stringify(famData));
-  var gn = document.getElementById('group-name');
-  var gi = document.getElementById('group-id');
-  if (gn) gn.textContent = name;
-  if (gi) gi.textContent = id;
-  if (typeof toast === 'function') toast('\u2705 Group created: ' + id);
-}
-
-function joinGroup() {
-  var code = prompt('Enter group code:');
-  if (!code) return;
-  famData.id = code;
-  famData.name = 'Group ' + code;
-  localStorage.setItem(K+'fam2', JSON.stringify(famData));
-  var gn = document.getElementById('group-name');
-  var gi = document.getElementById('group-id');
-  if (gn) gn.textContent = famData.name;
-  if (gi) gi.textContent = code;
-  if (typeof toast === 'function') toast('\u2705 Joined: ' + code);
-}
-
-function shareGroupCode() {
-  if (!famData.id) { createFamilyGroup(); return; }
-  var msg = 'Join my Haramain family group! Code: ' + famData.id + '\nharamain.pages.dev';
-  if (navigator.share) { navigator.share({ title:'Join my group', text:msg }); }
-  else { if (typeof copyClip === 'function') copyClip(famData.id); if (typeof toast === 'function') toast('Copied: ' + famData.id); }
-}
-
-function setMeetingPoint(p) {
-  localStorage.setItem(K+'mtg', p);
-  var el = document.getElementById('meeting-point');
-  if (el) el.textContent = '\uD83D\uDCCD ' + p;
-  if (typeof toast === 'function') toast('\u2705 Meeting: ' + p);
-}
-
-function sendCheckin(s) {
-  if (typeof addTx === 'function') addTx('\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 ' + s);
-  if (typeof toast === 'function') toast('\uD83D\uDCE4 ' + s);
-}
-
-/* ══ SMART MAP ══ */
-function initSmartMap() {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    var zone = getHajjZone(pos.coords.latitude, pos.coords.longitude);
-    if (typeof toast === 'function') toast('\uD83D\uDCCD You are in: ' + zone);
-    updateMapSvgDot(pos.coords.latitude, pos.coords.longitude, 'tracker-dot', 'tracker-dot-inner');
-  });
-}
-
-function filterMap(t) {
-  if (typeof toast === 'function') toast('Showing: ' + (t === 'all' ? 'All places' : t));
-}
-
-/* ══ SCREEN INIT ON NAVIGATE ══ */
-var __goSv4 = goS;
-goS = function(id, btn) {
-  __goSv4(id, btn);
-  setTimeout(function() {
-    if (id === 'audio') initAudioDuas();
-    if (id === 'learning') renderCourses();
-    if (id === 'family') {
-      if (famData.id) {
-        var gn = document.getElementById('group-name');
-        var gi = document.getElementById('group-id');
-        if (gn) gn.textContent = famData.name;
-        if (gi) gi.textContent = famData.id;
-      }
-    }
-    if (id === 'map') initSmartMap();
-    if (id === 'ai') initAIScreen();
-  }, 100);
-};
-
-/* ══ DOM READY SETUP ══ */
-document.addEventListener('DOMContentLoaded', function() {
-  /* Setup lesson container in learning screen */
-  var ls = document.getElementById('s-learning');
-  if (ls) {
-    if (!document.getElementById('lesson-container')) {
-      var c = document.createElement('div');
-      c.id = 'lesson-container';
-      c.style.display = 'none';
-      ls.appendChild(c);
-    }
-    if (!document.getElementById('lesson-list-wrap')) {
-      var w = document.createElement('div');
-      w.id = 'lesson-list-wrap';
-      ls.appendChild(w);
-    }
-  }
-  renderCourses();
-  initAudioDuas();
-
-  /* Load language preference */
-  var savedLang = localStorage.getItem(K+'lang');
-  if (savedLang && typeof setLang === 'function') {
-    setLang(savedLang);
-    var tbLang = document.getElementById('tb-lang');
-    if (tbLang) tbLang.textContent = savedLang.toUpperCase();
-    _langIdx2 = _langCodes2.indexOf(savedLang);
-  }
-
-  /* Load meeting point */
-  var mp = localStorage.getItem(K+'mtg');
-  if (mp) { var mpEl = document.getElementById('meeting-point'); if (mpEl) mpEl.textContent = '\uD83D\uDCCD ' + mp; }
-
-  /* Load family group */
-  if (famData.id) {
-    var gn = document.getElementById('group-name');
-    var gi = document.getElementById('group-id');
-    if (gn) gn.textContent = famData.name;
-    if (gi) gi.textContent = famData.id;
-  }
-});
-
-/* ══ OVERRIDE addTx FOR RECEIPT ══ */
-var __addTxV4 = typeof addTx === 'function' ? addTx : function(){};
-addTx = function(text) {
-  __addTxV4(text);
-  var isPayment = text.indexOf('\u03C0') > -1 || text.indexOf('Paid') > -1 || text.indexOf('Sent') > -1 || text.indexOf('Zakat') > -1 || text.indexOf('Qurbani') > -1 || text.indexOf('Sadaqah') > -1;
-  if (isPayment) {
-    setTimeout(function() { showReceipt(text); }, 1000);
-  }
-};
-
-
-/* === EXTRA FUNCTIONS === */
-var _transLang = 'ar';
-var _TRANS = {
-  ar:{name:'Arabic',phrases:{'Where is the toilet?':'اين الحمام؟','I need help':'احتاج مساعدة','Where is Masjid al-Haram?':'اين المسجد الحرام؟','I am lost, please help':'انا تائه، ساعدني','How much does this cost?':'كم سعر هذا؟'}},
-  ha:{name:'Hausa',phrases:{'Where is the toilet?':'Ina ne bandaki?','I need help':'Ina bukatar taimako','I am lost, please help':'Na bace, don Allah ka taimake ni','How much does this cost?':'Nawa ne wannan?'}},
-  ur:{name:'Urdu',phrases:{'Where is the toilet?':'باتھ روم کہاں ہے؟','I need help':'مجھے مدد چاہیے','I am lost, please help':'میں گم ہو گیا ہوں','How much does this cost?':'یہ کتنے کا ہے؟'}},
-  id:{name:'Bahasa',phrases:{'Where is the toilet?':'Di mana toiletnya?','I need help':'Saya butuh bantuan','I am lost, please help':'Saya tersesat, tolong bantu','How much does this cost?':'Berapa harganya?'}},
-  fr:{name:'French',phrases:{'Where is the toilet?':'Ou sont les toilettes?','I need help':'J ai besoin d aide','I am lost, please help':'Je suis perdu, aidez-moi','How much does this cost?':'Combien ca coute?'}},
-  en:{name:'English',phrases:{}},
-};
-function setTransLang(c){_transLang=c;if(typeof toast==='function')toast('Language: '+(_TRANS[c]?_TRANS[c].name:c));}
-function doTranslate(){
-  var inp=document.getElementById('trans-input');if(!inp||!inp.value.trim())return;
+function setTrLang(c){_trLang=c;var n=_trMap[c];if(typeof toast==='function')toast((n?n.n:c)+' selected');}
+function doTr(){
+  var inp=document.getElementById('tr-inp');if(!inp||!inp.value.trim())return;
   var txt=inp.value.trim();
-  var lang=_TRANS[_transLang];
-  var result=lang&&lang.phrases[txt]?lang.phrases[txt]:'['+(_transLang.toUpperCase())+'] '+txt;
-  var out=document.getElementById('trans-output');var res=document.getElementById('trans-result');var lbl=document.getElementById('trans-lang-lbl');
-  if(out)out.style.display='block';if(res){res.textContent=result;res.style.direction=(_transLang==='ar'||_transLang==='ur')?'rtl':'ltr';}if(lbl)lbl.textContent=(_TRANS[_transLang]?_TRANS[_transLang].name.toUpperCase():_transLang.toUpperCase());
+  var lang=_trMap[_trLang];
+  var result=lang&&lang.p[txt]?lang.p[txt]:'['+_trLang.toUpperCase()+'] '+txt;
+  var out=document.getElementById('tr-out'),res=document.getElementById('tr-res'),lbl=document.getElementById('tr-lbl');
+  if(out)out.style.display='block';
+  if(res){res.textContent=result;res.style.direction=(_trLang==='ar'||_trLang==='ur')?'rtl':'ltr';}
+  if(lbl&&lang)lbl.textContent=lang.n.toUpperCase();
 }
-function quickTranslate(p){var inp=document.getElementById('trans-input');if(inp)inp.value=p;doTranslate();}
-function speakTrans(){var res=document.getElementById('trans-result');if(!res||res.textContent==='--')return;if('speechSynthesis' in window){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(res.textContent);u.rate=0.82;speechSynthesis.speak(u);}else{if(typeof toast==='function')toast(res.textContent);}}
+function quickTr(p){var inp=document.getElementById('tr-inp');if(inp)inp.value=p;doTr();}
+function speakTr(){var res=document.getElementById('tr-res');if(!res||res.textContent==='--')return;if('speechSynthesis' in window){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(res.textContent);u.rate=0.82;speechSynthesis.speak(u);}else{if(typeof toast==='function')toast(res.textContent);}}
 
-var _docs=JSON.parse(localStorage.getItem(K+'docs')||'[]');
-var _DICONS={passport:'🛂',visa:'📋',hotel:'🏨',flight:'✈️',medical:'💉'};
-function showDocForm(){document.getElementById('doc-form').style.display='block';document.getElementById('doc-form').scrollIntoView({behavior:'smooth'});}
+/* Documents */
+var _docs5=JSON.parse(localStorage.getItem(K+'docs5')||'[]');
+var _DICONS5={passport:'??',visa:'??',hotel:'??',medical:'??'};
 function saveDoc(){
   var t=document.getElementById('doc-type'),n=document.getElementById('doc-title'),nt=document.getElementById('doc-notes');
   if(!n||!n.value.trim()){if(typeof toast==='function')toast('Enter a title');return;}
-  var doc={id:Date.now(),type:t.value,title:n.value.trim(),notes:nt.value.trim(),date:new Date().toLocaleDateString()};
-  _docs.push(doc);localStorage.setItem(K+'docs',JSON.stringify(_docs));
-  document.getElementById('doc-form').style.display='none';n.value='';nt.value='';
-  renderDocs();if(typeof toast==='function')toast('Document saved');
+  var doc={id:Date.now(),type:t?t.value:'other',title:n.value.trim(),notes:nt?nt.value.trim():'',date:new Date().toLocaleDateString()};
+  _docs5.push(doc);localStorage.setItem(K+'docs5',JSON.stringify(_docs5));
+  document.getElementById('doc-add').style.display='none';n.value='';if(nt)nt.value='';
+  renderDocs5();if(typeof toast==='function')toast('?? Saved');
 }
-function renderDocs(){
+function renderDocs5(){
   var el=document.getElementById('doc-list');if(!el)return;
-  if(!_docs.length){el.innerHTML='<div class="empty">No documents saved yet.</div>';return;}
-  el.innerHTML=_docs.map(function(d){
-    return '<div class="ibox" style="margin-bottom:.38rem;display:flex;align-items:center;gap:.6rem">'+
-      '<span style="font-size:1.3rem">'+(_DICONS[d.type]||'📄')+'</span>'+
-      '<div style="flex:1"><div style="font-size:.65rem;font-weight:600;color:var(--t1)">'+d.title+'</div>'+(d.notes?'<div style="font-size:.5rem;color:var(--t3)">'+d.notes+'</div>':'')+'</div>'+
-      '<button class="btn btn-red btn-sm" onclick="delDoc('+d.id+')">✕</button></div>';
+  if(!_docs5.length){el.innerHTML='<div class="empty"><span class="empty-icon">??</span>No documents saved yet</div>';return;}
+  el.innerHTML=_docs5.map(function(d){
+    return '<div class="ibox" style="margin-bottom:.38rem;display:flex;align-items:center;gap:.58rem">'+
+      '<span style="font-size:1.3rem">'+(_DICONS5[d.type]||'??')+'</span>'+
+      '<div style="flex:1"><div style="font-size:.64rem;font-weight:600;color:var(--t1)">'+d.title+'</div>'+(d.notes?'<div style="font-size:.49rem;color:var(--t3)">'+d.notes+'</div>':'')+'</div>'+
+      '<button class="btn btn-red btn-sm" onclick="_delDoc5('+d.id+')">✕</button></div>';
   }).join('');
 }
-function delDoc(id){_docs=_docs.filter(function(d){return d.id!==id;});localStorage.setItem(K+'docs',JSON.stringify(_docs));renderDocs();}
+function _delDoc5(id){_docs5=_docs5.filter(function(d){return d.id!==id;});localStorage.setItem(K+'docs5',JSON.stringify(_docs5));renderDocs5();}
 
-function showLfForm(mode){document.getElementById('lf-form').style.display='block';document.getElementById('lf-form-title').textContent=(mode==='lost'?'📢 Report Lost':'🤝 Report Found');document.getElementById('lf-form').setAttribute('data-mode',mode);}
+/* LF */
 function submitLfReport(){
-  var item=document.getElementById('lf-item').value.trim();if(!item){if(typeof toast==='function')toast('Describe the item');return;}
-  var mode=document.getElementById('lf-form').getAttribute('data-mode')||'lost';
+  var item=document.getElementById('lf-item');if(!item||!item.value.trim()){if(typeof toast==='function')toast('Describe item');return;}
+  var mode=document.getElementById('lf-form').getAttribute('data-m')||'lost';
   var listId=mode==='lost'?'lf-lost-list':'lf-found-list';
   var el=document.createElement('div');el.className='lf-item';
-  var badge=mode==='lost'?'lf-lost':'lf-found';var label=mode==='lost'?'LOST':'FOUND';
-  el.innerHTML='<div class="lf-badge '+badge+'">'+label+'</div><div class="lf-title">'+item+'</div>'+(document.getElementById('lf-desc').value?'<div class="lf-desc">'+document.getElementById('lf-desc').value+'</div>':'')+'<div style="font-size:.48rem;color:var(--t3)">Just now</div>';
-  document.getElementById(listId).insertBefore(el,document.getElementById(listId).firstChild);
-  document.getElementById('lf-form').style.display='none';document.getElementById('lf-item').value='';document.getElementById('lf-desc').value='';
-  if(typeof toast==='function')toast('Report submitted');
+  var badge=mode==='lost'?'lf-lost':'lf-found';var lbl=mode==='lost'?'LOST':'FOUND';
+  el.innerHTML='<div class="lf-badge '+badge+'">'+lbl+'</div>'+
+    '<div class="lf-title">'+item.value.trim()+'</div>'+
+    (document.getElementById('lf-desc')&&document.getElementById('lf-desc').value?'<div class="lf-desc">'+document.getElementById('lf-desc').value+'</div>':'')+
+    '<div style="font-size:.48rem;color:var(--t3)">Just now</div>';
+  var list=document.getElementById(listId);if(list)list.insertBefore(el,list.firstChild);
+  document.getElementById('lf-form').style.display='none';
+  item.value='';if(document.getElementById('lf-desc'))document.getElementById('lf-desc').value='';
+  if(typeof toast==='function')toast('✅ Report submitted');
 }
-function setCustomMeeting(){var p=prompt('Enter meeting location:');if(p)setMeetingPoint(p);}
 
+/* Override addTx for receipts */
+var __aTx5=typeof addTx==='function'?addTx:function(){};
+addTx=function(text){
+  __aTx5(text);
+  var isP=text.indexOf('π')>-1||text.indexOf('Paid')>-1||text.indexOf('Sent')>-1||text.indexOf('Zakat')>-1||text.indexOf('Qurbani')>-1||text.indexOf('Sadaqah')>-1;
+  if(isP)setTimeout(function(){showReceipt(text);},800);
+};
+
+/* GoS hooks */
+var __gS5=goS;
+goS=function(id,btn){
+  __gS5(id,btn);
+  setTimeout(function(){
+    if(id==='ai')_aiW5();
+    if(id==='audio'){initAudioDuas();_rdl5();}
+    if(id==='learning')renderCourses5();
+    if(id==='documents')renderDocs5();
+    if(id==='family'){
+      if(_fam5.id){var gn=document.getElementById('group-name');var gi=document.getElementById('group-id');if(gn)gn.textContent=_fam5.name;if(gi)gi.textContent=_fam5.id;}
+      var mp=localStorage.getItem(K+'mtg5');if(mp){var e=document.getElementById('meeting-point');if(e)e.textContent='?? '+mp;}
+    }
+  },80);
+};
+
+/* DOM ready */
 document.addEventListener('DOMContentLoaded',function(){
-  renderDocs();
-  if(typeof renderCourses==='function')renderCourses();
-  if(typeof initAudioDuas==='function')initAudioDuas();
+  renderCourses5();
+  initAudioDuas();
+  renderDocs5();
   var sl=localStorage.getItem(K+'lang');
-  if(sl){var tb=document.getElementById('tb-lang');if(tb)tb.textContent=sl.toUpperCase();}
-  /* Restore family */
-  if(typeof _fam!=='undefined'&&_fam&&_fam.id){
-    var gn=document.getElementById('group-name');var gi=document.getElementById('group-id');
-    if(gn)gn.textContent=_fam.name;if(gi)gi.textContent=_fam.id;
+  if(sl&&typeof setLang==='function'){
+    setLang(sl,null);
+    var hdrLang=document.getElementById('hdr-lang');if(hdrLang)hdrLang.value=sl;
   }
-  var mp=localStorage.getItem(K+'mtg4');if(mp){var e=document.getElementById('meeting-point');if(e)e.textContent='📍 '+mp;}
-  /* Splash */
-  setTimeout(function(){var sp=document.getElementById('splash');if(sp){sp.classList.add('out');setTimeout(function(){sp.style.display='none';},600);}},2000);
-  /* Premium */
-  if(localStorage.getItem(K+'prem')==='1'){var pb=document.getElementById('prem-btn');if(pb){pb.textContent='⭐ Pilgrim Pass Active';pb.disabled=true;}}
+  if(_fam5.id){var gn=document.getElementById('group-name');var gi=document.getElementById('group-id');if(gn)gn.textContent=_fam5.name;if(gi)gi.textContent=_fam5.id;}
+  var mp=localStorage.getItem(K+'mtg5');if(mp){var e=document.getElementById('meeting-point');if(e)e.textContent='?? '+mp;}
+  if(localStorage.getItem(K+'prem')==='1'){var pb=document.getElementById('prem-btn');if(pb){pb.textContent='⭐ Active';pb.style.opacity='.7';}}
+  var ob=document.getElementById('offline-badge');
+  if(ob){ob.style.display=navigator.onLine?'none':'block';window.addEventListener('online',function(){ob.style.display='none';});window.addEventListener('offline',function(){ob.style.display='block';});}
 });
 </script>
 
@@ -8818,3 +8030,4 @@ document.addEventListener('DOMContentLoaded',function(){
 
 </body>
 </html>
+
