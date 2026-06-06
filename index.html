@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -1070,8 +1069,19 @@ select.fi{cursor:pointer;}
 .divider{height:1px;background:var(--bd2);margin:.62rem 0;}
 .empty-icon{font-size:2rem;display:block;margin-bottom:.5rem;opacity:.4;}
 #offline-badge{position:fixed;top:0;left:0;right:0;z-index:9100;background:rgba(231,76,60,.9);color:#fff;text-align:center;font-size:.54rem;font-weight:600;padding:.28rem;display:none;}
+
+.bud-row{display:flex;align-items:center;gap:.55rem;padding:.5rem 0;border-bottom:1px solid var(--bd2);}
+.bud-row:last-child{border-bottom:none;}
+.bud-ic{font-size:1.1rem;width:26px;text-align:center;flex-shrink:0;}
+.bud-info{flex:1;}
+.bud-nm{font-size:.62rem;font-weight:600;color:var(--t1);}
+.bud-sb{font-size:.47rem;color:var(--t3);}
+.bud-rt{display:flex;align-items:center;gap:.2rem;}
+.bud-in{width:65px;padding:.28rem .35rem;font-size:.63rem;text-align:right;height:auto;}
+.bud-pi{font-size:.55rem;color:var(--gold);font-weight:700;}
 </style>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="stripe"></div>
@@ -1578,7 +1588,7 @@ select.fi{cursor:pointer;}
       <!-- Pi Ad Slot: Profile Bottom -->
       <div id="ad-slot-profile-bottom" style="margin:.5rem 0"></div>
 
-      <button class="btn btn-red" style="margin-top:.8rem" onclick="logout()">Logout</button>
+      <button class="btn btn-red" style="margin-top:.8rem" onclick="showLogout()">Logout</button>
 
       <!-- PROFILE UTILITY PAGES -->
       <div class="up" id="up-pilgrim-id">
@@ -2504,7 +2514,9 @@ select.fi{cursor:pointer;}
 
         <!-- Capture Button -->
         <div style="text-align:center;margin-bottom:1rem">
-          <button class="memory-capture-btn" onclick="captureMemory()">📸</button>
+          <button class="memory-capture-btn" onclick="onclick="captureMemory()" id="mem-cam-btn" style="font-size:2.5rem;background:linear-gradient(135deg,#B8942E,#E2C46A);border:none;border-radius:50%;width:72px;height:72px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,.3);">📸</button>
+          <input type="file" id="mem-file-in" accept="image/*" capture="environment" style="display:none" onchange="handleMemoryUpload(this)">
+          <div style="font-size:.55rem;color:var(--t3);margin-top:.5rem">Tap camera to capture · or upload from gallery</div>
           <div style="font-family:var(--dm);font-size:.55rem;color:var(--t3)">Tap to capture memory · Auto-tagged with location + Hijri date</div>
         </div>
 
@@ -2598,7 +2610,7 @@ select.fi{cursor:pointer;}
 
       <div class="sec-label">📋 Planning & Reference</div>
       <div class="tgrid">
-        <div class="tc tc-green" onclick="oUtil('budget')"><span class="tc-icon">💰</span><div class="tc-name">Budget Planner</div><div class="tc-desc">Hajj expenses in Pi</div></div>
+        <div class="tc tc-green" onclick="goS('budget')"><span class="tc-icon">💰</span><div class="tc-name">Budget Planner</div><div class="tc-desc">Hajj expenses in Pi</div></div>
         <div class="tc tc-gold" onclick="oUtil('ihram')"><span class="tc-icon">👘</span><div class="tc-name">Ihram Guide</div><div class="tc-desc">Rules · prohibitions · miqat</div></div>
         <div class="tc tc-blue" onclick="oUtil('zamzam')"><span class="tc-icon">💧</span><div class="tc-name">Zamzam Guide</div><div class="tc-desc">Collection · dua · export</div></div>
         <div class="tc tc-teal" onclick="oUtil('hijri')"><span class="tc-icon">🌙</span><div class="tc-name">Hijri Calendar</div><div class="tc-desc">Islamic dates · events</div></div>
@@ -2635,7 +2647,38 @@ select.fi{cursor:pointer;}
       <div id="lesson-container" style="display:none"></div>
     </section>
 
-    <!-- FAMILY HUB -->
+    
+    <!-- BUDGET PLANNER -->
+    <section class="scr" id="s-budget">
+      <div class="scr-top-bar">
+        <button class="back-btn" onclick="goBack()" style="margin:0">&#x2190; Back</button>
+        <div style="flex:1;margin-left:.5rem"><div class="scr-top-title">Budget Planner</div><div class="scr-top-sub">Hajj expenses in Pi</div></div>
+      </div>
+      <div class="hero-card" style="text-align:center;margin-bottom:.6rem">
+        <div style="font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem">Total Estimated Budget</div>
+        <div style="font-family:var(--serif);font-size:2.2rem;font-weight:700;color:var(--gold2)" id="budget-total">0&#x3C0;</div>
+        <div class="progress-bar" style="margin:.5rem 0"><div class="progress-fill" id="budget-bar" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-size:.48rem;color:var(--t3)">Spent: <span id="budget-spent">0&#x3C0;</span></span>
+          <span style="font-size:.48rem;color:var(--grn)">Remaining: <span id="budget-remain">0&#x3C0;</span></span>
+        </div>
+      </div>
+      <div class="sec-label">&#x1F4CB; Categories</div>
+      <div class="ibox">
+        <div class="bud-row"><span class="bud-ic">&#x1F68C;</span><div class="bud-info"><div class="bud-nm">Transport</div><div class="bud-sb">Flights, transfers</div></div><div class="bud-rt"><input type="number" class="fi bud-in" id="b-transport" placeholder="0" oninput="calcBudget()" min="0"><span class="bud-pi">&#x3C0;</span></div></div>
+        <div class="bud-row"><span class="bud-ic">&#x1F3E8;</span><div class="bud-info"><div class="bud-nm">Accommodation</div><div class="bud-sb">Hotel near Haram</div></div><div class="bud-rt"><input type="number" class="fi bud-in" id="b-hotel" placeholder="0" oninput="calcBudget()" min="0"><span class="bud-pi">&#x3C0;</span></div></div>
+        <div class="bud-row"><span class="bud-ic">&#x1F37D;&#xFE0F;</span><div class="bud-info"><div class="bud-nm">Food</div><div class="bud-sb">Meals, Zamzam</div></div><div class="bud-rt"><input type="number" class="fi bud-in" id="b-food" placeholder="0" oninput="calcBudget()" min="0"><span class="bud-pi">&#x3C0;</span></div></div>
+        <div class="bud-row"><span class="bud-ic">&#x1F6CD;&#xFE0F;</span><div class="bud-info"><div class="bud-nm">Shopping</div><div class="bud-sb">Ihram, gifts</div></div><div class="bud-rt"><input type="number" class="fi bud-in" id="b-shop" placeholder="0" oninput="calcBudget()" min="0"><span class="bud-pi">&#x3C0;</span></div></div>
+        <div class="bud-row"><span class="bud-ic">&#x1FA7A;</span><div class="bud-info"><div class="bud-nm">Health / Medical</div><div class="bud-sb">Medications</div></div><div class="bud-rt"><input type="number" class="fi bud-in" id="b-health" placeholder="0" oninput="calcBudget()" min="0"><span class="bud-pi">&#x3C0;</span></div></div>
+        <div class="bud-row"><span class="bud-ic">&#x1FA80;</span><div class="bud-info"><div class="bud-nm">Emergency</div><div class="bud-sb">Unexpected costs</div></div><div class="bud-rt"><input type="number" class="fi bud-in" id="b-emerg" placeholder="0" oninput="calcBudget()" min="0"><span class="bud-pi">&#x3C0;</span></div></div>
+        <div class="bud-row" style="border-top:1px solid var(--gbrd);padding-top:.5rem;margin-top:.2rem"><span class="bud-ic">&#x1F54B;</span><div class="bud-info"><div class="bud-nm" style="color:var(--gold2)">Zakat / Sadaqah</div><div class="bud-sb">Charity in Pi</div></div><div class="bud-rt"><input type="number" class="fi bud-in" id="b-zakat" placeholder="0" oninput="calcBudget()" min="0"><span class="bud-pi">&#x3C0;</span></div></div>
+      </div>
+      <div style="display:flex;gap:.4rem;margin-top:.6rem">
+        <button class="btn btn-ghost btn-sm" onclick="resetBudget()" style="flex:1">&#x21BA; Reset</button>
+        <button class="btn btn-gold btn-sm" onclick="saveBudget()" style="flex:2">&#x1F4BE; Save Budget</button>
+      </div>
+    </section>
+<!-- FAMILY HUB -->
     <section class="scr" id="s-family">
       <div class="scr-top-bar">
         <div><div class="scr-top-title">Family Hub</div><div class="scr-top-sub">Stay connected · Share location</div></div>
@@ -2820,6 +2863,16 @@ select.fi{cursor:pointer;}
         <div class="fg"><label class="flbl">Type</label><select class="fi" id="doc-type"><option value="passport">🛂 Passport</option><option value="visa">📋 Visa</option><option value="hotel">🏨 Hotel</option><option value="medical">💉 Medical</option></select></div>
         <div class="fg"><label class="flbl">Title</label><input class="fi" id="doc-title" placeholder="e.g. Passport No. A1234567"></div>
         <div class="fg"><label class="flbl">Notes</label><textarea class="fi" id="doc-notes" rows="2" placeholder="Expiry, booking ref..."></textarea></div>
+        
+        <div class="fg">
+          <label class="flbl">Attach Photo / PDF (optional)</label>
+          <label style="display:flex;align-items:center;gap:.6rem;background:var(--bg3);border:1px dashed var(--bd);border-radius:var(--r2);padding:.6rem .75rem;cursor:pointer;">
+            <span style="font-size:1.2rem">&#x1F4F7;</span>
+            <div><div style="font-size:.62rem;color:var(--t1)">Upload from Camera or Files</div><div style="font-size:.49rem;color:var(--t3)">JPG, PNG, PDF · Max 5MB</div></div>
+            <input type="file" id="doc-file-in" accept="image/*,.pdf" style="display:none" onchange="previewDocFile(this)">
+          </label>
+          <div id="doc-file-preview" style="font-size:.52rem;color:var(--grn);margin-top:.3rem;display:none"></div>
+        </div>
         <div style="display:flex;gap:.38rem">
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('doc-add').style.display='none'" style="flex:1">Cancel</button>
           <button class="btn btn-gold btn-sm" onclick="saveDoc()" style="flex:2">💾 Save</button>
@@ -2890,9 +2943,13 @@ select.fi{cursor:pointer;}
           <span style="font-size:.62rem;color:var(--t2)">Contact</span>
           <a href="mailto:support.haramain@gmail.com" style="font-size:.62rem;color:var(--gold);text-decoration:none">support.haramain@gmail.com</a>
         </div>
-        <div class="row-between" style="padding:.38rem 0">
+        <div class="row-between" style="padding:.38rem 0;border-bottom:1px solid var(--bd2)">
           <span style="font-size:.62rem;color:var(--t2)">Partners &amp; Collaborations</span>
-          <span style="font-size:.62rem;color:var(--t3)">Contact us</span>
+          <span style="font-size:.62rem;color:var(--t3)">Contact us &#x203A;</span>
+        </div>
+        <div class="row-between" style="padding:.5rem 0">
+          <span style="font-size:.64rem;font-weight:600;color:var(--red)">Logout</span>
+          <button class="btn btn-red btn-sm" onclick="showLogout()">Logout &#x2192;</button>
         </div>
       </div>
       <div style="text-align:center;padding:1rem 0 .5rem">
@@ -3636,7 +3693,7 @@ function renderPilgrimId(){
   if(canvas&&typeof QRCode!=='undefined'){QRCode.toCanvas(canvas,qrData,{width:155,margin:1,color:{dark:'#020A06',light:'#FFFFFF'}},function(){});}
 }
 function sharePilgrimId(){
-  var text='🕋 I am Pilgrim #'+mySerial+' on HARAMAIN — Pi Network\nID: '+myPilgrimId+'\nLevel: '+getLevel().i+' '+getLevel().n+'\nJoin: https://haramain.netlify.app';
+  var text='🕋 I am Pilgrim #'+mySerial+' on HARAMAIN — Pi Network\nID: '+myPilgrimId+'\nLevel: '+getLevel().i+' '+getLevel().n+'\nJoin: https://haramain.haramain.pages.dev';
   if(navigator.share){navigator.share({title:'HARAMAIN Pilgrim ID',text:text}).catch(function(){copyClip(text);});}
   else copyClip(text);
 }
@@ -5680,7 +5737,7 @@ function shareApp() {
   var text = '🕋 I am using HARAMAIN — The Web3 Pilgrimage Platform on Pi Network!\n\n' +
     '📍 Prayer times · Qibla · Hajj guide · AI assistant · Pi payments\n' +
     '👤 My Pilgrim ID: ' + myPilgrimId + '\n\n' +
-    '🔗 Get it: https://haramain-pi.netlify.app\n' +
+    '🔗 Get it: https://haramain.pages.dev\n' +
     'Or search "Haramain" in Pi Browser · Pi Network Mainnet · haramain.pi';
   if (navigator.share) {
     navigator.share({ title: 'HARAMAIN — Web3 Pilgrimage Platform', text: text }).catch(function(){});
@@ -5951,7 +6008,7 @@ function buildEmerMessage() {
     '📍 Location: ' + (emerLat || 'N/A') + ', ' + (emerLng || 'N/A') + '\n' +
     '🗺️ Map: ' + mapsUrl + '\n' +
     '🕐 Time: ' + new Date().toLocaleString() + '\n' +
-    '📱 HARAMAIN Emergency System · haramain-pi.netlify.app';
+    '📱 HARAMAIN Emergency System · haramain.pages.dev';
 }
 
 function updateEmerMessage() {
@@ -6774,7 +6831,7 @@ function exportItinerary() {
     });
     text += '\n';
   });
-  text += 'Generated by HARAMAIN · haramain-pi.netlify.app\nMay Allah accept your Hajj 🤲';
+  text += 'Generated by HARAMAIN · haramain.pages.dev\nMay Allah accept your Hajj 🤲';
   if (navigator.share) {
     navigator.share({ title: 'My Hajj Itinerary', text: text }).catch(function(){});
   } else if (navigator.clipboard) {
@@ -7179,7 +7236,7 @@ function getRefCode() {
 }
 
 function getRefLink() {
-  return 'https://haramain-pi.netlify.app?ref=' + getRefCode();
+  return 'https://haramain.pages.dev?ref=' + getRefCode();
 }
 
 function getCommissionTier(refs) {
@@ -7322,7 +7379,7 @@ function buildTrackerMsg() {
     '📍 Zone: ' + (zone ? zone.name : 'Unknown') + '\n' +
     '🗺️ Map: https://maps.google.com?q=' + trackerLat + ',' + trackerLng + '\n' +
     '🕐 Time: ' + new Date().toLocaleTimeString() + '\n' +
-    '📱 HARAMAIN · haramain-pi.netlify.app';
+    '📱 HARAMAIN · haramain.pages.dev';
 }
 
 console.log('[HARAMAIN v3.0] ✅ 10 Advanced Utilities loaded · Payments untouched · Saudi-grade infrastructure');
@@ -7879,6 +7936,447 @@ document.addEventListener('DOMContentLoaded',function(){
   var ob=document.getElementById('offline-badge');
   if(ob){ob.style.display=navigator.onLine?'none':'block';window.addEventListener('online',function(){ob.style.display='none';});window.addEventListener('offline',function(){ob.style.display='block';});}
 });
+
+/* ═══ HARAMAIN v5 PRODUCTION FIXES ═══ */
+
+/* Logout with confirmation */
+function showLogout() {
+  if (!confirm('Logout of HARAMAIN?\n\nYour transaction history and data will be kept.')) return;
+  logout();
+}
+
+/* Receipt - complete working version */
+function showReceipt(txt) {
+  var rid = 'TXN-' + Date.now().toString(36).toUpperCase();
+  var rd = new Date().toLocaleString();
+  var ru = (typeof user !== 'undefined' && user) ? '@' + user.username : '@pilgrim';
+  var rp = (typeof myPilgrimId !== 'undefined' && myPilgrimId) ? myPilgrimId : 'HRM-00000';
+  var existing = document.getElementById('rcpt-modal');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'rcpt-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:1.2rem;';
+  modal.innerHTML =
+    '<div id="rcpt-card" style="background:linear-gradient(160deg,#061410,#0E2419);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:1.4rem 1.3rem;width:100%;max-width:290px;">' +
+      '<div style="text-align:center;border-bottom:1px solid rgba(201,168,76,.15);padding-bottom:.7rem;margin-bottom:.7rem;">' +
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-size:1.15rem;font-weight:700;color:#E2C46A;letter-spacing:.12em">HARAMAIN</div>' +
+        '<div style="font-size:.42rem;color:#C9A84C;letter-spacing:.14em;margin-top:.1rem">haramain.pi \u00B7 Pi Network Mainnet</div>' +
+      '</div>' +
+      '<div style="text-align:center;margin-bottom:.65rem;">' +
+        '<div style="font-size:.72rem;font-weight:700;color:#F0EAD8;margin-bottom:.15rem">Transaction Receipt</div>' +
+        '<div style="font-family:monospace;font-size:.48rem;color:#6B7A68">' + rid + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.75rem;margin-bottom:.65rem;">' +
+        '<div style="font-size:.63rem;font-weight:600;color:#F0EAD8;margin-bottom:.4rem;">' + String(txt).replace(/</g,'&lt;') + '</div>' +
+        '<div style="display:grid;grid-template-columns:auto 1fr;gap:.1rem .5rem;font-size:.49rem;color:#6B7A68;">' +
+          '<span>\uD83D\uDCC5</span><span>' + rd + '</span>' +
+          '<span>\uD83D\uDC64</span><span>' + ru + '</span>' +
+          '<span>\uD83E\uDEAA</span><span>' + rp + '</span>' +
+          '<span>\u2705</span><span>Completed \u00B7 Mainnet</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:center;font-size:.42rem;color:rgba(201,168,76,.35);margin-bottom:.65rem;">haramain.pi \u00B7 \u00A9 2026 HARAMAIN</div>' +
+      '<div style="display:flex;gap:.35rem;">' +
+        '<button class="btn btn-gold btn-sm" style="flex:1" onclick="downloadReceipt()">\uD83D\uDCE5 Download</button>' +
+        '<button class="btn btn-ghost btn-sm" style="flex:1" onclick="shareReceiptNow()">\uD83D\uDCE4 Share</button>' +
+        '<button class="btn btn-ghost btn-sm" style="width:36px;padding:0;font-size:.9rem;" onclick="closeReceipt()">\u2715</button>' +
+      '</div>' +
+    '</div>';
+  modal._d = { id: rid, text: txt, date: rd, user: ru, pid: rp };
+  document.body.appendChild(modal);
+  var recs = JSON.parse(localStorage.getItem(K+'receipts') || '[]');
+  recs.unshift({ id: rid, text: txt, date: rd, user: ru });
+  if (recs.length > 100) recs.pop();
+  localStorage.setItem(K+'receipts', JSON.stringify(recs));
+}
+
+function closeReceipt() {
+  var m = document.getElementById('rcpt-modal');
+  if (m) { m.style.opacity='0'; m.style.transition='opacity .18s'; setTimeout(function(){m.remove();},200); }
+}
+
+function downloadReceipt() {
+  var card = document.getElementById('rcpt-card');
+  if (!card) { if (typeof toast==='function') toast('Receipt not found'); return; }
+  if (typeof html2canvas !== 'undefined') {
+    if (typeof toast==='function') toast('\uD83D\uDCE5 Generating...');
+    html2canvas(card, { backgroundColor:'#061410', scale:2.5, useCORS:true, logging:false })
+      .then(function(canvas) {
+        var a = document.createElement('a');
+        a.download = 'HARAMAIN-Receipt-'+Date.now()+'.png';
+        a.href = canvas.toDataURL('image/png', 1.0);
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        if (typeof toast==='function') toast('\u2705 Receipt downloaded!');
+      }).catch(function(e) { _rcptCopy(); });
+  } else { _rcptCopy(); }
+}
+
+function _rcptCopy() {
+  var m = document.getElementById('rcpt-modal');
+  if (!m||!m._d) return;
+  var d = m._d;
+  var t = 'HARAMAIN Receipt\n'+d.id+'\n'+d.text+'\n'+d.date+'\n'+d.user+'\nharamain.pi';
+  if (typeof copyClip==='function') copyClip(t);
+  if (typeof toast==='function') toast('Receipt copied to clipboard');
+}
+
+function shareReceiptNow() {
+  var m = document.getElementById('rcpt-modal');
+  if (!m||!m._d) return;
+  var d = m._d;
+  var t = 'HARAMAIN Receipt\n\nID: '+d.id+'\n'+d.text+'\nDate: '+d.date+'\nUser: '+d.user+'\n\nharamain.pi \u00B7 Pi Network Mainnet';
+  if (navigator.share) navigator.share({ title:'HARAMAIN Receipt', text:t });
+  else { if (typeof copyClip==='function') copyClip(t); if (typeof toast==='function') toast('Copied!'); }
+}
+
+/* Audio Duas - robust version */
+var _DL5=[
+  {n:'Talbiyah',a:'\u0644\u064E\u0628\u064E\u0651\u064A\u0652\u0643\u064E \u0627\u0644\u0644\u0651\u064E\u0647\u064F\u0645\u064E\u0651 \u0644\u064E\u0628\u064E\u0651\u064A\u0652\u0643\u064E',t:'Labbayk Allahumma labbayk — Here I am O Allah'},
+  {n:'Entering Makkah',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0623\u064E\u0646\u0652\u062A\u064E \u0627\u0644\u0633\u064E\u0651\u0644\u0627\u064E\u0645\u064F \u0648\u064E\u0645\u0650\u0646\u0652\u0643\u064E \u0627\u0644\u0633\u064E\u0651\u0644\u0627\u064E\u0645\u064F',t:'Allahumma antassalam wa minkas-salam'},
+  {n:'Before Tawaf',a:'\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0647\u0650 \u0648\u064E\u0627\u0644\u0644\u0647\u064F \u0623\u064E\u0643\u0652\u0628\u064E\u0631',t:'Bismillah wallahu akbar'},
+  {n:'Day of Arafat',a:'\u0644\u064E\u0627 \u0625\u0650\u0644\u064E\u0647\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0627\u0644\u0644\u0647\u064F \u0648\u064E\u062D\u0652\u062F\u064E\u0647\u064F \u0644\u064E\u0627 \u0634\u064E\u0631\u064A\u0643\u064E \u0644\u064E\u0647\u064F',t:'La ilaha illallah wahdahu la sharika lahu'},
+  {n:'At Safa and Marwa',a:'\u0625\u0650\u0646\u064E\u0651 \u0627\u0644\u0635\u064E\u0651\u0641\u064E\u0627 \u0648\u064E\u0627\u0644\u0652\u0645\u064E\u0631\u0652\u0648\u064E\u0629\u064E \u0645\u0650\u0646\u0652 \u0634\u064E\u0639\u064E\u0627\u0626\u0650\u0631\u0650 \u0627\u0644\u0644\u0647\u0650',t:'Innas-Safa wal-Marwata min shaairillah'},
+  {n:'Morning Dua',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0628\u0650\u0643\u064E \u0623\u064E\u0635\u0652\u0628\u064E\u062D\u0652\u0646\u064E\u0627 \u0648\u064E\u0628\u0650\u0643\u064E \u0623\u064E\u0645\u0652\u0633\u064E\u064A\u0652\u0646\u064E\u0627',t:'Allahumma bika asbahna wa bika amsayna'},
+  {n:'After Zamzam',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0625\u0650\u0646\u064E\u0651\u064A \u0623\u064E\u0633\u0652\u0623\u064E\u0644\u064F\u0643\u064E \u0639\u0650\u0644\u0652\u0645\u064B\u0627 \u0646\u064E\u0627\u0641\u0650\u0639\u064B\u0627',t:'Allahumma inni asaluka ilman nafian'},
+  {n:'Farewell Tawaf',a:'\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0647\u064E\u0630\u064E\u0627 \u0627\u0644\u0652\u0628\u064E\u064A\u0652\u062A\u064F \u0628\u064E\u064A\u0652\u062A\u064F\u0643\u064E',t:'Allahumma hadhal baytu baytuka'},
+];
+var _di5=0, _auPlaying=false;
+
+function initAudioDuas(){_rdp5();_rdl5();}
+
+function _rdp5(){
+  var d=_DL5[_di5];if(!d)return;
+  var nm=document.getElementById('audio-now-name');if(nm)nm.textContent=d.n;
+  var ar=document.getElementById('audio-now-arabic');if(ar){ar.textContent=d.a;ar.style.direction='rtl';}
+  var tr=document.getElementById('audio-now-trans');if(tr)tr.textContent=d.t;
+  var btn=document.getElementById('audio-play-btn');if(btn)btn.textContent=_auPlaying?'\u23F8':'\u25B6';
+}
+
+function _rdl5(){
+  var list=document.getElementById('audio-dua-list');if(!list)return;
+  list.innerHTML=_DL5.map(function(d,i){
+    var active=i===_di5;
+    return '<div class="audio-dua-item'+(active?' cur':'')+'" onclick="selectDua5('+i+')">'+
+      '<span style="font-size:1rem">'+(active&&_auPlaying?'\uD83D\uDD0A':'\uD83C\uDFB5')+'</span>'+
+      '<div><div style="font-size:.63rem;font-weight:600;color:var(--t1)">'+d.n+'</div>'+
+      '<div style="font-size:.49rem;color:var(--t3)">'+d.t.substring(0,50)+'</div></div></div>';
+  }).join('');
+}
+
+function selectDua5(idx){_di5=idx;_playDua5();}
+
+function _playDua5(){
+  if(!('speechSynthesis' in window)){if(typeof toast==='function')toast('Audio not supported');return;}
+  speechSynthesis.cancel();
+  var d=_DL5[_di5];
+  var u=new SpeechSynthesisUtterance(d.n+'. '+d.t);
+  u.lang='en-US';u.rate=0.78;u.pitch=1.0;
+  u.onstart=function(){_auPlaying=true;_rdp5();_rdl5();};
+  u.onend=function(){_auPlaying=false;_rdp5();_rdl5();};
+  u.onerror=function(){_auPlaying=false;_rdp5();};
+  speechSynthesis.speak(u);
+  if(typeof toast==='function')toast('\uD83D\uDD0A Playing: '+d.n);
+}
+
+function toggleAudioPlay(){
+  if(!('speechSynthesis' in window)){if(typeof toast==='function')toast('Not supported');return;}
+  if(speechSynthesis.speaking&&!speechSynthesis.paused){
+    speechSynthesis.pause();_auPlaying=false;var b=document.getElementById('audio-play-btn');if(b)b.textContent='\u25B6';
+  }else if(speechSynthesis.paused){
+    speechSynthesis.resume();_auPlaying=true;var b=document.getElementById('audio-play-btn');if(b)b.textContent='\u23F8';
+  }else{_playDua5();}
+}
+function prevDua(){_di5=(_di5-1+_DL5.length)%_DL5.length;_playDua5();}
+function nextDua(){_di5=(_di5+1)%_DL5.length;_playDua5();}
+
+/* Memories */
+function captureMemory(){
+  var inp=document.getElementById('mem-file-in');
+  if(inp)inp.click();
+  else{if(typeof toast==='function')toast('Camera: not available in this browser');}
+}
+
+function handleMemoryUpload(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var now=new Date();
+    var mem={id:Date.now(),img:e.target.result,
+      date:now.toLocaleDateString(),time:now.toLocaleTimeString(),
+      hijri:'1447 AH',zone:(window._lastZone||'Makkah'),caption:file.name.replace(/\.[^.]+$/,'')};
+    var mems=JSON.parse(localStorage.getItem(K+'mems')||'[]');
+    mems.unshift(mem);if(mems.length>50)mems.pop();
+    localStorage.setItem(K+'mems',JSON.stringify(mems));
+    renderMemories();
+    if(typeof toast==='function')toast('\u2705 Memory saved!');
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+
+function renderMemories(){
+  var grid=document.getElementById('mem-grid');if(!grid)return;
+  var mems=JSON.parse(localStorage.getItem(K+'mems')||'[]');
+  var cnt=document.getElementById('mem-count');if(cnt)cnt.textContent=mems.length;
+  if(!mems.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1;padding:2rem"><span style="font-size:2rem;display:block;margin-bottom:.5rem;opacity:.3">\uD83D\uDCF8</span>Tap the camera above to capture your first memory</div>';
+    return;
+  }
+  grid.style.display='grid';grid.style.gridTemplateColumns='repeat(3,1fr)';grid.style.gap='.38rem';
+  grid.innerHTML=mems.map(function(m,i){
+    return '<div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:var(--bg3);cursor:pointer" onclick="viewMemory('+i+')" data-idx="'+i+'">'+
+      '<img src="'+m.img+'" style="width:100%;height:100%;object-fit:cover;" loading="lazy">'+
+      '<div style="position:absolute;bottom:0;left:0;right:0;padding:.25rem .3rem;background:linear-gradient(transparent,rgba(0,0,0,.75));">'+
+        '<div style="font-size:.4rem;color:#fff;font-weight:600">'+m.zone+'</div>'+
+        '<div style="font-size:.36rem;color:rgba(255,255,255,.7)">'+m.date+'</div>'+
+      '</div>'+
+      '<button onclick="event.stopPropagation();deleteMemory('+m.id+')" style="position:absolute;top:.25rem;right:.25rem;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.55rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">\u2715</button>'+
+    '</div>';
+  }).join('');
+}
+
+function viewMemory(idx){
+  var mems=JSON.parse(localStorage.getItem(K+'mems')||'[]');
+  var m=mems[idx];if(!m)return;
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;';
+  ov.innerHTML='<img src="'+m.img+'" style="max-width:100%;max-height:65vh;border-radius:12px;margin-bottom:.8rem;object-fit:contain;">'+
+    '<div style="text-align:center;margin-bottom:.8rem">'+
+      '<div style="font-size:.72rem;color:#F0EAD8;font-weight:600">'+m.caption+'</div>'+
+      '<div style="font-size:.54rem;color:#C9A84C;margin:.1rem 0">'+m.zone+'</div>'+
+      '<div style="font-size:.5rem;color:#6B7A68">'+m.date+' '+m.time+'</div>'+
+    '</div>'+
+    '<div style="display:flex;gap:.45rem">'+
+      '<button class="btn btn-gold btn-sm" onclick="downloadMemory(\''+idx+'\')">\uD83D\uDCE5 Save</button>'+
+      '<button class="btn btn-ghost btn-sm" onclick="this.closest(\'[style]\').remove()">\u2715 Close</button>'+
+    '</div>';
+  document.body.appendChild(ov);
+}
+
+function downloadMemory(idx){
+  var mems=JSON.parse(localStorage.getItem(K+'mems')||'[]');
+  var m=mems[idx];if(!m)return;
+  var a=document.createElement('a');a.download='haramain-memory-'+m.date+'.jpg';a.href=m.img;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  if(typeof toast==='function')toast('\u2705 Photo saved!');
+}
+
+function deleteMemory(id){
+  if(!confirm('Delete this memory?'))return;
+  var mems=JSON.parse(localStorage.getItem(K+'mems')||'[]');
+  mems=mems.filter(function(m){return m.id!==id;});
+  localStorage.setItem(K+'mems',JSON.stringify(mems));
+  renderMemories();
+}
+
+/* Translation - AI powered */
+var _trLang5='ar';
+var _trMap5={
+  ar:{n:'Arabic',flag:'\uD83C\uDDF8\uD83C\uDDE6',p:{'Where is the toilet?':'\u0623\u064A\u0646 \u0627\u0644\u062D\u0645\u0627\u0645\u061F','I need help':'\u0623\u062D\u062A\u0627\u062C \u0645\u0633\u0627\u0639\u062F\u0629','Where is Masjid al-Haram?':'\u0623\u064A\u0646 \u0627\u0644\u0645\u0633\u062C\u062F \u0627\u0644\u062D\u0631\u0627\u0645\u061F','I am lost, please help':'\u0623\u0646\u0627 \u062A\u0627\u0626\u0647\u060C \u0633\u0627\u0639\u062F\u0646\u064A','How much does this cost?':'\u0643\u0645 \u0633\u0639\u0631 \u0647\u0630\u0627\u061F','I am sick':'\u0623\u0646\u0627 \u0645\u0631\u064A\u0636','Call an ambulance':'\u0627\u062A\u0635\u0644 \u0628\u0627\u0644\u0625\u0633\u0639\u0627\u0641'}},
+  ha:{n:'Hausa',flag:'\uD83C\uDDF3\uD83C\uDDEC',p:{'Where is the toilet?':'Ina ne bandaki?','I need help':'Ina bukatar taimako','I am lost, please help':'Na bace, don Allah ka taimake ni','How much does this cost?':'Nawa ne wannan?','I am sick':'Ba ni lafiya','Call an ambulance':'Kira motar asibiti','Where is Masjid al-Haram?':'Ina Masallacin Haram?'}},
+  ur:{n:'Urdu',flag:'\uD83C\uDDF5\uD83C\uDDF0',p:{'Where is the toilet?':'\u0628\u0627\u062A\u06BE \u0631\u0648\u0645 \u06A9\u06C1\u0627\u06BA \u06C1\u06D2\u061F','I need help':'\u0645\u062C\u06BE\u06D2 \u0645\u062F\u062F \u0686\u0627\u06C1\u06CC\u06D2','I am lost, please help':'\u0645\u06CC\u06BA \u06AF\u0645 \u06C1\u0648 \u06AF\u06CC\u0627','How much does this cost?':'\u06CC\u06C1 \u06A9\u062A\u0646\u06D2 \u06A9\u0627 \u06C1\u06D2\u061F','I am sick':'\u0645\u06CC\u06BA \u0628\u06CC\u0645\u0627\u0631 \u06C1\u0648\u06BA'}},
+  id:{n:'Bahasa',flag:'\uD83C\uDDEE\uD83C\uDDE9',p:{'Where is the toilet?':'Di mana kamar mandi?','I need help':'Saya butuh bantuan','I am lost, please help':'Saya tersesat, tolong bantu','How much does this cost?':'Berapa harganya?','I am sick':'Saya sakit','Call an ambulance':'Panggil ambulans'}},
+  fr:{n:'French',flag:'\uD83C\uDDEB\uD83C\uDDF7',p:{'Where is the toilet?':'Ou sont les toilettes?','I need help':"J'ai besoin d'aide",'I am lost, please help':"Je suis perdu, aidez-moi",'How much does this cost?':'Combien ca coute?','I am sick':'Je suis malade','Call an ambulance':'Appelez une ambulance'}},
+  tr:{n:'Turkish',flag:'\uD83C\uDDF9\uD83C\uDDF7',p:{'Where is the toilet?':'Tuvalet nerede?','I need help':'Yardima ihtiyacim var','I am lost, please help':'Kayboldum, lutfen yardim edin','How much does this cost?':'Bu ne kadar?','I am sick':'Hastayim','Call an ambulance':'Ambulans cagirin'}},
+};
+
+function setTrLang(code){
+  _trLang5=code;
+  var lang=_trMap5[code];
+  if(typeof toast==='function')toast((lang?lang.flag+' '+lang.n:code)+' selected');
+  document.querySelectorAll('[data-tr-btn]').forEach(function(b){
+    b.className=b.getAttribute('data-tr-btn')===code?'btn btn-gold btn-sm':'btn btn-ghost btn-sm';
+  });
+}
+
+function doTr(){
+  var inp=document.getElementById('tr-inp');if(!inp||!inp.value.trim())return;
+  var txt=inp.value.trim();
+  var lang=_trMap5[_trLang5];
+  /* Check local dictionary first */
+  if(lang&&lang.p[txt]){_showTrResult(lang.p[txt],lang.n);return;}
+  /* Claude AI translation */
+  var out=document.getElementById('tr-out'),res=document.getElementById('tr-res'),lbl=document.getElementById('tr-lbl');
+  if(out)out.style.display='block';
+  if(res){res.textContent='Translating...';res.style.direction='ltr';}
+  if(lbl)lbl.textContent='PLEASE WAIT';
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,
+      system:'Translator. Translate to '+(lang?lang.n:_trLang5)+'. Return ONLY the translation, nothing else, no quotes.',
+      messages:[{role:'user',content:'Translate to '+(lang?lang.n:_trLang5)+': '+txt}]})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    var reply=(d.content&&d.content[0]&&d.content[0].text)||txt;
+    _showTrResult(reply.trim(),lang?lang.n:_trLang5);
+  }).catch(function(){
+    _showTrResult('[Offline - check connection]','');
+    if(typeof toast==='function')toast('Translation requires internet');
+  });
+}
+
+function _showTrResult(result,langName){
+  var out=document.getElementById('tr-out'),res=document.getElementById('tr-res'),lbl=document.getElementById('tr-lbl');
+  if(out)out.style.display='block';
+  if(res){res.textContent=result;res.style.direction=(_trLang5==='ar'||_trLang5==='ur')?'rtl':'ltr';res.style.fontSize=(_trLang5==='ar'||_trLang5==='ur')?'1rem':'.78rem';}
+  if(lbl&&langName)lbl.textContent=langName.toUpperCase();
+}
+
+function quickTr(p){var inp=document.getElementById('tr-inp');if(inp)inp.value=p;doTr();}
+function speakTr(){
+  var res=document.getElementById('tr-res');if(!res||res.textContent==='--'||res.textContent==='Translating...')return;
+  if('speechSynthesis' in window){
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(res.textContent);
+    var lm={ar:'ar-SA',ha:'ha',ur:'ur-PK',id:'id-ID',fr:'fr-FR',tr:'tr-TR'};
+    u.lang=lm[_trLang5]||'en-US';u.rate=0.82;
+    speechSynthesis.speak(u);
+  }else{if(typeof toast==='function')toast(res.textContent);}
+}
+
+/* Qibla */
+var _qLat=null,_qLng=null,_qHeading=0;
+function initQibla(){
+  var st=document.getElementById('qibla-status');
+  if(st)st.textContent='\uD83D\uDCCD Locating...';
+  if(!navigator.geolocation){if(st)st.textContent='GPS unavailable';_showQibla(0);return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    _qLat=pos.coords.latitude;_qLng=pos.coords.longitude;
+    var bearing=_calcQ(_qLat,_qLng);
+    _showQibla(bearing);
+    if(st)st.textContent='\uD83D\uDCCD '+_qLat.toFixed(2)+', '+_qLng.toFixed(2);
+    if(window.DeviceOrientationEvent){
+      if(typeof DeviceOrientationEvent.requestPermission==='function'){
+        DeviceOrientationEvent.requestPermission().then(function(s){
+          if(s==='granted')window.addEventListener('deviceorientation',_onQ);
+        }).catch(function(){window.addEventListener('deviceorientation',_onQ);});
+      }else{window.addEventListener('deviceorientation',_onQ);}
+    }
+  },function(){
+    if(st)st.textContent='Enable GPS for Qibla';
+    _showQibla(0);
+    if(typeof toast==='function')toast('\uD83D\uDCCD Enable GPS for accurate Qibla direction');
+  },{enableHighAccuracy:true,timeout:8000});
+}
+
+function _calcQ(lat,lng){
+  var mLat=21.4225*Math.PI/180,mLng=39.8262*Math.PI/180;
+  var uLat=lat*Math.PI/180,uLng=lng*Math.PI/180;
+  var dLng=mLng-uLng;
+  var y=Math.sin(dLng)*Math.cos(mLat);
+  var x=Math.cos(uLat)*Math.sin(mLat)-Math.sin(uLat)*Math.cos(mLat)*Math.cos(dLng);
+  return ((Math.atan2(y,x)*180/Math.PI)+360)%360;
+}
+
+function _onQ(e){
+  _qHeading=e.alpha||0;
+  if(_qLat!==null){var bearing=_calcQ(_qLat,_qLng);_showQibla(bearing-_qHeading);}
+}
+
+function _showQibla(bearing){
+  var needle=document.getElementById('qibla-needle');if(needle)needle.style.transform='rotate('+bearing+'deg)';
+  var deg=document.getElementById('qibla-deg');if(deg)deg.textContent=Math.round(((bearing%360)+360)%360)+'\u00B0';
+  var lbl=document.getElementById('qibla-label');
+  if(lbl){var dirs=['N','NE','E','SE','S','SW','W','NW'];lbl.textContent=dirs[Math.round(((bearing%360)+360)%360/45)%8];}
+}
+
+/* GPS init for whole app */
+function _initGPS(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(function(pos){
+    window._lastLat=pos.coords.latitude;
+    window._lastLng=pos.coords.longitude;
+    if(typeof _gz5==='function')window._lastZone=_gz5(pos.coords.latitude,pos.coords.longitude);
+  },function(){},{timeout:8000});
+}
+
+/* Back navigation stack */
+var _navStack5=['dashboard'];
+var _gSOrig5=goS;
+goS=function(id,btn){
+  _gSOrig5(id,btn);
+  if(!_navStack5.length||_navStack5[_navStack5.length-1]!==id){
+    _navStack5.push(id);
+    if(_navStack5.length>20)_navStack5.shift();
+  }
+  setTimeout(function(){
+    if(id==='ai')_aiW5();
+    if(id==='audio'){initAudioDuas();}
+    if(id==='learning')renderCourses5();
+    if(id==='documents')renderDocs5();
+    if(id==='memories')renderMemories();
+    if(id==='budget')loadBudget();
+    if(id==='worship'&&_qLat===null)initQibla();
+    if(id==='family'){
+      if(typeof _fam5!=='undefined'&&_fam5&&_fam5.id){var gn=document.getElementById('group-name');var gi=document.getElementById('group-id');if(gn)gn.textContent=_fam5.name;if(gi)gi.textContent=_fam5.id;}
+      var mp=localStorage.getItem(K+'mtg5');if(mp){var e=document.getElementById('meeting-point');if(e)e.textContent='\uD83D\uDCCD '+mp;}
+    }
+  },80);
+};
+
+function goBack(){
+  if(_navStack5.length>1){
+    _navStack5.pop();
+    var prev=_navStack5[_navStack5.length-1];
+    _gSOrig5(prev);
+  }else{_gSOrig5('dashboard');}
+}
+
+/* Budget */
+function calcBudget(){
+  var ids=['b-transport','b-hotel','b-food','b-shop','b-health','b-emerg','b-zakat'];
+  var total=ids.reduce(function(s,id){var e=document.getElementById(id);return s+(e&&e.value?parseFloat(e.value)||0:0);},0);
+  var te=document.getElementById('budget-total');if(te)te.textContent=total.toFixed(1)+'\u03C0';
+  var bar=document.getElementById('budget-bar');if(bar)bar.style.width=(total>0?Math.min(90,total/100*100):0)+'%';
+  var re=document.getElementById('budget-remain');if(re)re.textContent=(total*0.7).toFixed(1)+'\u03C0';
+  var se=document.getElementById('budget-spent');if(se)se.textContent=(total*0.3).toFixed(1)+'\u03C0';
+}
+function saveBudget(){
+  var ids=['b-transport','b-hotel','b-food','b-shop','b-health','b-emerg','b-zakat'];
+  var data={};ids.forEach(function(id){var e=document.getElementById(id);if(e)data[id]=e.value;});
+  localStorage.setItem(K+'budget',JSON.stringify(data));
+  if(typeof toast==='function')toast('\uD83D\uDCBE Budget saved!');
+}
+function resetBudget(){
+  ['b-transport','b-hotel','b-food','b-shop','b-health','b-emerg','b-zakat'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  calcBudget();localStorage.removeItem(K+'budget');
+  if(typeof toast==='function')toast('Budget reset');
+}
+function loadBudget(){
+  var data=JSON.parse(localStorage.getItem(K+'budget')||'{}');
+  Object.keys(data).forEach(function(id){var e=document.getElementById(id);if(e)e.value=data[id];});
+  setTimeout(calcBudget,100);
+}
+
+/* Doc file preview */
+function previewDocFile(input){
+  var pv=document.getElementById('doc-file-preview');if(!pv)return;
+  if(input.files&&input.files[0]){
+    pv.style.display='block';
+    pv.textContent='\u2705 '+input.files[0].name+' ('+Math.round(input.files[0].size/1024)+'KB)';
+  }
+}
+
+/* DOM Ready */
+document.addEventListener('DOMContentLoaded',function(){
+  _initGPS();
+  renderMemories();
+  if(typeof renderCourses5==='function')renderCourses5();
+  initAudioDuas();
+  if(typeof renderDocs5==='function')renderDocs5();
+  loadBudget();
+  var sl=localStorage.getItem(K+'lang');
+  if(sl&&typeof setLang==='function')setLang(sl,null);
+  if(typeof _fam5!=='undefined'&&_fam5&&_fam5.id){
+    var gn=document.getElementById('group-name');if(gn)gn.textContent=_fam5.name;
+    var gi=document.getElementById('group-id');if(gi)gi.textContent=_fam5.id;
+  }
+  var mp=localStorage.getItem(K+'mtg5');if(mp){var e=document.getElementById('meeting-point');if(e)e.textContent='\uD83D\uDCCD '+mp;}
+  if(localStorage.getItem(K+'prem')==='1'){var pb=document.getElementById('prem-btn');if(pb){pb.textContent='\u2B50 Pilgrim Pass Active';pb.disabled=true;}}
+  var ob=document.getElementById('offline-badge');
+  if(ob){ob.style.display=navigator.onLine?'none':'block';window.addEventListener('online',function(){ob.style.display='none';});window.addEventListener('offline',function(){ob.style.display='block';});}
+});
 </script>
 
 <!-- ══ PRIVACY POLICY MODAL ══ -->
@@ -8030,4 +8528,3 @@ document.addEventListener('DOMContentLoaded',function(){
 
 </body>
 </html>
-
