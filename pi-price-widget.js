@@ -4,7 +4,14 @@
 (function () {
   'use strict';
   if (window.PiPrice) return;
-  var S = { d: null, mounts: [], busy: false, last: 0 };
+  var S = { d: null, mounts: [], busy: false, last: 0, fx: null };
+  var CURS = [['NGN','₦','Nigerian naira'],['PKR','Rs ','Pakistani rupee'],['INR','₹','Indian rupee'],['IDR','Rp ','Indonesian rupiah'],['BDT','৳','Bangladeshi taka'],['EGP','E£','Egyptian pound'],['TRY','₺','Turkish lira'],['MYR','RM ','Malaysian ringgit'],['GBP','£','British pound'],['EUR','€','Euro'],['AED','AED ','UAE dirham'],['XOF','CFA ','West African CFA'],['GHS','GH₵','Ghanaian cedi'],['MAD','MAD ','Moroccan dirham']];
+  var LKEY = 'pi_price_local_v1';
+  function local() { try { return localStorage.getItem(LKEY) || 'NGN'; } catch (e) { return 'NGN'; } }
+  function localVal(d) { var c = local(); if (!d) return null; if (S.fx && S.fx[c] && d.sar) return d.sar * S.fx[c]; if (c === 'NGN') return d.ngn; return null; }
+  function lsym(c) { var x = CURS.filter(function (k) { return k[0] === c; })[0]; return x ? x[1] : c + ' '; }
+  function loadFx() { if (S.fx !== null) return; S.fx = false; fetch('/fx').then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok && d.rates) { S.fx = d.rates; paintAll(); } }).catch(function () {}); }
+  window.hmSetLocal = function (c) { try { localStorage.setItem(LKEY, c); } catch (e) {} paintAll(); var w = document.querySelector('.pp-wrap'); if (w) { w.remove(); open(S.lastOpt || {}); } };
   var KEY = 'pi_price_last_v1';
   try { S.d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (S.d) S.d.stale = true; } catch (e) {}
 
@@ -19,6 +26,7 @@
     '.pp-sheet{width:100%;max-width:480px;background:#fff;color:#13202B;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));font-family:inherit;box-sizing:border-box}' +
     '.pp-sheet h3{margin:0 0 4px;font-size:18px}.pp-big{font-size:34px;font-weight:800;letter-spacing:-.02em}' +
     '.pp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.pp-grid div{background:#F4F6F9;border-radius:12px;padding:10px;text-align:center}.pp-grid b{display:block;font-size:15px}.pp-grid small{font-size:11.5px;color:#6B7A88}' +
+    '.pp-fx{font-size:13.5px;font-weight:700;color:#13202B}.pp-pick{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13.5px;font-weight:700;margin:4px 0 10px}.pp-pick select{font:inherit;font-size:13.5px;padding:7px 8px;border-radius:10px;border:1px solid rgba(15,30,40,.15);background:#fff;max-width:60%}.pp-calc{display:flex;align-items:center;gap:10px;background:#F4F6F9;border-radius:12px;padding:10px}.pp-calc input{width:90px;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:1px solid rgba(15,30,40,.15)}.pp-calc span{font-size:13.5px}' +
     '.pp-note{font-size:12px;color:#6B7A88;line-height:1.5;margin-top:10px}.pp-x{display:block;width:100%;margin-top:14px;padding:12px;border-radius:14px;border:1px solid rgba(15,30,40,.15);background:none;font:inherit;font-weight:700;color:inherit;cursor:pointer}';
   document.head.appendChild(css);
 
@@ -40,7 +48,9 @@
     if (o.style === 'chip') { m.el.innerHTML = '<button type="button" class="pp-chip" aria-label="Pi price"><span style="color:' + o.accent + '">π</span> ' + (v ? sym(cur) + fmt(v, dec(v)) : '…') + change(d) + '</button>'; }
     else {
       m.el.innerHTML = '<button type="button" class="pp-card" aria-label="Pi price, tap for details"><span class="pp-pi" style="background:' + o.accent + '">π</span><span class="pp-main"><span class="pp-l">Pi price · live</span><br>' +
-        '<span class="pp-v">' + (v ? sym(cur) + fmt(v, dec(v)) : (S.busy ? 'Loading…' : 'Unavailable')) + '</span>' + change(d) + '<br><span class="pp-sub">' + (d ? (d.stale ? 'Last known · ' : 'Updated ') + ago(d.updated) : 'Checking exchanges…') + '</span></span>' +
+        '<span class="pp-v">' + (v ? sym(cur) + fmt(v, dec(v)) : (S.busy ? 'Loading…' : 'Unavailable')) + '</span>' + change(d) + '<br>' +
+        (d && d.sar ? '<span class="pp-fx">' + (cur !== 'SAR' ? fmt(d.sar, dec(d.sar)) + ' SAR' : '$' + fmt(d.usd, dec(d.usd))) + (localVal(d) ? ' · ' + lsym(local()) + fmt(localVal(d), dec(localVal(d))) : '') + '</span><br>' : '') +
+        '<span class="pp-sub">' + (d ? (d.stale ? 'Last known · ' : 'Updated ') + ago(d.updated) : 'Checking exchanges…') + '</span></span>' +
         (d && d.spark ? spark(d.spark, 64, 30, (d.change24h || 0) >= 0 ? '#0E8A55' : '#C0392B') : '') + '</button>';
     }
     m.el.firstChild.onclick = function () { open(o); };
@@ -48,11 +58,13 @@
   function paintAll() { S.mounts = S.mounts.filter(function (m) { return document.body.contains(m.el); }); S.mounts.forEach(paint); }
 
   function open(o) {
-    var d = S.d, w = document.createElement('div'); w.className = 'pp-wrap';
+    S.lastOpt = o; var d = S.d, w = document.createElement('div'); w.className = 'pp-wrap';
     w.innerHTML = '<div class="pp-sheet" role="dialog" aria-label="Pi price"><h3>Pi (PI) price</h3>' +
       (d ? '<div><span class="pp-big">$' + fmt(d.usd, dec(d.usd)) + '</span>' + change(d) + '</div>' +
         '<div style="margin-top:8px">' + spark(d.spark, 300, 64, o.accent) + '<div class="pp-sub">Last 7 days</div></div>' +
-        '<div class="pp-grid"><div><b>$' + fmt(d.usd, dec(d.usd)) + '</b><small>US dollar</small></div><div><b>' + fmt(d.sar, dec(d.sar)) + '</b><small>Saudi riyal</small></div><div><b>' + (d.ngn ? '₦' + fmt(d.ngn, 2) : '—') + '</b><small>Nigerian naira</small></div></div>' +
+        '<div class="pp-grid"><div><b>$' + fmt(d.usd, dec(d.usd)) + '</b><small>US dollar</small></div><div><b>' + fmt(d.sar, dec(d.sar)) + '</b><small>Saudi riyal</small></div><div><b>' + (localVal(d) ? lsym(local()) + fmt(localVal(d), dec(localVal(d))) : '—') + '</b><small>' + local() + '</small></div></div>' +
+        '<label class="pp-pick">My currency <select onchange="hmSetLocal(this.value)">' + CURS.filter(function (c) { return (S.fx && S.fx[c[0]]) || c[0] === 'NGN'; }).map(function (c) { return '<option value="' + c[0] + '"' + (c[0] === local() ? ' selected' : '') + '>' + c[0] + ' · ' + c[2] + '</option>'; }).join('') + '</select></label>' +
+        '<div class="pp-calc"><input type="number" inputmode="decimal" value="100" min="0" oninput="var a=+this.value||0;this.nextElementSibling.innerHTML=a+\' π = <b>\'+(a*' + d.sar + ').toFixed(2)+\' SAR</b> · $\'+(a*' + d.usd + ').toFixed(2)' + (localVal(d) ? '+\' · ' + lsym(local()) + '\'+Math.round(a*' + localVal(d) + ').toLocaleString()' : '') + '"><span>100 π = <b>' + (100 * d.sar).toFixed(2) + ' SAR</b> · $' + (100 * d.usd).toFixed(2) + (localVal(d) ? ' · ' + lsym(local()) + Math.round(100 * localVal(d)).toLocaleString() : '') + '</span></div>' +
         '<div class="pp-note">Source: ' + (d.source || 'exchange data') + ' · ' + (d.stale ? 'last known price, ' : 'updated ') + ago(d.updated) + '.<br>Prices come from public market data (OKX first, then CoinGecko). They change all the time and are for information only, not financial advice.</div>'
         : '<div class="pp-note">The price could not be loaded right now. Please try again in a moment.</div>') +
       '<button type="button" class="pp-x">Close</button></div>';
@@ -72,7 +84,7 @@
   }
 
   window.PiPrice = {
-    mount: function (el, o) { if (!el) return; o = o || {}; o.accent = o.accent || '#0E7A52'; var m = { el: el, o: o }; S.mounts.push(m); paint(m); load(); },
+    mount: function (el, o) { if (!el) return; o = o || {}; loadFx(); o.accent = o.accent || '#0E7A52'; var m = { el: el, o: o }; S.mounts.push(m); paint(m); load(); },
     get: function () { return S.d; },
     refresh: function () { S.last = 0; load(); }
   };

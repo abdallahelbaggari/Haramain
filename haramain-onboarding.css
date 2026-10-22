@@ -41,3 +41,4 @@ html.hob-on,html.hob-on body{overflow:hidden}
 @media (max-height:700px){.hob-media{height:58%}.hob-txt h2{font-size:30px}.hob-txt p{font-size:15px;margin-top:8px}.hob-bars{margin:14px 0 12px}}
 @media (min-width:521px){#hob{background:#05291D}}
 .hob-full{display:none}#hob.last .hob-full{display:inline}
+.hob-legal a{color:rgba(255,255,255,.85);text-decoration:underline}

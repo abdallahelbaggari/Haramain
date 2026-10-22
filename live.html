@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Live location · Haramain</title><meta name="theme-color" content="#0E7A52"><link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{color-scheme:light}*{box-sizing:border-box}
+body{margin:0;background:#F6F4EE;color:#13261E;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;min-height:100vh}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;box-shadow:inset 0 -3px 0 #0E7A52}
+header img{width:36px;height:36px;border-radius:10px}header b{font-size:18px;letter-spacing:.06em;color:#0E7A52}
+#map{flex:1;min-height:55vh}
+.panel{background:#fff;padding:16px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -8px 20px -12px rgba(0,0,0,.25)}
+h1{margin:0;font-size:20px}.muted{color:#5E6B63;font-size:14px;margin:4px 0 12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#0E8A55;margin-right:6px;box-shadow:0 0 0 4px rgba(14,138,85,.18)}
+.dot.off{background:#9AA6A0;box-shadow:none}
+a.btn{display:block;text-align:center;padding:13px;border-radius:14px;background:#0E7A52;color:#fff;font-weight:800;text-decoration:none}
+.end{padding:28px 16px;text-align:center}
+</style></head>
+<body>
+<header><img src="icons/icon-192.png" alt=""><b>HARAMAIN</b></header>
+<div id="map"></div>
+<div class="panel" id="panel"><h1>Loading location…</h1></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function () {
+  var id = new URLSearchParams(location.search).get('id') || '', map, mk, circ, first = true;
+  var panel = document.getElementById('panel');
+  function esc(s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function ago(ts) { var s = Math.max(0, (Date.now() - ts) / 1000); return s < 60 ? 'just now' : s < 3600 ? Math.round(s / 60) + ' min ago' : Math.round(s / 3600) + ' h ago'; }
+  if (window.L) {
+    map = L.map('map', { zoomControl: true }).setView([21.4225, 39.8262], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+  }
+  function load() {
+    fetch('/live?id=' + encodeURIComponent(id), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok || !d.active) {
+        panel.innerHTML = '<div class="end"><h1>Location sharing has ended</h1><p class="muted">The person stopped sharing, or the link is older than 12 hours.</p></div>'; return;
+      }
+      if (d.lat == null) { panel.innerHTML = '<h1>' + esc(d.name) + '</h1><p class="muted">Waiting for the first location…</p>'; return; }
+      var ll = [d.lat, d.lng], fresh = Date.now() - d.ts < 180000;
+      if (map) {
+        if (!mk) { mk = L.circleMarker(ll, { radius: 10, color: '#fff', weight: 3, fillColor: '#0E7A52', fillOpacity: 1 }).addTo(map); circ = L.circle(ll, { radius: d.acc || 20, color: '#0E7A52', weight: 1, fillOpacity: .12 }).addTo(map); }
+        mk.setLatLng(ll); circ.setLatLng(ll).setRadius(d.acc || 20);
+        if (first) { map.setView(ll, 17); first = false; }
+      }
+      panel.innerHTML = '<h1><span class="dot' + (fresh ? '' : ' off') + '"></span>' + esc(d.name) + '</h1>' +
+        '<p class="muted">Updated ' + ago(d.ts) + (d.acc ? ' · accurate to about ' + Math.round(d.acc) + ' m' : '') + (fresh ? '' : ' · the phone may be offline or the app closed') + '</p>' +
+        '<a class="btn" href="https://www.google.com/maps/dir/?api=1&destination=' + d.lat + ',' + d.lng + '" target="_blank" rel="noopener">Get directions</a>';
+    }).catch(function () { panel.innerHTML = '<h1>Connection problem</h1><p class="muted">Trying again…</p>'; });
+  }
+  load(); setInterval(load, 15000);
+})();
+</script>
+</body></html>

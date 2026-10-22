@@ -1087,8 +1087,12 @@ select.fi{cursor:pointer;}
 </style>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link rel="stylesheet" href="haramain-pro.css?v=5">
-<link rel="stylesheet" href="haramain-onboarding.css?v=2">
+<link rel="stylesheet" href="haramain-pro.css?v=7">
+<link rel="stylesheet" href="haramain-onboarding.css?v=3">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
 <div class="stripe"></div>
@@ -1162,8 +1166,8 @@ select.fi{cursor:pointer;}
   <div class="landing-footer">
     <div class="lf-powered">haramain.pi</div>
     <div class="lf-links">
-      <span class="lf-link" onclick="openModal('modal-privacy')">Privacy Policy</span>
-      <span class="lf-link" onclick="openModal('modal-terms')">Terms of Service</span>
+      <a class="lf-link" href="/privacy-policy">Privacy Policy</a>
+      <a class="lf-link" href="/terms-of-service">Terms of Service</a>
       <span class="lf-link" onclick="openModal('modal-about')">About</span>
     </div>
   </div>
@@ -1191,7 +1195,7 @@ select.fi{cursor:pointer;}
   <!-- Header -->
   <header id="hdr">
     <div class="hdr-l">
-      <div class="hdr-logo">HARAMAIN</div>
+      <div class="hdr-logo"><img src="logo.svg" alt="" class="hdr-mark">HARAMAIN</div>
       
     </div>
     <div class="hdr-r">
@@ -1550,6 +1554,7 @@ select.fi{cursor:pointer;}
       <div class="sh"><div class="sh-t">Transaction History</div><div class="sh-a" onclick="clrTx()">Clear</div></div>
       <div id="tx-list"></div>
 
+      <div class="hm-legal"><a href="/privacy-policy">Privacy Policy</a><a href="/terms-of-service">Terms of Service</a><a href="mailto:support.haramain@gmail.com">Contact us</a></div>
       <button class="btn btn-red" style="margin-top:.8rem" onclick="showLogout()">Logout</button>
 
       <!-- PROFILE UTILITY PAGES -->
@@ -3267,6 +3272,7 @@ function piLogin() {
     Pi.authenticate(['username', 'payments'], onIncompletePayment)
       .then(function(auth) {
         user = auth.user;
+        window.HM_TOKEN = auth.accessToken;
         console.log('[Haramain] ✅ Authenticated:', user.username);
         console.log('[Haramain] Endpoint:', _APPROVE);
         genPilgrimId();
@@ -8157,12 +8163,13 @@ function orderQurbani(){
 }
 </script>
 <script>/* Testnet copy: same code, a clear label so nobody mistakes test Pi for real Pi */(function(){if(!/(^|[.-])testnet[.-]/i.test(location.hostname))return;document.title="[Testnet] "+document.title;var b=document.createElement("div");b.textContent="TESTNET";b.setAttribute("aria-label","Testnet: test Pi only");b.style.cssText="position:fixed;left:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:99999;padding:3px 10px;border-radius:999px;background:#B45309;color:#fff;font:800 11px/1.4 system-ui,sans-serif;letter-spacing:.06em;pointer-events:none;opacity:.92";(document.body||document.documentElement).appendChild(b);})();</script>
-<script src="pi-price-widget.js?v=1"></script>
+<script src="pi-price-widget.js?v=2"></script>
 <script src="prayer-calc.js?v=1"></script>
-<script src="haramain-pro.js?v=5"></script>
+<script src="haramain-pro.js?v=6"></script>
 <script src="haramain-daily.js?v=1"></script>
 <script src="haramain-tools.js?v=1"></script>
 <script src="haramain-quran.js?v=1"></script>
-<script src="haramain-onboarding.js?v=2"></script>
+<script src="haramain-live.js?v=1"></script>
+<script src="haramain-onboarding.js?v=3"></script>
 </body>
 </html>

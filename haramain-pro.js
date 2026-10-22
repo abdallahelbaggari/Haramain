@@ -143,6 +143,7 @@
     }).catch(function () {
       window.weatherCache = null; try { weatherCache = null; } catch (e) {}
       var w = $('weather-widget'); if (w) w.innerHTML = '<div class="empty">Makkah weather is unavailable right now. Pull down or tap Refresh to try again.</div>';
+      var hf = $('heat-full-widget'); if (hf) hf.innerHTML = '<div class="ibox"><b>Live weather is unavailable right now.</b><div class="hm-li">☀️ Makkah is usually 30–45°C from May to September and 25–35°C in winter.</div><div class="hm-li">💧 Drink water every hour in daytime, more when walking.</div><div class="hm-li">⛱️ Avoid direct sun from late morning to late afternoon; use an umbrella.</div><div class="hm-li">🆘 Dizziness, confusion or no sweating can mean heat stroke: call 997.</div></div>';
       var lw = $('lc-weather'); if (lw) lw.textContent = '—';
       var ls = $('lc-weather-sub'); if (ls) ls.textContent = 'Unavailable';
       try { updateHeatRisk(); renderHeatIndex(); } catch (e) {}
@@ -501,7 +502,7 @@
     var mm = $('moon-method'); if (mm) { var box = mm.closest('.ibox,.card,.ic') || mm.parentNode; box.style.display = 'none'; var lb = box.previousElementSibling; if (lb && lb.classList.contains('sec-label')) lb.style.display = 'none'; }
     var ly = $('lc-hijri-year'); if (ly) ly.textContent = 'Umm al-Qura';
     var _oUtil = window.oUtil;
-    window.oUtil = function (id) { var r = _oUtil.apply(this, arguments); if (id === 'pi-calc') { var pp = $('pi-p'); if (pp && !pp.value) window.calcPi(); } return r; };
+    window.oUtil = function (id) { var r = _oUtil.apply(this, arguments); if (id === 'heat' && !window.weatherCache) { try { window.fetchWeather(); } catch (e) {} } if (id === 'pi-calc') { var pp = $('pi-p'); if (pp && !pp.value) window.calcPi(); } return r; };
     // the screen-switcher calls init functions by name; make sure it reaches the new ones
     var _goS = window.goS;
     window.goS = function (id, btn) {
