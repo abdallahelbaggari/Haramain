@@ -1,0 +1,52 @@
+/* Haramain — professional pass: light emerald & gold */
+html,body{background:#F6F4EE}
+.hm-note{font-size:12.5px;line-height:1.55;color:var(--t3);margin:.6rem 0}
+.hm-li{font-size:13.5px;line-height:1.55;color:var(--t2);padding:.45rem 0;border-bottom:1px solid var(--bd)}
+.hm-li:last-child{border-bottom:0}
+.hm-place{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--bd);text-decoration:none;color:var(--t1)}
+.hm-place:last-child{border-bottom:0}
+.hm-place-i{width:40px;height:40px;flex:none;border-radius:12px;background:var(--grndim);display:flex;align-items:center;justify-content:center;font-size:20px}
+.hm-place-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.hm-place-t b{font-size:14.5px;font-weight:700}
+.hm-place-t small{font-size:12.5px;color:var(--t3)}
+.hm-place-go{font-size:13px;font-weight:700;color:var(--grn);white-space:nowrap}
+/* sheet */
+.hm-sheet-wrap{position:fixed;inset:0;z-index:99999;background:rgba(19,38,30,.45);display:flex;align-items:flex-end;justify-content:center}
+.hm-sheet{width:100%;max-width:480px;background:#fff;color:var(--t1);border-radius:22px 22px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px -10px rgba(19,38,30,.3);font-family:'DM Sans','Segoe UI',Arial,sans-serif;line-height:1.55}
+.hm-sheet-t{font-size:18px;font-weight:800;margin-bottom:8px}
+.hm-sheet-b{font-size:15px;color:var(--t2)}
+.hm-sheet-a{display:block;width:100%;margin-top:14px;text-align:center;padding:14px;border-radius:14px;border:0;background:var(--grn);color:#fff;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
+.hm-sheet-x{display:block;width:100%;margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--bd2);background:none;color:var(--t1);font:inherit;font-weight:700;cursor:pointer}
+.hm-sos-call{display:block;text-align:center;padding:15px;border-radius:14px;background:#C0392B;color:#fff;font-weight:800;font-size:17px;text-decoration:none;margin-bottom:8px}
+.hm-sos-call.alt{background:#fff;color:#C0392B;border:1.5px solid #C0392B}
+.hm-sos-row{display:block;width:100%;text-align:left;padding:13px 14px;border-radius:12px;border:1px solid var(--bd2);background:#fff;color:var(--t1);font:inherit;font-weight:700;text-decoration:none;margin-top:8px;cursor:pointer}
+/* prayer log */
+.hm-pray-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.hm-pray{flex:1 1 30%;min-height:40px;border-radius:12px;border:1.5px solid var(--bd2);background:#fff;color:var(--t2);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.hm-pray.on{background:var(--grn);border-color:var(--grn);color:#fff}
+.hm-week{display:flex;justify-content:space-between;align-items:flex-end;gap:4px}
+.moon-day-g{font-size:9.5px;color:var(--t3);line-height:1.1}
+/* calmer, cleaner surfaces */
+.card,.ibox,.ic,.tc,.uc,.hub-item,.qa-btn,.lc,.tile{box-shadow:var(--sh)}
+.scr-hdr-title,.scr-top-title{letter-spacing:-.01em !important}
+#hdr{background:#fff !important;border-bottom:1px solid var(--bd) !important;box-shadow:0 1px 0 rgba(19,38,30,.04)}
+.hdr-logo{color:var(--grn) !important;letter-spacing:.08em}
+#bnav{background:#fff !important;border-top:1px solid var(--bd) !important;box-shadow:0 -4px 18px rgba(19,38,30,.06)}
+.bni{color:var(--t3)}
+.bni.on,.bni.on .bni-l{color:var(--grn) !important}
+.ticker{background:var(--grn) !important;color:#fff !important}
+.ticker .ti{color:#fff !important}
+.info-bar,.greeting-bar{background:#fff !important;border-bottom:1px solid var(--bd) !important}
+/* grids that had no styles */
+.ugrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ugrid.ugrid-2{grid-template-columns:repeat(2,1fr)}
+.uc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:84px;padding:12px 6px;background:#fff;border:1px solid var(--bd);border-radius:14px;color:var(--t1);text-align:center;cursor:pointer}
+.uc-icon{font-size:26px;line-height:1}
+.uc-name{font-size:13px;font-weight:700;color:var(--t1)}
+#analytics-week{display:block !important}
+.bud-pi{font-size:12px;font-weight:700;color:var(--t3);min-width:30px}
+/* top bars of the later screens: same look as the main screen headers */
+.scr-top-bar{position:static !important;background:transparent !important;border:0 !important;padding:.2rem 0 .8rem !important;margin:0 !important}
+.scr-top-title{font-size:20px !important;font-weight:800 !important;color:var(--t1) !important}
+.scr-top-sub{font-size:13px !important;color:var(--t3) !important;margin-top:2px}
+.day-tab-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px}.day-tab-row::-webkit-scrollbar{display:none}
