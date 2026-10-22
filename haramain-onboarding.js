@@ -27,7 +27,7 @@
         '<div class="hob-bars" aria-hidden="true">' + STEPS.map(function () { return '<i><b></b></i>'; }).join('') + '</div>' +
         '<div class="hob-actions"><button type="button" class="hob-next" aria-label="Next">Next <span>→</span></button></div>' +
         '<div class="hob-final"><button type="button" class="hob-pi"><span>π</span> Sign in with Pi</button><button type="button" class="hob-guest">Continue as guest</button></div>' +
-        '<p class="hob-legal"><span class="hob-full">Independent app, not affiliated with the Saudi government or the Ministry of Hajj and Umrah.<br></span>© Haramain 2026</p>' +
+        '<p class="hob-legal">© Haramain 2026</p>' +
       '</div>';
     document.body.appendChild(el);
     document.documentElement.classList.add('hob-on');
