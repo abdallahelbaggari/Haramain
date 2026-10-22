@@ -1284,7 +1284,7 @@ select.fi{cursor:pointer;}
           <div class="qa-sub">Share a request</div>
         </button>
         <button class="qa-btn" onclick="goS('ai')">
-          <div class="qa-icon">🤖</div>
+          <div class="qa-icon">💬</div>
           <div class="qa-title">Ask</div>
           <div class="qa-sub">Hajj questions</div>
         </button>
@@ -1574,7 +1574,7 @@ select.fi{cursor:pointer;}
 
       <div class="up" id="up-health">
         <div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">💊 Health Passport</div></div>
-        <div class="hp-card"><div class="hp-badge">🏥 Medical Profile</div><div style="font-size:15.2px;color:var(--t2);line-height:1.6">Hospital staff scan QR for instant emergency access. Fill all fields accurately — this can save your life.</div></div>
+        <div class="hp-card"><div class="hp-badge">🏥 Medical Profile</div><div style="font-size:15.2px;color:var(--t2);line-height:1.6">Show this card or its QR code to medical staff; the QR holds your details as text. Fill all fields accurately — this can save your life.</div></div>
         <div class="ic">
           <div class="fg"><label class="flbl">Blood Type</label><select class="fi" id="h-blood"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
           <div class="fg"><label class="flbl">Allergies</label><input class="fi" id="h-allergy" type="text" placeholder="e.g. Penicillin, nuts"></div>
@@ -1602,7 +1602,7 @@ select.fi{cursor:pointer;}
 
       <div class="up" id="up-lost">
         <div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">🔍 Lost & Found</div></div>
-        <div class="ibox">Register your details. If found, staff scan QR — family notified immediately.</div>
+        <div class="ibox">Make a card with your name, hotel, group and tent. If you get lost, show the QR or the screen to a staff member or anyone helping you, so they can take you back or call your group.</div>
         <div class="ic">
           <div class="fg"><label class="flbl">Full Name</label><input class="fi" id="lost-name" type="text" placeholder="Your full name"></div>
           <div class="fg"><label class="flbl">Country</label><input class="fi" id="lost-country" type="text" placeholder="e.g. Nigeria"></div>
@@ -1710,17 +1710,12 @@ select.fi{cursor:pointer;}
         </div>
       </div>
 
-      <div class="up" id="up-sadaqah"><div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">💝 Sadaqah in Pi</div></div><div class="ibox">Give Sadaqah instantly in Pi. Every transaction on blockchain.</div><div class="ic"><div class="ic-title">Choose Your Cause</div><div id="sadaqah-causes"></div></div></div>
+      <div class="up" id="up-sadaqah"><div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">💝 Sadaqah</div></div><div class="ibox">Haramain does not collect charity. Give directly, so your Sadaqah reaches the people you choose.</div><div class="ic"><div class="ic-title">Ways to give</div><div class="hm-li">🤲 Give to a person in need you know, by hand or with Pi from Pi Wallet.</div><div class="hm-li">🇸🇦 In Saudi Arabia, the official Ehsan platform lists verified charity projects. <a href="https://ehsan.sa" target="_blank" rel="noopener" style="color:var(--grn);font-weight:700">ehsan.sa ›</a></div><div class="hm-li">🕌 At home, give through a registered charity or your local mosque.</div><button class="btn" style="margin-top:.6rem" onclick="sendPi()">Send Pi to a person ›</button></div></div>
 
       <div class="up" id="up-qurbani">
-        <div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">🐑 Qurbani / Sacrifice</div></div>
-        <div class="ibox">Order Eid Al-Adha sacrifice in Pi. Blockchain certificate issued.</div>
-        <div class="ic">
-          <div class="ic-title">Select Animal</div>
-          <div id="qurbani-options"></div>
-          <div class="fg" style="margin-top:.65rem"><label class="flbl">Distribution Country</label><select class="fi" id="qurb-country"><option>Yemen</option><option>Syria</option><option>Somalia</option><option>Bangladesh</option><option>Pakistan</option><option>Palestine</option></select></div>
-          <button class="btn" onclick="orderQurbani()">🐑 Order Qurbani in Pi</button>
-        </div>
+        <div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">🐑 Hady &amp; Qurbani</div></div>
+        <div class="ibox">Pilgrims usually arrange the Hajj sacrifice (Hady) through their Hajj company or the official Adahi programme, which slaughters on your behalf on the correct days and distributes the meat to people in need. Haramain does not sell sacrifices.</div>
+        <div class="ic"><div class="hm-li">1. Ask your Hajj company first: many include the Hady in your package.</div><div class="hm-li">2. Otherwise buy an Adahi coupon from the official programme or an authorised bank or post office.</div><div class="hm-li">3. Keep your receipt. Shave or trim only after your sacrifice time.</div><button class="btn" style="margin-top:.6rem" onclick="orderQurbani()">About the Adahi programme ›</button></div>
       </div>
 
       <div class="up" id="up-pi-calc">
@@ -1728,7 +1723,7 @@ select.fi{cursor:pointer;}
         <div class="ic">
           <div class="ic-title">Convert Pi to Any Currency</div>
           <div class="fg"><label class="flbl">Pi Amount (π)</label><input class="fi" type="number" id="pi-a" placeholder="0" oninput="calcPi()"></div>
-          <div class="fg"><label class="flbl">Pi Price (USD)</label><input class="fi" type="number" id="pi-p" value="0.17" oninput="calcPi()"></div>
+          <div class="fg"><label class="flbl">Pi Price (USD) · live</label><input class="fi" type="number" id="pi-p" value="" placeholder="loading…" oninput="calcPi()"></div>
           <div class="fres" id="pi-res">Enter amount above</div>
           <div class="qk-grid"><button class="btn btn-ghost btn-sm" onclick="spi(100)">100π</button><button class="btn btn-ghost btn-sm" onclick="spi(500)">500π</button><button class="btn btn-ghost btn-sm" onclick="spi(1000)">1Kπ</button><button class="btn btn-ghost btn-sm" onclick="spi(5000)">5Kπ</button></div>
         </div>
@@ -2533,10 +2528,10 @@ select.fi{cursor:pointer;}
         <div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.3rem">🔒</span><div><div style="font-size:13.9px;font-weight:600;color:var(--gold2)">Stored Locally &amp; Securely</div><div style="font-size:11.5px;color:var(--t3)">Saved on your device. Never uploaded to servers.</div></div></div>
       </div>
       <div class="ugrid ugrid-2" style="margin-bottom:.5rem">
-        <div class="uc" onclick="toast('Passport')"><div class="uc-icon">🛂</div><div class="uc-name">Passport</div></div>
-        <div class="uc" onclick="toast('Visa')"><div class="uc-icon">📋</div><div class="uc-name">Visa</div></div>
-        <div class="uc" onclick="toast('Hotel')"><div class="uc-icon">🏨</div><div class="uc-name">Hotel</div></div>
-        <div class="uc" onclick="toast('Medical')"><div class="uc-icon">💉</div><div class="uc-name">Medical</div></div>
+        <div class="uc" onclick="hmAddDoc('passport')"><div class="uc-icon">🛂</div><div class="uc-name">Passport</div></div>
+        <div class="uc" onclick="hmAddDoc('visa')"><div class="uc-icon">📋</div><div class="uc-name">Visa</div></div>
+        <div class="uc" onclick="hmAddDoc('hotel')"><div class="uc-icon">🏨</div><div class="uc-name">Hotel</div></div>
+        <div class="uc" onclick="hmAddDoc('medical')"><div class="uc-icon">💉</div><div class="uc-name">Medical</div></div>
       </div>
       <div class="ibox" id="doc-add" style="display:none;margin-bottom:.5rem">
         <div style="font-size:15.5px;font-weight:600;color:var(--t1);margin-bottom:.5rem">Add Document</div>
@@ -8163,15 +8158,16 @@ function orderQurbani(){
 }
 </script>
 <script>/* Testnet copy: same code, a clear label so nobody mistakes test Pi for real Pi */(function(){if(!/(^|[.-])testnet[.-]/i.test(location.hostname))return;document.title="[Testnet] "+document.title;var b=document.createElement("div");b.textContent="TESTNET";b.setAttribute("aria-label","Testnet: test Pi only");b.style.cssText="position:fixed;left:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:99999;padding:3px 10px;border-radius:999px;background:#B45309;color:#fff;font:800 11px/1.4 system-ui,sans-serif;letter-spacing:.06em;pointer-events:none;opacity:.92";(document.body||document.documentElement).appendChild(b);})();</script>
+<script src="pi-price-widget.js?v=1"></script>
 <script src="prayer-calc.js?v=1"></script>
-<script src="haramain-pro.js?v=3"></script>
+<script src="haramain-pro.js?v=5"></script>
 <script>window.PRO_WELCOME={name:'HARAMAIN',loginSelector:'#landing',signIn:'piLogin',guestIn:'guestLogin',guest:true,
- film:'films/welcome',logo:'logo.svg',accent:'#0E7A52',accent2:'#0A6243',panel:'#FFFFFF',ink:'#13261E',sub:'#5E6B63',
- legal:'Independent app. Not affiliated with the Saudi government or the Ministry of Hajj and Umrah.',
- scenes:[['Your Hajj & Umrah','companion.','Prayer times, every ritual step by step, duas and Qibla in one place.'],
-         ['Prayer times','for Makkah.','See the next prayer and the days left until the Day of Arafat.'],
-         ['Every ritual,','step by step.','Ihram, Tawaf, Sa\'i, Arafat and Mina, with the duas for each.'],
-         ['Worship and safety','in your pocket.','Prayer tools, emergency numbers and your health card. Sign in with Pi or look around as a guest.']]};</script>
+ film:'films/haramain-welcome',logo:'logo.svg',accent:'#0E7A52',accent2:'#0A6243',panel:'#FFFFFF',ink:'#13261E',sub:'#5E6B63',
+ legal:'© Haramain 2026 · Independent app, not affiliated with the Saudi government or the Ministry of Hajj and Umrah.',
+ scenes:[['Welcome to the land','of the Two Holy Mosques.','Your companion for Hajj and Umrah, from the moment you arrive.'],
+         ['Makkah,','step by step.','Prayer times for Makkah, Tawaf and Sa\'i counters, and every ritual explained.'],
+         ['Madinah','al-Munawwarah.','Duas, the Quran and guidance for your visit to the Prophet\'s Mosque ﷺ.'],
+         ['Guided and safe,','with Pi.','Emergency help, your health card and a checklist. Sign in with Pi or look around as a guest.']]};</script>
 <script src="pro-welcome.js?v=2"></script>
 </body>
 </html>

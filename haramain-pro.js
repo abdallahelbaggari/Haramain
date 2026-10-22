@@ -453,6 +453,37 @@
     return r;
   };
 
+
+  /* ── Live Pi price (OKX first, then CoinGecko; server-cached) ── */
+  window.fetchPiValue = function () {
+    var el = $('lc-pi'); if (!window.PiPrice) return;
+    var show = function () { var d = PiPrice.get(); if (el) el.textContent = d && d.usd ? '$' + d.usd.toFixed(4) : '—'; };
+    show(); PiPrice.refresh(); setTimeout(show, 2500); setInterval(show, 30000);
+  };
+  function mountPrice() {
+    if (!window.PiPrice) return;
+    var dash = $('s-dashboard'); var wx = $('weather-widget');
+    if (dash && wx && !$('hm-pi-dash')) { var d = document.createElement('div'); d.id = 'hm-pi-dash'; d.style.margin = '0 0 .8rem'; wx.parentNode.insertBefore(d, wx.nextSibling); PiPrice.mount(d, { accent: '#0E7A52', currency: 'USD' }); }
+    var pay = $('s-payments'); if (pay && !$('hm-pi-pay')) { var h = pay.querySelector('.scr-hdr'); var p = document.createElement('div'); p.id = 'hm-pi-pay'; p.style.margin = '0 0 .8rem'; if (h) h.parentNode.insertBefore(p, h.nextSibling); else pay.prepend(p); PiPrice.mount(p, { accent: '#0E7A52', currency: 'SAR' }); }
+  }
+
+
+  /* ── Pi calculator uses the live price ── */
+  window.calcPi = function () {
+    var a = parseFloat(($('pi-a') || {}).value) || 0, inp = $('pi-p'), d = window.PiPrice && PiPrice.get();
+    if (inp && !inp.value && d && d.usd) inp.value = d.usd.toFixed(4);
+    var p = parseFloat((inp || {}).value) || (d && d.usd) || 0, el = $('pi-res'); if (!el) return;
+    if (!a) { el.textContent = 'Enter amount above'; return; }
+    if (!p) { el.textContent = 'Live price unavailable — enter a price'; return; }
+    var r = d && d.usd ? { sar: d.sar / d.usd, ngn: d.ngn ? d.ngn / d.usd : null } : { sar: 3.75, ngn: null };
+    el.innerHTML = a + 'π = $' + (a * p).toFixed(2) + ' · ' + (a * p * r.sar).toFixed(2) + ' SAR' + (r.ngn ? ' · ₦' + Math.round(a * p * r.ngn).toLocaleString() : '');
+  };
+  /* document tiles open the form with that type chosen */
+  window.hmAddDoc = function (type) {
+    var f = $('doc-add'), t = $('doc-type'); if (!f) return;
+    f.style.display = 'block'; if (t) t.value = type; var n = $('doc-title'); if (n) n.focus();
+  };
+
   /* ── start ─────────────────────────────────────────────────────── */
   function start() {
     // some screens were written after <main> closed: move them in so spacing and scrolling match the rest
@@ -463,12 +494,14 @@
     try { window.fetchWeather(); } catch (e) {}
     try { if (!window.prayerData || !window.prayerData.Sunrise) window._fetchPrayerAPI(); } catch (e) {}
     try { showVitals(); renderHealthProfile(); } catch (e) {}
-    lfGuide(); lfList(); budgetUnits();
+    lfGuide(); lfList(); budgetUnits(); mountPrice(); window.fetchPiValue();
     var mp = ''; try { mp = localStorage.getItem(K + 'mtg5') || ''; } catch (e) {}
     if (mp && $('meeting-point')) $('meeting-point').textContent = '📍 ' + mp;
     // the moon-sighting 'region' picker changed nothing; hide it
     var mm = $('moon-method'); if (mm) { var box = mm.closest('.ibox,.card,.ic') || mm.parentNode; box.style.display = 'none'; var lb = box.previousElementSibling; if (lb && lb.classList.contains('sec-label')) lb.style.display = 'none'; }
     var ly = $('lc-hijri-year'); if (ly) ly.textContent = 'Umm al-Qura';
+    var _oUtil = window.oUtil;
+    window.oUtil = function (id) { var r = _oUtil.apply(this, arguments); if (id === 'pi-calc') { var pp = $('pi-p'); if (pp && !pp.value) window.calcPi(); } return r; };
     // the screen-switcher calls init functions by name; make sure it reaches the new ones
     var _goS = window.goS;
     window.goS = function (id, btn) {
@@ -483,6 +516,7 @@
         if (id === 'lostfound') { lfGuide(); lfList(); }
         if (id === 'itinerary') { itineraryDates(); initItinerary(); }
         if (id === 'budget') budgetUnits();
+        if (id === 'utilities') { var pp = $('pi-p'); if (pp && !pp.value) window.calcPi(); }
       } catch (e) {}
       return r;
     };

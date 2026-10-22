@@ -1,0 +1,142 @@
+// /pi-price  (Cloudflare Pages Function)
+// Live Pi Network price (USD, SAR, NGN + 24h change + 7-day chart), cached ~90 seconds.
+// If every exchange is busy, the last good price is served (marked stale) instead of an error.
+// Sources, with automatic fallback:
+//   1. OKX public market API (PI-USDT) — free, no key
+//   2. CoinGecko — free; set COINGECKO_API_KEY (free "Demo" key) because CoinGecko
+//      often blocks requests from cloud servers without a key
+// If COINGECKO_API_KEY is set, CoinGecko is tried first.
+
+const HEADERS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Content-Type': 'application/json' };
+const json = (obj, maxAge) => new Response(JSON.stringify(obj), { status: 200, headers: { ...HEADERS, 'Cache-Control': 'public, max-age=' + (maxAge || 30) } });
+const MEM = globalThis.__piPriceMem || (globalThis.__piPriceMem = {});
+const UA = { 'Accept': 'application/json', 'User-Agent': 'PiApp/1.0 (Pi Network app)' };
+
+async function cached(key, ttl, producer) {
+  const now = Date.now(), m = MEM[key];
+  if (m && now - m.t < ttl * 1000) return m.data;
+  const req = new Request('https://cache.app.internal/pi/' + key);
+  try { const hit = await caches.default.match(req); if (hit) { const data = await hit.json(); MEM[key] = { t: now, data }; return data; } } catch (e) {}
+  try {
+    const data = await producer();
+    MEM[key] = { t: now, data };
+    try { await caches.default.put(req, new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=' + ttl } })); } catch (e) {}
+    return data;
+  } catch (err) {
+    if (m) return m.data;
+    throw err;
+  }
+}
+
+async function getJSON(url, headers) {
+  const r = await fetch(url, { headers: { ...UA, ...(headers || {}) } });
+  if (!r.ok) throw new Error(url.split('/')[2] + ' ' + r.status);
+  return r.json();
+}
+
+// USD -> SAR / NGN rates (SAR is pegged at 3.75)
+async function fxRates() {
+  return cached('fx', 21600, async () => {
+    const d = await getJSON('https://open.er-api.com/v6/latest/USD');
+    return { SAR: (d.rates && d.rates.SAR) || 3.75, NGN: (d.rates && d.rates.NGN) || null };
+  }).catch(() => ({ SAR: 3.75, NGN: null }));
+}
+
+async function fromGate() {
+  const d = await getJSON('https://api.gateio.ws/api/v4/spot/tickers?currency_pair=PI_USDT');
+  const t = Array.isArray(d) && d[0]; const last = t && parseFloat(t.last);
+  if (!last) throw new Error('Gate no price');
+  const fx = await fxRates();
+  return { usd: last, sar: last * fx.SAR, ngn: fx.NGN ? last * fx.NGN : null, change24h: parseFloat(t.change_percentage) || 0, updated: new Date().toISOString(), source: 'Gate.io' };
+}
+async function fromBitget() {
+  const d = await getJSON('https://api.bitget.com/api/v2/spot/market/tickers?symbol=PIUSDT');
+  const t = d && d.data && d.data[0]; const last = t && parseFloat(t.lastPr);
+  if (!last) throw new Error('Bitget no price');
+  const fx = await fxRates();
+  return { usd: last, sar: last * fx.SAR, ngn: fx.NGN ? last * fx.NGN : null, change24h: (parseFloat(t.change24h) || 0) * 100, updated: new Date(+t.ts || Date.now()).toISOString(), source: 'Bitget' };
+}
+async function fromMEXC() {
+  const t = await getJSON('https://api.mexc.com/api/v3/ticker/24hr?symbol=PIUSDT'); const last = t && parseFloat(t.lastPrice);
+  if (!last) throw new Error('MEXC no price');
+  const fx = await fxRates();
+  return { usd: last, sar: last * fx.SAR, ngn: fx.NGN ? last * fx.NGN : null, change24h: (parseFloat(t.priceChangePercent) || 0) * 100, updated: new Date().toISOString(), source: 'MEXC' };
+}
+async function fromOKX() {
+  const d = await getJSON('https://www.okx.com/api/v5/market/ticker?instId=PI-USDT');
+  const t = d && d.data && d.data[0];
+  const last = t && parseFloat(t.last), open = t && parseFloat(t.open24h);
+  if (!last) throw new Error('OKX no price');
+  const fx = await fxRates();
+  return { usd: last, sar: last * fx.SAR, ngn: fx.NGN ? last * fx.NGN : null, change24h: open ? (last - open) / open * 100 : 0, updated: new Date(+t.ts || Date.now()).toISOString(), source: 'OKX' };
+}
+async function sparkOKX() {
+  const d = await getJSON('https://www.okx.com/api/v5/market/candles?instId=PI-USDT&bar=4H&limit=42');
+  const rows = (d && d.data) || [];
+  if (!rows.length) throw new Error('OKX no candles');
+  return rows.map(r => +parseFloat(r[4]).toFixed(6)).reverse();   // close prices, oldest first
+}
+
+async function sparkGate() {
+  const rows = await getJSON('https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=PI_USDT&interval=4h&limit=42');
+  if (!Array.isArray(rows) || !rows.length) throw new Error('Gate no candles');
+  return rows.map(r => +parseFloat(r[2]).toFixed(6)).filter(v => v > 0);   // [time, volume, close, ...] oldest first
+}
+async function sparkMEXC() {
+  const rows = await getJSON('https://api.mexc.com/api/v3/klines?symbol=PIUSDT&interval=4h&limit=42');
+  if (!Array.isArray(rows) || !rows.length) throw new Error('MEXC no candles');
+  return rows.map(r => +parseFloat(r[4]).toFixed(6)).filter(v => v > 0);
+}
+function cgHeaders(env) { return env.COINGECKO_API_KEY ? { 'x-cg-demo-api-key': env.COINGECKO_API_KEY } : {}; }
+async function fromCoinGecko(env) {
+  const d = await getJSON('https://api.coingecko.com/api/v3/simple/price?ids=pi-network&vs_currencies=usd,sar,ngn&include_24hr_change=true&include_last_updated_at=true', cgHeaders(env));
+  const p = d['pi-network'];
+  if (!p || !p.usd) throw new Error('CoinGecko no price');
+  return { usd: p.usd, sar: p.sar || p.usd * 3.75, ngn: p.ngn || null, change24h: p.usd_24h_change || 0, updated: p.last_updated_at ? new Date(p.last_updated_at * 1000).toISOString() : new Date().toISOString(), source: 'CoinGecko' };
+}
+async function sparkCoinGecko(env) {
+  const d = await getJSON('https://api.coingecko.com/api/v3/coins/pi-network/market_chart?vs_currency=usd&days=7', cgHeaders(env));
+  const pts = (d.prices || []).map(p => p[1]);
+  if (!pts.length) throw new Error('CoinGecko no chart');
+  const step = Math.max(1, Math.floor(pts.length / 48));
+  const out = pts.filter((_, i) => i % step === 0); out.push(pts[pts.length - 1]);
+  return out.map(v => +v.toFixed(6));
+}
+
+async function firstOf(fns) {
+  const errs = [];
+  for (const fn of fns) { try { return await fn(); } catch (e) { errs.push(String(e && e.message || e)); } }
+  throw new Error(errs.join(' | '));
+}
+
+export async function onRequestGet(context) {
+  const env = context.env;
+  const sources = env.COINGECKO_API_KEY
+    ? [() => fromCoinGecko(env), fromOKX, fromGate, fromBitget, fromMEXC]
+    : [fromOKX, fromGate, fromBitget, fromMEXC, () => fromCoinGecko(env)];
+  const lastReq = new Request('https://cache.app.internal/pi/last-good');
+  try {
+    let price;
+    try {
+      price = await cached('price', 90, () => firstOf(sources));
+      try { await caches.default.put(lastReq, new Response(JSON.stringify(price), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } })); } catch (e) {}
+      if (env.DS_KV) context.waitUntil(env.DS_KV.put('pi:last', JSON.stringify(price)));
+    } catch (err) {
+      // every source failed right now: serve the last good price (marked stale)
+      let last = null;
+      try { const h = await caches.default.match(lastReq); if (h) last = await h.json(); } catch (e) {}
+      if (!last && env.DS_KV) { try { last = await env.DS_KV.get('pi:last', 'json'); } catch (e) {} }
+      if (!last) throw err;
+      price = { ...last, stale: true };
+    }
+    let spark = [];
+    try { spark = await cached('spark', 3600, () => firstOf(env.COINGECKO_API_KEY ? [() => sparkCoinGecko(env), sparkOKX, sparkGate, sparkMEXC] : [sparkOKX, sparkGate, sparkMEXC, () => sparkCoinGecko(env)])); } catch (e) {}
+    return json({ ok: true, ...price, spark }, 60);
+  } catch (err) {
+    return json({ ok: false, error: String(err && err.message || err) }, 15);
+  }
+}
+
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: HEADERS });
+}
