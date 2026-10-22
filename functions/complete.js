@@ -17,8 +17,7 @@ export async function onRequestGet(context) {
       message: "complete.js is working",
       route: "/functions/complete",
       pi_api_key_present: !!key,
-      pi_api_key_length: key ? key.length : 0,
-      pi_api_key_prefix: key ? key.substring(0, 8) + "..." : "MISSING"
+      pi_api_key_length: key ? key.length : 0
     }),
     {
       status: 200,
