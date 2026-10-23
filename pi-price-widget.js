@@ -9,7 +9,18 @@
   var LKEY = 'pi_price_local_v1';
   function local() { try { return localStorage.getItem(LKEY) || 'NGN'; } catch (e) { return 'NGN'; } }
   function localVal(d) { var c = local(); if (!d) return null; if (S.fx && S.fx[c] && d.sar) return d.sar * S.fx[c]; if (c === 'NGN') return d.ngn; return null; }
-  function lsym(c) { var x = CURS.filter(function (k) { return k[0] === c; })[0]; return x ? x[1] : c + ' '; }
+  var DN = null; try { DN = new Intl.DisplayNames(['en'], { type: 'currency' }); } catch (e) {}
+  function cname(c) { var x = CURS.filter(function (k) { return k[0] === c; })[0]; if (x) return x[2]; try { return DN ? DN.of(c) : c; } catch (e) { return c; } }
+  function lsym(c) {
+    var x = CURS.filter(function (k) { return k[0] === c; })[0]; if (x) return x[1];
+    try { var p = new Intl.NumberFormat('en', { style: 'currency', currency: c, currencyDisplay: 'narrowSymbol' }).formatToParts(0).filter(function (q) { return q.type === 'currency'; })[0]; if (p && p.value && p.value !== c) return p.value.length > 2 ? p.value + ' ' : p.value; } catch (e) {}
+    return c + ' ';
+  }
+  function allCurs() {
+    var codes = S.fx ? Object.keys(S.fx).filter(function (c) { return /^[A-Z]{3}$/.test(c) && c !== 'SAR'; }) : CURS.map(function (c) { return c[0]; });
+    if (codes.indexOf('NGN') < 0) codes.push('NGN');
+    return codes.map(function (c) { return { code: c, name: cname(c), sym: lsym(c).trim() }; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
+  }
   function loadFx() { if (S.fx !== null) return; S.fx = false; fetch('/fx').then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok && d.rates) { S.fx = d.rates; paintAll(); } }).catch(function () {}); }
   window.hmSetLocal = function (c) { try { localStorage.setItem(LKEY, c); } catch (e) {} paintAll(); var w = document.querySelector('.pp-wrap'); if (w) { w.remove(); open(S.lastOpt || {}); } };
   var KEY = 'pi_price_last_v1';
@@ -63,7 +74,7 @@
       (d ? '<div><span class="pp-big">$' + fmt(d.usd, dec(d.usd)) + '</span>' + change(d) + '</div>' +
         '<div style="margin-top:8px">' + spark(d.spark, 300, 64, o.accent) + '<div class="pp-sub">Last 7 days</div></div>' +
         '<div class="pp-grid"><div><b>$' + fmt(d.usd, dec(d.usd)) + '</b><small>US dollar</small></div><div><b>' + fmt(d.sar, dec(d.sar)) + '</b><small>Saudi riyal</small></div><div><b>' + (localVal(d) ? lsym(local()) + fmt(localVal(d), dec(localVal(d))) : '—') + '</b><small>' + local() + '</small></div></div>' +
-        '<label class="pp-pick">My currency <select onchange="hmSetLocal(this.value)">' + CURS.filter(function (c) { return (S.fx && S.fx[c[0]]) || c[0] === 'NGN'; }).map(function (c) { return '<option value="' + c[0] + '"' + (c[0] === local() ? ' selected' : '') + '>' + c[0] + ' · ' + c[2] + '</option>'; }).join('') + '</select></label>' +
+        '<label class="pp-pick">My currency <select onchange="hmSetLocal(this.value)">' + allCurs().map(function (c) { return '<option value="' + c.code + '"' + (c.code === local() ? ' selected' : '') + '>' + c.code + ' · ' + c.name + '</option>'; }).join('') + '</select></label>' +
         '<div class="pp-calc"><input type="number" inputmode="decimal" value="100" min="0" oninput="var a=+this.value||0;this.nextElementSibling.innerHTML=a+\' π = <b>\'+(a*' + d.sar + ').toFixed(2)+\' SAR</b> · $\'+(a*' + d.usd + ').toFixed(2)' + (localVal(d) ? '+\' · ' + lsym(local()) + '\'+Math.round(a*' + localVal(d) + ').toLocaleString()' : '') + '"><span>100 π = <b>' + (100 * d.sar).toFixed(2) + ' SAR</b> · $' + (100 * d.usd).toFixed(2) + (localVal(d) ? ' · ' + lsym(local()) + Math.round(100 * localVal(d)).toLocaleString() : '') + '</span></div>' +
         '<div class="pp-note">Source: ' + (d.source || 'exchange data') + ' · ' + (d.stale ? 'last known price, ' : 'updated ') + ago(d.updated) + '.<br>Prices come from public market data (OKX first, then CoinGecko). They change all the time and are for information only, not financial advice.</div>'
         : '<div class="pp-note">The price could not be loaded right now. Please try again in a moment.</div>') +
@@ -87,7 +98,10 @@
     mount: function (el, o) { if (!el) return; o = o || {}; loadFx(); o.accent = o.accent || '#0E7A52'; var m = { el: el, o: o }; S.mounts.push(m); paint(m); load(); },
     get: function () { return S.d; },
     refresh: function () { S.last = 0; load(); },
-    local: function () { var c = local(); return { code: c, sym: lsym(c), rate: localVal(S.d) }; },
+    local: function () { var c = local(); return { code: c, sym: lsym(c), name: cname(c), rate: localVal(S.d) }; },
+    currencies: allCurs,
+    rateIn: function (c) { var d = S.d; if (!d) return null; if (c === 'SAR') return d.sar; if (c === 'USD') return d.usd; if (S.fx && S.fx[c] && d.sar) return d.sar * S.fx[c]; if (c === 'NGN') return d.ngn; return null; },
+    sym: lsym,
     fx: function () { return S.fx || null; },
     open: function (o) { open(o || {}); },
     watch: function () { loadFx(); load(); }

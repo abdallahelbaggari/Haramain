@@ -46,7 +46,13 @@
   /* ── receipts ── */
   function spec(r) {
     var d = new Date(r.ts), when = [['Date', d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })], ['Time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })]];
-    var sub = r.usd ? '≈ ' + (r.amount * r.sar).toFixed(2) + ' SAR · $' + (r.amount * r.usd).toFixed(2) + ' at payment time' : '';
+    var sub = r.usd ? '≈ ' + (r.amount * r.sar).toFixed(2) + ' SAR · $' + (r.amount * r.usd).toFixed(2) + (r.lr && r.lc && r.lc !== 'SAR' && r.lc !== 'USD' ? ' · ' + (r.ls || r.lc + ' ') + num(r.amount * r.lr, r.amount * r.lr < 10 ? 2 : 0) : '') + ' at payment time' : '';
+    if (r.kind === 'p2p' && r.send) {
+      return { title: 'Transfer receipt', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
+        rows: [['From', (r.name || '—') + (r.user ? ' (@' + r.user + ')' : '')], ['To', (r.toName ? r.toName + ' · ' : '') + short(r.to)], ['Narration', r.narr || '—'], ['Reference', r.ref]]
+          .concat(when, [['Network', r.net], ['Recipient address', r.to, 1], ['Transaction ID', r.txid, 1]]),
+        thanks: 'Sent with Haramain', note: 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
+    }
     if (r.kind === 'p2p') {
       var inn = r.dir === 'in';
       return { title: inn ? 'Sale receipt' : 'Payment receipt', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
@@ -60,7 +66,7 @@
   }
   window.hmReceipt = function (i) {
     var r = get('rcpts', [])[i]; if (!r || !window.HMReceipt) return;
-    var text = 'HARAMAIN · ' + (r.kind === 'p2p' ? 'Verified payment' : 'Payment receipt') + '\n' + r.amount + ' π · ' + (TYPES[r.kind] || r.item || r.memo || 'Pi payment') + '\nDate: ' + new Date(r.ts).toLocaleString() + '\nTransaction ID: ' + (r.txid || '—') + '\nharamain.pi';
+    var text = 'HARAMAIN · ' + (r.send ? 'Transfer receipt' : r.kind === 'p2p' ? 'Verified payment' : 'Payment receipt') + '\n' + r.amount + ' π · ' + (r.narr || TYPES[r.kind] || r.item || r.memo || 'Pi payment') + '\nDate: ' + new Date(r.ts).toLocaleString() + '\nTransaction ID: ' + (r.txid || '—') + '\nharamain.pi';
     HMReceipt.sheet(spec(r), 'Haramain-receipt-' + (r.txid ? r.txid.slice(0, 8) : r.ts) + '.png', text);
   };
 
@@ -145,7 +151,7 @@
       if (n) { say('💰 ' + n + ' payment' + (n > 1 ? 's' : '') + ' received'); drawWallet(); } else if (manual) say('No payment yet. Haramain keeps checking while the app is open.');
     });
   }
-  window.hmCheckSales = function () { checkSales(true); };
+  window.hmCheckSales = function () { checkSales(true); checkSends(); };
 
   /* ── wallet screen ── */
   window.hmEditName = function () {
@@ -153,8 +159,125 @@
     setTimeout(function () { $('nm-v').focus(); }, 80);
     $('nm-go').onclick = function () { put('fullname', $('nm-v').value.trim().slice(0, 50)); w.remove(); drawWallet(); say('✅ Name saved'); };
   };
+  /* ── Send Pi: everything in Haramain, approval in Pi Wallet, receipt from the blockchain ── */
+  function decLink(v) {
+    var m = /pay\.html#([A-Za-z0-9_-]+)/.exec(v || ''); if (!m) return null;
+    try { var t = m[1].replace(/-/g, '+').replace(/_/g, '/'); while (t.length % 4) t += '='; var o = JSON.parse(decodeURIComponent(escape(atob(t)))); return /^G[A-Z2-7]{55}$/.test(o.t || '') && o.a > 0 ? o : null; } catch (e) { return null; }
+  }
   window.hmSendSheet = function () {
-    hmSheet('💸 Send Pi', 'Pi is sent from <b>Pi Wallet</b> in the Pi app, straight to the person you choose. Haramain never holds your Pi.<ol style="margin:10px 0 0 18px;line-height:1.7"><li>Tap <b>Open Pi Wallet</b></li><li>Choose <b>Send</b> and paste the wallet address</li><li>Enter the amount, add a memo and confirm</li></ol><div class="wf-hint" style="margin-top:8px">Paying a seller? Ask them for a Haramain Pay link so you both get a verified receipt.</div>', 'Open Pi Wallet', 'https://wallet.pinet.com');
+    var payees = get('payees', []), lock = null;
+    var w = sheetEl('💸 Send Pi',
+      '<div class="hm-sheet-b">Fill in your transfer here. You approve it in Pi Wallet, and Haramain confirms it on the Pi blockchain and gives you a receipt with your narration.</div>' +
+      (payees.length ? '<label class="wf-l">Recent</label><div class="wf-payees">' + payees.slice(0, 6).map(function (p, i) { return '<button type="button" data-i="' + i + '">' + esc(p.n || short(p.t)) + '</button>'; }).join('') + '</div>' : '') +
+      '<label class="wf-l">To · wallet address or Haramain Pay link</label><input class="fi wf-mono" id="sd-to" autocomplete="off" autocapitalize="characters" placeholder="G… address, or paste a payment link">' +
+      '<div class="wf-hint" id="sd-tohint"></div>' +
+      '<label class="wf-l">Recipient name (optional)</label><input class="fi" id="sd-n" maxlength="50" placeholder="e.g. Abdullahi, Al-Safwa Hotel">' +
+      '<label class="wf-l">Amount</label><div class="wf-amt"><input id="sd-a" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><span>π</span></div><div class="wf-conv" id="sd-c"></div>' +
+      '<label class="wf-l">Narration</label><input class="fi" id="sd-x" maxlength="80" placeholder="What is it for? e.g. Hotel deposit, gift for Umrah">' +
+      '<button type="button" class="hm-sheet-a" id="sd-go">Continue</button>' +
+      '<div class="wf-hint" style="margin-top:8px">🔒 Only you can approve a payment, in Pi Wallet. Haramain never holds your Pi and never asks for your passphrase.</div>');
+    var to = $('sd-to'), a = $('sd-a');
+    a.oninput = function () { $('sd-c').textContent = convLine(parseFloat(a.value)); };
+    to.oninput = function () {
+      var o = decLink(to.value), h = $('sd-tohint');
+      if (o) { lock = o; to.value = o.t; $('sd-n').value = o.n || ''; a.value = o.a; a.readOnly = true; $('sd-x').value = o.i || ''; a.oninput(); h.innerHTML = '✅ Haramain Pay request from <b>' + esc(o.n || 'the seller') + '</b> · reference <span class="wf-mono">' + esc(o.r) + '</span>'; return; }
+      var v = to.value.trim().toUpperCase().replace(/\s+/g, ''); h.textContent = v.length >= 56 && !/^G[A-Z2-7]{55}$/.test(v) ? 'This address does not look right: it starts with G and has 56 characters.' : '';
+    };
+    w.querySelectorAll('.wf-payees button').forEach(function (b) { b.onclick = function () { var p = payees[+b.getAttribute('data-i')]; to.value = p.t; $('sd-n').value = p.n || ''; a.focus(); }; });
+    setTimeout(function () { to.focus(); }, 80);
+    $('sd-go').onclick = function () {
+      var t = to.value.trim().toUpperCase().replace(/\s+/g, ''), amt = Math.round(parseFloat(a.value) * 1e7) / 1e7, nm = $('sd-n').value.trim(), nx = $('sd-x').value.trim();
+      if (!/^G[A-Z2-7]{55}$/.test(t)) return say('Enter the recipient’s wallet address (starts with G, 56 characters)');
+      if (!(amt > 0)) return say('Enter the amount in π');
+      if (!nx) return say('Add a narration: what is this payment for?');
+      var p = price(), l = loc();
+      var sd = { t: t, a: amt, n: nm, x: nx, r: lock && lock.t === t ? lock.r : newRef(), d: Date.now(), usd: p && p.usd, sar: p && p.sar, lc: l.code, lr: l.rate, ls: l.sym, seller: lock && lock.t === t };
+      var all = get('sends', []); all.unshift(sd); put('sends', all.slice(0, 100));
+      var py = payees.filter(function (x) { return x.t !== t; }); py.unshift({ t: t, n: nm }); put('payees', py.slice(0, 12));
+      w.remove(); drawWallet(); showSend(0);
+    };
+  };
+  window.hmPay = function () { hmSendSheet(); setTimeout(function () { var e = $('sd-to'); if (e) e.placeholder = 'Paste the Haramain Pay link here'; }, 60); };
+  function copyBtn(v, label) { return '<div class="wf-copy"><code>' + esc(v) + '</code><button type="button" data-c="' + esc(v) + '">' + (label || 'Copy') + '</button></div>'; }
+  var sendTimer = null;
+  function showSend(i) {
+    var sd = get('sends', [])[i]; if (!sd) return;
+    if (sd.paid) return hmReceiptByTx(sd.paid);
+    var w = sheetEl('💸 Approve in Pi Wallet',
+      '<div class="wf-req"><div class="wf-req-a">' + sd.a + ' π</div><div class="wf-req-c">' + esc(convLine(sd.a)) + '</div><div class="wf-req-i">To ' + esc(sd.n || short(sd.t)) + ' · ' + esc(sd.x) + '</div></div>' +
+      '<div class="wf-steps">' +
+        '<div class="wf-step"><i>1</i><div><b>Copy the recipient’s address</b>' + copyBtn(sd.t) + '</div></div>' +
+        '<div class="wf-step"><i>2</i><div><b>Copy the amount</b>' + copyBtn(String(sd.a)) + '</div></div>' +
+        '<div class="wf-step"><i>3</i><div><b>Copy the memo</b><small>Put it in the memo so Haramain can find your payment.</small>' + copyBtn(sd.r) + '</div></div>' +
+        '<div class="wf-step"><i>4</i><div><b>Open Pi Wallet, tap Send, paste and approve</b><a class="hm-sheet-a" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="https://wallet.pinet.com" target="_blank" rel="noopener">Open Pi Wallet</a></div></div>' +
+      '</div>' +
+      '<button type="button" class="wf-cta" id="sd-chk">✅ I have sent it · confirm</button><div class="wf-status" id="sd-st"></div>' +
+      '<details class="wf-alt"><summary>Forgot the memo? Use the transaction ID</summary><input class="fi wf-mono" id="sd-tx" placeholder="64-character transaction ID" autocomplete="off" style="margin-top:8px"><button type="button" class="wf-btn" id="sd-txb" style="margin-top:8px;width:100%">Verify this transaction</button></details>');
+    w.querySelectorAll('[data-c]').forEach(function (b) { b.onclick = function () { var v = b.getAttribute('data-c'); try { navigator.clipboard.writeText(v); } catch (e) {} var o = b.textContent; b.textContent = '✓ Copied'; setTimeout(function () { b.textContent = o; }, 1300); }; });
+    var st = function (c, h) { var e = $('sd-st'); if (e) { e.className = 'wf-status ' + c; e.innerHTML = h; } };
+    var tries = 0;
+    var poll = function () {
+      if (!document.body.contains(w)) return;
+      st('wait', '⏳ Looking for your payment on the Pi blockchain…');
+      fetch('/verify?to=' + sd.t + '&ref=' + sd.r + '&amt=' + sd.a + '&net=' + (TESTNET ? 'test' : 'main')).then(function (r) { return r.json(); }).then(function (d) {
+        if (d.ok && d.found) { w.remove(); finishSend(i, d.tx); return; }
+        if (d.ok && d.account === false) { st('err', 'This address has no activity on the ' + NETN + ' yet. Check that it is right before you send.'); return; }
+        st('wait', '⏳ Not found yet. Haramain checks every 10 seconds' + (tries > 30 ? '; tap the button to check again' : '') + '.');
+        if (++tries <= 60) sendTimer = setTimeout(poll, 10000);
+      }).catch(function () { st('err', 'No connection. Haramain will try again.'); if (++tries <= 60) sendTimer = setTimeout(poll, 10000); });
+    };
+    $('sd-chk').onclick = function () { clearTimeout(sendTimer); tries = 0; poll(); };
+    $('sd-txb').onclick = function () {
+      var h = ($('sd-tx').value || '').trim().toLowerCase(); if (!/^[a-f0-9]{64}$/.test(h)) return st('err', 'A transaction ID has 64 letters and numbers. Copy it from the payment in Pi Wallet.');
+      st('wait', '⏳ Checking this transaction…');
+      fetch('/verify?tx=' + h + '&net=' + (TESTNET ? 'test' : 'main')).then(function (r) { return r.json(); }).then(function (d) {
+        if (!d.ok) return st('err', esc(d.error));
+        if (!d.tx.ok) return st('err', 'This transaction failed, so no Pi was sent.');
+        var p = (d.tx.payments || []).filter(function (x) { return x.to === sd.t && parseFloat(x.amount) + 1e-7 >= sd.a; })[0];
+        if (!p) return st('err', 'This transaction did not send ' + sd.a + ' π to this address.');
+        w.remove(); finishSend(i, { hash: d.tx.hash, at: d.tx.at, from: p.from, to: p.to, amount: p.amount });
+      }).catch(function () { st('err', 'No connection. Try again.'); });
+    };
+  }
+  window.hmShowSend = showSend;
+  function finishSend(i, tx) {
+    var all = get('sends', []), sd = all[i]; if (!sd || sd.paid) return;
+    sd.paid = tx.hash; sd.at = Date.parse(tx.at) || Date.now(); sd.from = tx.from; put('sends', all);
+    var R = get('rcpts', []);
+    if (!R.some(function (x) { return x.txid === tx.hash; })) {
+      R.unshift({ amount: +parseFloat(tx.amount).toFixed(7), kind: 'p2p', send: true, dir: 'out', narr: sd.x, item: sd.x, memo: sd.x, toName: sd.n, seller: sd.n, other: sd.n || short(sd.t), to: sd.t, from: tx.from, ref: sd.r, ts: sd.at, name: fullName(), user: uname(), net: NETN, txid: tx.hash, status: 'Verified', usd: sd.usd, sar: sd.sar, lc: sd.lc, lr: sd.lr, ls: sd.ls });
+      put('rcpts', R.slice(0, 200));
+    }
+    var msg = sd.a + ' π to ' + (sd.n || short(sd.t)) + ' · ' + sd.x;
+    try { addNotif('✅', 'Transfer confirmed', msg, 'now'); } catch (e) {}
+    if (window.hmSysNotify) hmSysNotify('✅ Transfer confirmed', msg, 'hm-send-' + sd.r);
+    drawWallet(); hmReceiptByTx(tx.hash);
+  }
+  function checkSends() {
+    var all = get('sends', []);
+    all.forEach(function (sd, i) {
+      if (sd.paid || Date.now() - sd.d > 7 * 864e5) return;
+      fetch('/verify?to=' + sd.t + '&ref=' + sd.r + '&amt=' + sd.a + '&net=' + (TESTNET ? 'test' : 'main')).then(function (r) { return r.json(); }).then(function (d) {
+        if (d.ok && d.found) { var cur = get('sends', []); var j = cur.findIndex ? cur.findIndex(function (x) { return x.r === sd.r && x.t === sd.t; }) : i; if (j >= 0) { var open = document.querySelector('.hm-sheet-wrap'); if (open && /Approve in Pi Wallet/.test(open.textContent)) open.remove(); finishSend(j, d.tx); } }
+      }).catch(function () {});
+    });
+  }
+
+  /* ── any currency ── */
+  window.hmPickCurrency = function () {
+    var L = (window.PiPrice && PiPrice.currencies) ? PiPrice.currencies() : [], cur = loc().code;
+    var w = sheetEl('💱 Your currency',
+      '<input class="fi" id="cu-q" type="search" placeholder="Search: naira, dollar, PKR…" autocomplete="off">' +
+      '<div class="wf-cur" id="cu-l"></div><div class="wf-hint">Rates: OKX / CoinGecko for Pi, open.er-api.com for currencies. For information only.</div>');
+    var draw = function () {
+      var q = ($('cu-q').value || '').trim().toLowerCase();
+      $('cu-l').innerHTML = L.filter(function (c) { return !q || c.code.toLowerCase().indexOf(q) >= 0 || c.name.toLowerCase().indexOf(q) >= 0; }).map(function (c) {
+        var r = PiPrice.rateIn ? PiPrice.rateIn(c.code) : null;
+        return '<button type="button" data-c="' + c.code + '" class="' + (c.code === cur ? 'on' : '') + '"><b>' + c.code + '</b><span>' + esc(c.name) + '</span><small>' + (r ? '1 π = ' + esc(c.sym) + (r < 10 ? num(r, 3) : num(r, 2)) : '') + '</small></button>';
+      }).join('') || '<div class="wl-empty"><b>No match</b></div>';
+      $('cu-l').querySelectorAll('button').forEach(function (b) { b.onclick = function () { hmSetLocal(b.getAttribute('data-c')); w.remove(); drawWallet(); say('💱 ' + b.getAttribute('data-c') + ' selected'); }; });
+    };
+    $('cu-q').oninput = draw; draw(); setTimeout(function () { $('cu-q').focus(); }, 80);
   };
   window.hmRequestSheet = window.hmGetPaid;
   var filter = 'all';
@@ -164,8 +287,10 @@
     if (!p || !p.usd) { e.innerHTML = '<div class="wf-p-k"><i class="wf-live"></i>Pi price</div><div class="wf-p-v">Loading…</div>'; return; }
     var ch = typeof p.change24h === 'number' ? p.change24h : null, ago = p.updated ? Math.max(0, Math.round((Date.now() - Date.parse(p.updated)) / 60000)) : null;
     e.innerHTML = '<div class="wf-p-k"><i class="wf-live' + (p.stale ? ' off' : '') + '"></i>' + (p.stale ? 'Last known Pi price' : 'Pi price · live') + (ch !== null ? '<span class="wf-ch ' + (ch >= 0 ? 'up' : 'dn') + '">' + (ch >= 0 ? '▲ ' : '▼ ') + Math.abs(ch).toFixed(2) + '%</span>' : '') + '</div>' +
-      '<div class="wf-p-v">1 π = <b>SAR ' + p.sar.toFixed(4) + '</b></div>' +
-      '<div class="wf-p-s">$' + p.usd.toFixed(4) + (l.rate && l.code !== 'SAR' && l.code !== 'USD' ? ' · ' + l.sym + num(l.rate, l.rate < 10 ? 3 : 2) : '') + ' · ' + (ago === null ? 'refreshes automatically' : ago < 1 ? 'updated just now' : 'updated ' + ago + ' min ago') + '</div>';
+      (l.rate && l.code !== 'SAR' && l.code !== 'USD' ? '<div class="wf-p-v">1 π = <b>' + esc(l.sym) + num(l.rate, l.rate < 10 ? 3 : 2) + '</b><button type="button" class="wf-cur-b" onclick="event.stopPropagation();hmPickCurrency()">' + esc(l.code) + ' ▾</button></div>' +
+        '<div class="wf-p-s">SAR ' + p.sar.toFixed(4) + ' · $' + p.usd.toFixed(4) + ' · ' + (ago === null ? 'refreshes automatically' : ago < 1 ? 'updated just now' : 'updated ' + ago + ' min ago') + '</div>' :
+       '<div class="wf-p-v">1 π = <b>SAR ' + p.sar.toFixed(4) + '</b><button type="button" class="wf-cur-b" onclick="event.stopPropagation();hmPickCurrency()">' + esc(l.code) + ' ▾</button></div>' +
+        '<div class="wf-p-s">$' + p.usd.toFixed(4) + ' · ' + (ago === null ? 'refreshes automatically' : ago < 1 ? 'updated just now' : 'updated ' + ago + ' min ago') + '</div>');
   }
   function stats() {
     var R = get('rcpts', []), m = new Date(); m.setDate(1); m.setHours(0, 0, 0, 0);
@@ -201,21 +326,24 @@
     var st = stats(), l = loc(), sales = get('sales', []);
     top.innerHTML =
       '<div class="wf-card"><div class="wf-row"><img src="icons/icon-192.png" alt=""><div class="wf-who"><small>Haramain Wallet</small><b>' + esc(fullName()) + '<button type="button" onclick="hmEditName()" aria-label="Edit name">✎</button></b><span>' + (uname() ? '@' + esc(uname()) : 'Guest · sign in with Pi to pay') + '</span></div>' + (prem ? '<span class="wf-badge">⭐ Supporter</span>' : '') + '</div>' +
-        '<button type="button" class="wf-price" id="wf-price" onclick="PiPrice.open && PiPrice.open()"></button>' +
+        '<div class="wf-price" id="wf-price" role="button" tabindex="0" onclick="PiPrice.open && PiPrice.open()"></div>' +
         '<div class="wf-stats"><div><small>Received this month</small><b>+' + st.inn + ' π</b></div><div><small>Paid this month</small><b>−' + st.out + ' π</b></div></div>' +
         '<div class="wf-net">' + NETN + ' · haramain.pi</div></div>' +
-      '<div class="wf-acts"><button type="button" onclick="hmGetPaid()"><span>💰</span>Get paid</button><button type="button" onclick="hmPay()"><span>💳</span>Pay</button><button type="button" onclick="hmSendSheet()"><span>💸</span>Send</button><button type="button" onclick="document.getElementById(\'wf-act\').scrollIntoView({behavior:\'smooth\',block:\'start\'})"><span>🧾</span>Receipts</button></div>';
+      '<div class="wf-acts"><button type="button" onclick="hmSendSheet()"><span>💸</span>Send</button><button type="button" onclick="hmGetPaid()"><span>💰</span>Get paid</button><button type="button" onclick="hmPay()"><span>💳</span>Pay link</button><button type="button" onclick="document.getElementById(\'wf-act\').scrollIntoView({behavior:\'smooth\',block:\'start\'})"><span>🧾</span>Receipts</button></div>';
     heroPrice();
-    var openN = sales.filter(function (s) { return !s.paid; }).length;
+    var sends = get('sends', []);
+    var items = sales.map(function (s, i) { return { k: 'in', d: s.d, s: s, i: i }; }).concat(sends.map(function (s, i) { return { k: 'out', d: s.d, s: s, i: i }; })).sort(function (a, b) { return b.d - a.d; }).slice(0, 8);
+    var openN = sales.filter(function (s) { return !s.paid; }).length + sends.filter(function (s) { return !s.paid; }).length;
     $('wl-rest').innerHTML =
-      '<div class="wf-sec"><div class="wf-sec-h"><b>🛍️ Haramain Pay · buy &amp; sell with Pi</b>' + (openN ? '<button type="button" class="wf-link" onclick="hmCheckSales()">Check now</button>' : '') + '</div>' +
-        (sales.length ? sales.slice(0, 6).map(function (s, i) {
-          return '<div class="wf-sale"><div class="wf-sale-i ' + (s.paid ? 'ok' : '') + '">' + (s.paid ? '✓' : '⏳') + '</div><div class="wf-sale-t"><b>' + esc(s.i) + '</b><small>' + s.r + ' · ' + new Date(s.d).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · ' + (s.paid ? 'Paid' : 'Waiting for payment') + '</small></div><div class="wf-sale-a"><b>' + s.a + ' π</b>' +
-            (s.paid ? '<button type="button" onclick="hmReceiptByTx(\'' + s.paid + '\')">Receipt</button>' : '<button type="button" onclick="hmReqOpen(' + i + ')">Share</button>') + '</div></div>';
+      '<div class="wf-sec"><div class="wf-sec-h"><b>🛍️ Haramain Pay · send &amp; get paid</b>' + (openN ? '<button type="button" class="wf-link" onclick="hmCheckSales()">Check now</button>' : '') + '</div>' +
+        (items.length ? items.map(function (x) {
+          var s = x.s, paid = !!s.paid, inn = x.k === 'in';
+          return '<div class="wf-sale"><div class="wf-sale-i ' + (paid ? 'ok' : '') + '">' + (paid ? '✓' : inn ? '⏳' : '↑') + '</div><div class="wf-sale-t"><b>' + esc(inn ? s.i : 'To ' + (s.n || short(s.t))) + '</b><small>' + (inn ? '' : esc(s.x) + ' · ') + s.r + ' · ' + new Date(s.d).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · ' + (paid ? (inn ? 'Paid' : 'Sent ✓') : (inn ? 'Waiting for payment' : 'Waiting for your approval')) + '</small></div><div class="wf-sale-a"><b class="' + (inn ? 'in' : '') + '">' + (inn ? '+' : '−') + s.a + ' π</b>' +
+            (paid ? '<button type="button" onclick="hmReceiptByTx(\'' + s.paid + '\')">Receipt</button>' : inn ? '<button type="button" onclick="hmReqOpen(' + x.i + ')">Share</button>' : '<button type="button" onclick="hmShowSend(' + x.i + ')">Confirm</button>') + '</div></div>';
         }).join('') :
-        '<div class="wf-how"><div><span>1</span>Create a request with the amount and item</div><div><span>2</span>The buyer pays from Pi Wallet</div><div><span>3</span>Both get a receipt verified on the Pi blockchain</div></div>') +
-        '<button type="button" class="wf-cta" onclick="hmGetPaid()">＋ Create payment request</button></div>' +
-      '<div class="wf-sec"><div class="wf-sec-h"><b>💱 Converter · live rate</b><button type="button" class="wf-link" onclick="PiPrice.open && PiPrice.open()">' + esc(l.code) + ' ›</button></div>' +
+        '<div class="wf-how"><div><span>1</span>Send Pi or create a payment request here</div><div><span>2</span>Approve the payment in Pi Wallet</div><div><span>3</span>Haramain verifies it on the Pi blockchain and makes your receipt</div></div>') +
+        '<div class="wf-two"><button type="button" class="wf-cta" style="margin-top:12px" onclick="hmSendSheet()">💸 Send Pi</button><button type="button" class="wf-cta wf-cta2" style="margin-top:12px" onclick="hmGetPaid()">💰 Get paid</button></div></div>' +
+      '<div class="wf-sec"><div class="wf-sec-h"><b>💱 Converter · live rate</b><button type="button" class="wf-link" onclick="hmPickCurrency()">' + esc(l.code) + ' ▾</button></div>' +
         '<div class="wf-conv3"><label><span>π</span><input id="wc-pi" type="number" inputmode="decimal" placeholder="1" oninput="hmConv(\'pi\')"></label><label><span>SAR</span><input id="wc-sar" type="number" inputmode="decimal" placeholder="0" oninput="hmConv(\'sar\')"></label>' +
         (l.code !== 'SAR' ? '<label><span>' + esc(l.code) + '</span><input id="wc-loc" type="number" inputmode="decimal" placeholder="0" oninput="hmConv(\'loc\')"></label>' : '') + '</div></div>' +
       '<div class="wf-sec"><div class="wf-sec-h"><b>🤲 Give &amp; support</b></div><div class="nv-grid wl-tools">' +
@@ -232,7 +360,7 @@
     R.forEach(function (r, i) { var d = r.dir || 'out'; if (filter === 'all' || filter === d) rows.push([r, i]); });
     document.querySelectorAll('.wf-tabs button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-f') === filter); });
     var html = rows.length ? rows.slice(0, 60).map(function (x) {
-      var r = x[0], inn = r.dir === 'in', title = r.kind === 'p2p' ? (inn ? 'From ' + short(r.other) : 'To ' + (r.seller || short(r.to))) : (TYPES[r.kind] || r.memo || 'Pi payment');
+      var r = x[0], inn = r.dir === 'in', title = r.kind === 'p2p' ? (inn ? 'From ' + short(r.other) : 'To ' + (r.toName || r.seller || short(r.to))) : (TYPES[r.kind] || r.memo || 'Pi payment');
       var icon = r.kind === 'pilgrim_pass' ? '⭐' : inn ? '↓' : '↑';
       return '<div class="wl-tx"><span class="wl-txi ' + (inn ? 'in' : 'out') + '">' + icon + '</span><div class="wl-txt"><b>' + esc(title) + '</b><small>' + (r.kind === 'p2p' ? esc(r.item || '') + ' · ' : '') + new Date(r.ts).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + ' · ' + esc(r.status || 'Completed') + '</small></div><div class="wl-txa"><b class="' + (inn ? 'in' : '') + '">' + (inn ? '+' : '−') + r.amount + ' π</b><button type="button" onclick="hmReceipt(' + x[1] + ')">Receipt</button></div></div>';
     }).join('') : '<div class="wl-empty"><span>🧾</span><b>' + (filter === 'in' ? 'No payments received yet' : filter === 'out' ? 'No payments made yet' : 'No activity yet') + '</b><small>Payments in Haramain and Haramain Pay sales appear here with a receipt you can share as an image.</small></div>';
@@ -255,11 +383,11 @@
     wrapPi(); setTimeout(wrapPi, 2000);
     if (window.PiPrice && PiPrice.watch) PiPrice.watch();
     var _goS = window.goS;
-    window.goS = function (id) { var r = _goS.apply(this, arguments); if (id === 'payments') { drawWallet(); fixZakat(); checkSales(false); } if (id === 'profile') drawTx(); return r; };
+    window.goS = function (id) { var r = _goS.apply(this, arguments); if (id === 'payments') { drawWallet(); fixZakat(); checkSales(false); checkSends(); } if (id === 'profile') drawTx(); return r; };
     var _o = window.oUtil; window.oUtil = function (id) { var r = _o.apply(this, arguments); if (id === 'zakat') { fixZakat(); var pr = $('zk-price'), d = price(); if (pr && !pr.value && d && d.usd) { pr.value = d.usd.toFixed(4); try { calcZakat(); } catch (e) {} } } return r; };
     window.addEventListener('pi-price', function () { if (onWallet()) { heroPrice(); var w = $('wc-pi'); if (w && document.activeElement !== w && !/wc-/.test((document.activeElement || {}).id || '')) convert('pi'); } });
     setInterval(function () { if (!document.hidden && onWallet()) heroPrice(); }, 30000);
-    setInterval(function () { if (!document.hidden) checkSales(false); }, 60000);
+    setInterval(function () { if (!document.hidden) { checkSales(false); checkSends(); } }, 60000);
     setTimeout(function () { checkSales(false); }, 5000);
     drawTx();
   }
