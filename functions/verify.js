@@ -6,7 +6,7 @@ const out = (o, age) => new Response(JSON.stringify(o), { status: 200, headers: 
 const HORIZON = { main: 'https://api.mainnet.minepi.com', test: 'https://api.testnet.minepi.com' };
 const isHash = (x) => /^[a-f0-9]{64}$/i.test(x || '');
 const isAddr = (x) => /^G[A-Z2-7]{55}$/.test(x || '');
-const isRef = (x) => /^HM-[A-Z0-9]{6}$/.test(x || '');
+const isRef = (x) => /^(HM|DS)-[A-Z0-9]{6}$/.test(x || '');
 
 async function hz(base, path) {
   const r = await fetch(base + path, { headers: { Accept: 'application/json' }, cf: { cacheTtl: 5 } });
