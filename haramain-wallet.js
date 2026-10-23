@@ -211,7 +211,7 @@
         '<div class="wf-step"><i>1</i><div><b>Copy the recipient’s address</b>' + copyBtn(sd.t) + '</div></div>' +
         '<div class="wf-step"><i>2</i><div><b>Copy the amount</b>' + copyBtn(String(sd.a)) + '</div></div>' +
         '<div class="wf-step"><i>3</i><div><b>Copy the memo</b><small>Put it in the memo so Haramain can find your payment.</small>' + copyBtn(sd.r) + '</div></div>' +
-        '<div class="wf-step"><i>4</i><div><b>Open Pi Wallet, tap Send, paste and approve</b><a class="hm-sheet-a" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="https://wallet.pinet.com" target="_blank" rel="noopener">Open Pi Wallet</a></div></div>' +
+        '<div class="wf-step"><i>4</i><div><b>Open Pi Wallet, tap Send, paste and approve</b><button type="button" class="hm-sheet-a" style="margin-top:8px" onclick="hmOpenPiWallet()">Open Pi Wallet</button><small>After approving, tap Back to return to Haramain. Your transfer waits here.</small></div></div>' +
       '</div>' +
       '<button type="button" class="wf-cta" id="sd-chk">✅ I have sent it · confirm</button><div class="wf-status" id="sd-st"></div>' +
       '<details class="wf-alt"><summary>Forgot the memo? Use the transaction ID</summary><input class="fi wf-mono" id="sd-tx" placeholder="64-character transaction ID" autocomplete="off" style="margin-top:8px"><button type="button" class="wf-btn" id="sd-txb" style="margin-top:8px;width:100%">Verify this transaction</button></details>');
@@ -242,6 +242,11 @@
     };
   }
   window.hmShowSend = showSend;
+  /* Pi Wallet opens in the same tab (new tabs are blocked in the Pi Browser); Back returns to Haramain */
+  window.hmOpenPiWallet = function () {
+    try { sessionStorage.setItem('hm_back_to', 'payments'); } catch (e) {}
+    try { location.href = 'https://wallet.pinet.com'; } catch (e) { say('Open the Wallet from the Pi Browser home screen.'); }
+  };
   function finishSend(i, tx) {
     var all = get('sends', []), sd = all[i]; if (!sd || sd.paid) return;
     sd.paid = tx.hash; sd.at = Date.parse(tx.at) || Date.now(); sd.from = tx.from; put('sends', all);
@@ -381,7 +386,14 @@
   }
 
   function onWallet() { var s = $('s-payments'); return s && s.classList.contains('on'); }
+  function backFromWallet() {
+    var b = null; try { b = sessionStorage.getItem('hm_back_to'); sessionStorage.removeItem('hm_back_to'); } catch (e) {}
+    if (b !== 'payments') return;
+    setTimeout(function () { try { goS('payments'); } catch (e) {} say('Welcome back. Checking for your payment…'); checkSends(); }, 900);
+  }
+  window.addEventListener('pageshow', function (e) { if (e.persisted) backFromWallet(); });
   function start() {
+    backFromWallet();
     wrapPi(); setTimeout(wrapPi, 2000);
     if (window.PiPrice && PiPrice.watch) PiPrice.watch();
     var _goS = window.goS;
