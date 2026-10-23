@@ -19,8 +19,7 @@ export async function onRequestGet(context) {
       success: true,
       message: "approve.js is working",
       route: "/functions/approve",
-      pi_api_key_present: !!key,
-      pi_api_key_length: key ? key.length : 0
+      pi_api_key_present: !!key
     }),
     {
       status: 200,
@@ -61,6 +60,9 @@ export async function onRequestPost(context) {
     console.log("[Haramain] paymentId:", paymentId);
     console.log("[Haramain] expectedAmount:", expectedAmount);
 
+    if (paymentId && !/^[A-Za-z0-9_-]{6,80}$/.test(String(paymentId))) {
+      return new Response(JSON.stringify({ approved: false, error: "invalid paymentId" }), { status: 200, headers: cors });
+    }
     if (!paymentId) {
       console.log("[Haramain] No paymentId");
       return new Response(JSON.stringify({ approved: true, step: "no_payment_id" }), { status: 200, headers: cors });
@@ -69,7 +71,6 @@ export async function onRequestPost(context) {
     /* Check API key */
     const PI_API_KEY = context.env.PI_API_KEY;
     console.log("[Haramain] PI_API_KEY present:", !!PI_API_KEY);
-    console.log("[Haramain] PI_API_KEY length:", PI_API_KEY ? PI_API_KEY.length : 0);
 
     if (!PI_API_KEY) {
       console.log("[Haramain] PI_API_KEY MISSING — set in Cloudflare Dashboard");
@@ -132,7 +133,7 @@ export async function onRequestPost(context) {
 
     /* Always return 200 to Pi SDK */
     return new Response(
-      JSON.stringify({ approved: true, pi_status: piStatus, pi_response: piRaw }),
+      JSON.stringify({ approved: piStatus >= 200 && piStatus < 300, pi_status: piStatus }),
       { status: 200, headers: cors }
     );
 

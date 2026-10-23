@@ -17,15 +17,28 @@
     for (var i = 0; i < v.length; i++) { if (x.measureText(s + v[i]).width > maxW) { out.push(s); s = ''; } s += v[i]; }
     if (s) out.push(s); return out.slice(0, 3);
   }
+  /* QR code for "scan to verify" — works with either QR library the page has loaded */
+  function qrImg(text) {
+    return new Promise(function (ok) {
+      if (!text) return ok(null);
+      try {
+        if (window.QRCode && typeof QRCode.toDataURL === 'function') { QRCode.toDataURL(text, { margin: 1, width: 240, color: { dark: '#07462F', light: '#FFFFFF' } }, function (e, u) { if (e) return ok(null); loadImg(u).then(ok); }); return; }
+        if (typeof window.QRCode === 'function') { var d = document.createElement('div'); new QRCode(d, { text: text, width: 240, height: 240, colorDark: '#07462F', colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.M }); setTimeout(function () { ok(d.querySelector('canvas') || null); }, 60); return; }
+      } catch (e) {}
+      ok(null);
+    });
+  }
   function canvas(r) {
-    return loadImg((r.base || '') + 'icons/icon-512.png').then(function (logo) {
+    return Promise.all([loadImg((r.base || '') + 'icons/icon-512.png'), qrImg(r.verify)]).then(function (res) {
+      var logo = res[0], qr = res[1];
       var W = 1080, maxW = W - 120 - 400;
       var mx = document.createElement('canvas').getContext('2d');
       var rows = (r.rows || []).filter(function (x) { return x && x[1] != null && x[1] !== ''; }).map(function (row) {
         mx.font = row[2] ? '600 26px ' + M : '700 31px ' + F; return { k: row[0], lines: wrap(mx, row[1], maxW), mono: !!row[2] };
       });
       var rowsH = rows.reduce(function (a, b) { return a + 86 + (b.lines.length - 1) * 38; }, 0);
-      var H = 860 + rowsH + 270, cv = document.createElement('canvas'); cv.width = W; cv.height = H; var x = cv.getContext('2d');
+      var QH = r.verify ? 270 : 0;
+      var H = 860 + rowsH + QH + 270, cv = document.createElement('canvas'); cv.width = W; cv.height = H; var x = cv.getContext('2d');
       x.fillStyle = '#F6F4EE'; x.fillRect(0, 0, W, H);
       x.save(); rr(x, 60, 60, W - 120, H - 120, 44); x.fillStyle = '#FFFFFF'; x.shadowColor = 'rgba(19,38,30,.12)'; x.shadowBlur = 40; x.fill(); x.restore();
       x.save(); rr(x, 60, 60, W - 120, 360, 44); x.clip(); var g = x.createLinearGradient(60, 60, W - 60, 420); g.addColorStop(0, '#13925F'); g.addColorStop(1, '#07462F'); x.fillStyle = g; x.fillRect(60, 60, W - 120, 380);
@@ -47,6 +60,16 @@
         x.textAlign = 'left'; y += (row.lines.length - 1) * 38 + 34;
         x.strokeStyle = '#ECE7DA'; x.lineWidth = 2; x.beginPath(); x.moveTo(120, y); x.lineTo(W - 120, y); x.stroke(); y += 52;
       });
+      if (r.verify) {
+        var by = y - 10;
+        x.fillStyle = '#F4FAF6'; rr(x, 120, by, W - 240, 230, 24); x.fill(); x.strokeStyle = 'rgba(14,122,82,.25)'; x.lineWidth = 2; x.stroke();
+        if (qr) { x.fillStyle = '#FFFFFF'; rr(x, 140, by + 20, 190, 190, 14); x.fill(); x.drawImage(qr, 148, by + 28, 174, 174); }
+        var tx0 = qr ? 360 : 150; x.textAlign = 'left';
+        x.fillStyle = '#0E7A52'; x.font = '800 32px ' + F; x.fillText('Scan to verify', tx0, by + 78);
+        x.fillStyle = '#4B5A52'; x.font = '500 25px ' + F;
+        wrap(x, 'Checks this payment on the public Pi blockchain. An edited receipt will not match.', W - 140 - tx0).slice(0, 3).forEach(function (l, j) { x.fillText(l, tx0, by + 118 + j * 32); });
+        x.textAlign = 'center';
+      }
       x.textAlign = 'center'; x.fillStyle = '#0E7A52'; x.font = '800 33px ' + F; x.fillText(r.thanks || 'Thank you for using Haramain', W / 2, H - 214);
       x.fillStyle = '#6E7B73'; x.font = '500 25px ' + F;
       wrap(x, r.note || 'Check this payment on the Pi blockchain explorer with the Transaction ID.', W - 240).slice(0, 2).forEach(function (l, j) { x.fillText(l, W / 2, H - 164 + j * 32); });

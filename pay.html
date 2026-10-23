@@ -60,7 +60,7 @@ h2{font-size:15px;margin:22px 4px 10px}
   <div id="app"><div class="bad">Loading payment request…</div></div>
   <div class="foot">Haramain never holds your Pi · <a href="/privacy-policy">Privacy</a> · <a href="/terms-of-service">Terms</a> · <a href="/">Open Haramain</a></div>
 </div>
-<script src="haramain-receipt.js?v=1"></script>
+<script src="haramain-receipt.js?v=2"></script>
 <script>
 (function () {
   'use strict';
@@ -71,7 +71,8 @@ h2{font-size:15px;margin:22px 4px 10px}
   var esc = function (x) { return String(x == null ? '' : x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function dec(s) { try { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return JSON.parse(decodeURIComponent(escape(atob(s)))); } catch (e) { return null; } }
   var inv = dec((location.hash || '').slice(1));
-  var ok = inv && /^G[A-Z2-7]{55}$/.test(inv.t || '') && inv.a > 0 && /^HM-[A-Z0-9]{6}$/.test(inv.r || '');
+  if (inv) { inv.a = typeof inv.a === 'number' ? inv.a : NaN; inv.d = +inv.d || Date.now(); inv.i = String(inv.i || '').slice(0, 80); inv.n = String(inv.n || '').slice(0, 50); inv.u = String(inv.u || '').replace(/[^A-Za-z0-9_.-]/g, '').slice(0, 40); }
+  var ok = inv && /^G[A-Z2-7]{55}$/.test(inv.t || '') && isFinite(inv.a) && inv.a > 0 && inv.a <= 1e7 && /^HM-[A-Z0-9]{6}$/.test(inv.r || '');
   if (!ok) { $('app').innerHTML = '<div class="card"><div class="bad"><b style="color:#13261E;font-size:16px">This payment link is not complete</b><br><br>Ask the seller to send the Haramain Pay link again.</div></div>'; return; }
   var TEST = inv.k === 'test', NETN = TEST ? 'Pi Testnet' : 'Pi Mainnet';
   if (TEST) { $('net').textContent = 'Pi Testnet · test Pi'; $('net').classList.add('test'); }
@@ -155,6 +156,7 @@ h2{font-size:15px;margin:22px 4px 10px}
       rows: [['Paid to', (inv.n || '—') + (inv.u ? ' (@' + inv.u + ')' : '')], ['Paid by', (!mine && me) ? me : short(tx.from)], ['For', inv.i || 'Payment'], ['Reference', inv.r],
         ['Date', new Date(tx.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })], ['Time', new Date(tx.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })],
         ['Network', NETN], ['Seller address', inv.t, 1], ['Transaction ID', tx.hash, 1]],
+      verify: location.origin + '/receipt.html#tx=' + tx.hash + '&net=' + (TEST ? 'test' : 'main'),
       thanks: 'Paid with Haramain Pay', note: 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
   }
   function paid(tx) {

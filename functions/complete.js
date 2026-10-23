@@ -16,8 +16,7 @@ export async function onRequestGet(context) {
       success: true,
       message: "complete.js is working",
       route: "/functions/complete",
-      pi_api_key_present: !!key,
-      pi_api_key_length: key ? key.length : 0
+      pi_api_key_present: !!key
     }),
     {
       status: 200,
@@ -57,6 +56,10 @@ export async function onRequestPost(context) {
       );
     }
 
+    if (!/^[A-Za-z0-9_-]{6,80}$/.test(String(paymentId)) || (txid && !/^[A-Fa-f0-9]{64}$/.test(String(txid)))) {
+      return new Response(JSON.stringify({ completed: false, error: "invalid payment details" }), { status: 200, headers: cors });
+    }
+
     if (!txid) {
       console.log("[Haramain] Missing txid — payment still processing");
       return new Response(
@@ -67,7 +70,6 @@ export async function onRequestPost(context) {
 
     const PI_API_KEY = context.env.PI_API_KEY;
     console.log("[Haramain] PI_API_KEY present:", !!PI_API_KEY);
-    console.log("[Haramain] PI_API_KEY length:", PI_API_KEY ? PI_API_KEY.length : 0);
 
     if (!PI_API_KEY) {
       console.error("[Haramain] PI_API_KEY missing");
@@ -99,8 +101,7 @@ export async function onRequestPost(context) {
     return new Response(
       JSON.stringify({
         completed: res.ok,
-        pi_status: res.status,
-        response: text
+        pi_status: res.status
       }),
       {
         status: 200, /* Always 200 — never 500 to Pi SDK */

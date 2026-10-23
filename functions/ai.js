@@ -46,9 +46,33 @@ async function anthropic(key, system, msgs) {
   return ((d.content || [])[0] || {}).text || '';
 }
 
+/* Abuse protection: only this app's pages may call /ai, and each visitor gets a fair hourly allowance.
+   IP addresses are never stored: only a salted hash, kept for one hour. */
+const LIMIT_HOUR = 40;
+async function allowed(context) {
+  const req = context.request, env = context.env || {};
+  const origin = req.headers.get('Origin');
+  if (origin) { try { if (new URL(origin).host !== new URL(req.url).host) return 'This assistant only works inside the app.'; } catch (e) { return 'Bad request'; } }
+  const db = env.HM_DB; if (!db) return '';
+  try {
+    const ip = req.headers.get('CF-Connecting-IP') || '0';
+    const hour = Math.floor(Date.now() / 3600e3);
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('hm-ai|' + hour + '|' + ip));
+    const k = Array.from(new Uint8Array(buf).slice(0, 12), (b) => b.toString(16).padStart(2, '0')).join('');
+    await db.exec('CREATE TABLE IF NOT EXISTS ai_rl (k TEXT PRIMARY KEY, n INTEGER, hour INTEGER)');
+    await db.prepare('INSERT INTO ai_rl (k, n, hour) VALUES (?, 1, ?) ON CONFLICT(k) DO UPDATE SET n = n + 1').bind(k, hour).run();
+    const row = await db.prepare('SELECT n FROM ai_rl WHERE k = ?').bind(k).first();
+    if (Math.random() < 0.02) await db.prepare('DELETE FROM ai_rl WHERE hour < ?').bind(hour - 1).run();
+    if (row && row.n > LIMIT_HOUR) return 'You have asked a lot this hour. Please try again a little later.';
+  } catch (e) {}
+  return '';
+}
+
 export async function onRequestPost(context) {
   try {
     const env = context.env || {};
+    const block = await allowed(context);
+    if (block) return json({ error: block });
     const b = await context.request.json().catch(() => ({}));
     const msgs = clean(b.messages);
     if (!msgs.length || msgs[msgs.length - 1].role !== 'user') return json({ error: 'No question' });

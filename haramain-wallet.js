@@ -64,10 +64,12 @@
       rows: [['Name', r.name || '—'], ['Pi username', r.user ? '@' + r.user : '—'], ['Payment for', TYPES[r.kind] || r.memo || 'Pi payment']].concat(when, [['Network', r.net || 'Pi Network'], ['Payment ID', r.pid, 1], ['Transaction ID', r.txid, 1]]),
       thanks: 'Thank you for supporting Haramain' };
   }
+  function verifyUrl(r) { return r && /^[a-f0-9]{64}$/i.test(r.txid || '') ? location.origin + '/receipt.html#tx=' + r.txid.toLowerCase() + '&net=' + (/Testnet/.test(r.net || '') ? 'test' : 'main') : ''; }
   window.hmReceipt = function (i) {
     var r = get('rcpts', [])[i]; if (!r || !window.HMReceipt) return;
     var text = 'HARAMAIN · ' + (r.send ? 'Transfer receipt' : r.kind === 'p2p' ? 'Verified payment' : 'Payment receipt') + '\n' + r.amount + ' π · ' + (r.narr || TYPES[r.kind] || r.item || r.memo || 'Pi payment') + '\nDate: ' + new Date(r.ts).toLocaleString() + '\nTransaction ID: ' + (r.txid || '—') + '\nharamain.pi';
-    HMReceipt.sheet(spec(r), 'Haramain-receipt-' + (r.txid ? r.txid.slice(0, 8) : r.ts) + '.png', text);
+    var sp = spec(r); sp.verify = verifyUrl(r); if (sp.verify) text += '\nVerify: ' + sp.verify;
+    HMReceipt.sheet(sp, 'Haramain-receipt-' + (r.txid ? r.txid.slice(0, 8) : r.ts) + '.png', text);
   };
 
   /* ── Haramain Pay: payment requests ── */
@@ -162,7 +164,7 @@
   /* ── Send Pi: everything in Haramain, approval in Pi Wallet, receipt from the blockchain ── */
   function decLink(v) {
     var m = /pay\.html#([A-Za-z0-9_-]+)/.exec(v || ''); if (!m) return null;
-    try { var t = m[1].replace(/-/g, '+').replace(/_/g, '/'); while (t.length % 4) t += '='; var o = JSON.parse(decodeURIComponent(escape(atob(t)))); return /^G[A-Z2-7]{55}$/.test(o.t || '') && o.a > 0 ? o : null; } catch (e) { return null; }
+    try { var t = m[1].replace(/-/g, '+').replace(/_/g, '/'); while (t.length % 4) t += '='; var o = JSON.parse(decodeURIComponent(escape(atob(t)))); return /^G[A-Z2-7]{55}$/.test(o.t || '') && typeof o.a === 'number' && isFinite(o.a) && o.a > 0 && o.a <= 1e7 && /^HM-[A-Z0-9]{6}$/.test(o.r || '') ? o : null; } catch (e) { return null; }
   }
   window.hmSendSheet = function () {
     var payees = get('payees', []), lock = null;
