@@ -103,6 +103,7 @@
       '<div class="hmt-verse"><div class="hmt-ar" lang="ar" dir="rtl">' + esc(it.ar) + '</div><div class="hmt-en">' + esc(it.en) + '</div>' +
         '<div class="hmt-row"><span class="hmt-ref">' + esc(it.ref) + '</span><span><button type="button" onclick="hmDailyMore()">Another ›</button><button type="button" onclick="hmDailyShare()">Share</button></span></div></div>' +
       (c.on ? '<label class="hmt-before"><input type="checkbox" ' + (c.before ? 'checked' : '') + ' onchange="hmToggleRem(\'before\')"> Also remind me 10 minutes before</label>' : '') +
+      (window.HMA ? '<div class="hmt-adk"><button type="button" onclick="HMA.open(\'m\')"><span>☀️</span><b>Morning Adhkar</b><small>' + HMA.done('m') + ' / ' + HMA.total('m') + (HMA.done('m') === HMA.total('m') ? ' ✓' : '') + '</small></button><button type="button" onclick="HMA.open(\'e\')"><span>🌙</span><b>Evening Adhkar</b><small>' + HMA.done('e') + ' / ' + HMA.total('e') + (HMA.done('e') === HMA.total('e') ? ' ✓' : '') + '</small></button><button type="button" onclick="goS(\'quran\')"><span>📖</span><b>Quran</b><small>' + (window.HMQ && HMQ.last() ? 'Continue' : 'Read · listen') + '</small></button></div>' : '') +
       '<button type="button" class="hmt-pray" onclick="goS(\'analytics\')"><span>🕌 Prayers today <b>' + n + '/5</b>' + (st ? ' · 🔥 ' + st + '-day streak' : '') + '</span><span class="hmt-bar"><i style="width:' + (n * 20) + '%"></i></span></button>' +
       '<div class="hmt-cd">' + countdowns().map(function (x) { return '<div><b>' + (x.d === 0 ? 'Today' : x.d) + '</b><small>' + x.i + ' ' + (x.d === 0 ? x.n : (x.d === 1 ? 'day to ' : 'days to ') + x.n) + '</small></div>'; }).join('') + '</div>' +
       (c.on ? '<div class="hmt-note">Reminders sound while Haramain is open.</div>' : '');
@@ -128,6 +129,7 @@
     setInterval(function () { if (!document.hidden) render(); }, 600000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) { render(); check(); } });
     setTimeout(render, 1500);   // after the Hijri date is ready
+    window.addEventListener('hm-adhkar', render);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 60); }); else setTimeout(start, 60);
 })();
