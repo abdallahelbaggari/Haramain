@@ -1,0 +1,89 @@
+/* Haramain — final visual layer: one look across every screen.
+   Palette: emerald #0E7A52 / deep #0B3B29, gold #B8892B, ivory #F6F4EE, white cards. Loaded last. */
+:root{--hm-deep:#0B3B29;--hm-em:#0E7A52;--hm-em2:#07462F;--hm-gold:#B8892B;--hm-gold2:#94701F;--hm-ivory:#F6F4EE;--hm-line:rgba(19,38,30,.09);
+  --hm-sh:0 1px 2px rgba(19,38,30,.04),0 10px 24px -16px rgba(19,38,30,.22);--hm-r:18px}
+html body{background:var(--hm-ivory)}
+html body::after{display:none}
+html body::before{background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(14,122,82,.05),transparent 70%)}
+
+/* ── top chrome: one clean header, greeting only on Home ── */
+html body .ticker,html body .info-bar{display:none!important}
+html body #hdr{background:rgba(255,255,255,.94);border-bottom:1px solid var(--hm-line);padding:.62rem 1rem;box-shadow:0 6px 18px -16px rgba(19,38,30,.35)}
+html body .hdr-logo{font-weight:800;letter-spacing:.22em;color:var(--hm-deep);font-size:16px;display:flex;align-items:center;gap:9px}
+html body .hdr-user{font-weight:700;color:var(--hm-deep);max-width:96px}
+html body .hdr-lang{border-radius:10px;border:1px solid var(--hm-line);background:#fff;padding:4px 6px;font-weight:700;color:var(--hm-deep)}
+html body .bell{width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid var(--hm-line);display:flex;align-items:center;justify-content:center;font-size:15px}
+html body .bell-dot{top:5px;right:6px;width:8px;height:8px;border:2px solid #fff}
+html body .greeting-bar{background:none;border:0;padding:.7rem 1rem 0;flex-wrap:wrap;row-gap:0}
+html body #greeting-bar-text{color:var(--hm-deep);font-size:17px;font-weight:800}
+html body .greeting-msg{margin-left:0;flex-basis:100%;font-style:normal;color:var(--hm-gold2);font-size:13px;font-weight:600;padding-left:1.45rem}
+html body:not([data-scr="dashboard"]) .greeting-bar{display:none}
+html body #main{padding-top:.6rem}
+
+/* ── page titles ── */
+html body .scr-hdr{border-bottom:0;padding:.55rem 0 .25rem;margin-bottom:.55rem;align-items:flex-end}
+html body .scr-hdr-title{font-family:'DM Sans',system-ui,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.015em;color:var(--hm-deep);line-height:1.15}
+html body .scr-hdr-sub{font-size:13px;color:#6E7B73;margin-top:3px}
+html body .scr-hdr-action{font-weight:800;color:var(--hm-em);font-size:13px;padding:6px 10px;border-radius:999px;background:#E7F6EE}
+html body .scr-top-title{font-size:24px!important;font-weight:800!important;color:var(--hm-deep)!important;letter-spacing:-.015em!important;line-height:1.15}
+html body .scr-top-bar{padding:.55rem 0 .7rem!important}
+html body #s-dashboard>.scr-hdr{display:none}
+html body .sec-label{font-size:11.5px;letter-spacing:.16em;color:var(--hm-gold2);font-weight:800;margin:1.05rem 0 .55rem}
+html body .sec-label::after{background:var(--hm-line)}
+
+/* ── cards: white, soft shadow, no coloured top stripes ── */
+html body .card,html body .card-gold,html body .card-green,html body .card-blue,html body .card-red,
+html body .prof-hero,html body .checklist-hero,html body .health-hero,html body .counter-card,html body .tracker-card,html body .hp-card,html body .pid-card{
+  background:#fff;border:1px solid var(--hm-line);border-radius:var(--hm-r);box-shadow:var(--hm-sh)}
+html body .card::before,html body .prof-hero::before,html body .pid-card::before,html body .tracker-card::before,html body .hp-card::before,html body .wallet-hero::before{display:none}
+html body .card-green#next-prayer-card{background:linear-gradient(140deg,#13925F,#07462F);border:0;color:#fff;box-shadow:0 14px 30px -16px rgba(7,70,47,.6)}
+html body #next-prayer-card *{color:#fff}
+html body #next-prayer-card .np-time,html body #next-prayer-card [id="np-time"]{color:#E6BD5C!important}
+html body .ic{background:#fff;border:1px solid var(--hm-line);border-radius:var(--hm-r);box-shadow:var(--hm-sh);padding:.9rem 1rem}
+html body .ic-title{font-weight:800;color:var(--hm-deep)}
+html body .ibox{background:#F4FAF6;border:1px solid rgba(14,122,82,.14);border-radius:14px;color:#3F4F47;font-size:14px;line-height:1.6}
+html body .tile{background:#fff;border:1px solid var(--hm-line);border-radius:16px;box-shadow:var(--hm-sh)}
+html body .emer-hero{background:#fff;border:1px solid rgba(192,57,43,.22);border-radius:var(--hm-r);box-shadow:0 12px 28px -18px rgba(192,57,43,.45)}
+html body .emer-hero::before{display:none}
+html body .prem-card{background:linear-gradient(140deg,#FFFBF0,#FBF3DF);border:1px solid rgba(184,137,43,.28);border-radius:var(--hm-r);box-shadow:var(--hm-sh)}
+
+/* ── tool cards: white with a tinted icon chip ── */
+html body .tgrid{gap:.6rem}
+html body .tc,html body .tc-gold,html body .tc-green,html body .tc-blue,html body .tc-red,html body .tc-purple,html body .tc-teal,html body .tc-orange{
+  background:#fff;border:1px solid var(--hm-line);border-left:1px solid var(--hm-line);border-radius:var(--hm-r);box-shadow:var(--hm-sh);padding:.9rem .85rem;min-height:118px}
+html body .tc-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:23px;margin-bottom:.55rem;background:#E7F6EE}
+html body .tc-gold .tc-icon,html body .tc-orange .tc-icon{background:#FBF3DF}html body .tc-blue .tc-icon{background:#EAF1FB}html body .tc-red .tc-icon{background:#FDECEC}
+html body .tc-purple .tc-icon{background:#F2EDF9}html body .tc-teal .tc-icon{background:#E4F4F5}
+html body .tc-name{font-weight:800;color:var(--hm-deep);font-size:15px}
+html body .tc-desc{color:#6E7B73;font-size:12.5px}
+html body .tc-tag{border-radius:999px;font-size:10px;letter-spacing:.06em;padding:3px 7px;top:.6rem;right:.6rem}
+html body .hub-item{background:#fff;border:1px solid var(--hm-line);border-radius:16px;box-shadow:var(--hm-sh)}
+
+/* ── a tool opens as its own page ── */
+html body .scr.hm-u>.hm-hide{display:none!important}
+html body .up-hdr{background:var(--hm-ivory);border-bottom:0;padding:.35rem 0 .55rem;margin-bottom:.55rem}
+html body .back-btn{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--hm-line);box-shadow:var(--hm-sh);font-size:18px;color:var(--hm-deep)}
+html body .up-title{font-family:'DM Sans',system-ui,sans-serif;font-size:21px;font-weight:800;letter-spacing:-.01em;color:var(--hm-deep)}
+
+/* ── buttons & fields ── */
+html body .btn{border-radius:14px;font-weight:800;padding:.78rem 1rem;background:linear-gradient(135deg,#0E7A52,#07462F);color:#fff;box-shadow:0 10px 22px -14px rgba(7,70,47,.7)}
+html body .btn-gold{background:linear-gradient(135deg,#C99A37,#94701F);color:#fff;box-shadow:0 10px 22px -14px rgba(148,112,31,.8)}
+html body .btn-ghost{background:#fff;color:var(--hm-deep);border:1px solid var(--bd2);box-shadow:none}
+html body .btn-red,html body .emer-btn#emer-sos-btn{background:linear-gradient(135deg,#D64534,#A93226);color:#fff}
+html body .fi,html body select.fi,html body textarea.fi{background:#fff;border:1px solid rgba(19,38,30,.16);border-radius:12px;padding:.68rem .8rem;font-size:15px}
+html body .fi:focus{border-color:var(--hm-em);box-shadow:0 0 0 3px rgba(14,122,82,.13)}
+html body .flbl{font-weight:800;color:#4B5A52;font-size:12px;letter-spacing:.04em}
+
+/* ── chips & pills ── */
+html body .hm-chip,html body .guide-tab,html body .gtab{border-radius:999px}
+
+/* ── bottom navigation ── */
+html body #bnav{background:rgba(255,255,255,.97);border-top:1px solid var(--hm-line);box-shadow:0 -10px 24px -18px rgba(19,38,30,.35);padding-top:.4rem}
+html body .bni{position:relative;gap:.2rem}
+html body .bni-i{font-size:1.15rem;width:46px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:999px;transition:background .2s}
+html body .bni-l{font-size:10.5px;font-weight:800;letter-spacing:.05em;color:#7D8A82}
+html body .bni.on .bni-i{background:#E7F6EE;filter:none}
+html body .bni.on .bni-l{color:var(--hm-em)}
+
+/* ── toast ── */
+html body #toast{background:#0B3B29;color:#fff;border-radius:999px;font-weight:700;box-shadow:0 14px 30px -12px rgba(11,59,41,.6)}

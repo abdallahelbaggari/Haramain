@@ -6,7 +6,7 @@
     goS(screen);
     if (util) setTimeout(function () {
       try { oUtil(util); } catch (e) {}
-      var u = $('up-' + util); if (u) setTimeout(function () { u.scrollIntoView({ block: 'start' }); try { $('main').scrollTop = Math.max(0, $('main').scrollTop - 8); } catch (e) {} }, 60);
+      try { $('main').scrollTop = 0; } catch (e) {} window.scrollTo(0, 0);
     }, 40);
     else { try { $('main').scrollTop = 0; } catch (e) {} window.scrollTo(0, 0); }
   };
@@ -47,6 +47,29 @@
       [['👤', 'Profile', "hmOpen('profile')"], ['🪪', 'Pilgrim ID', "hmOpen('profile','pilgrim-id')"], ['🔔', 'Notifications', "hmOpen('notifs')"], ['💬', 'Ask', "hmOpen('ai')"]].map(function (t) { return '<button type="button" class="nv-t" onclick="' + t[2] + '"><span class="nv-i">' + t[0] + '</span><span class="nv-l">' + t[1] + '</span></button>'; }).join('') + '</div></div>';
     if (div) m.insertBefore(box, div); else m.appendChild(box);
   }
-  function start() { home(); more(); }
+  /* which screen is showing (for styling), and tools that open as their own page */
+  function mark(id) { try { document.body.setAttribute('data-scr', id || 'dashboard'); } catch (e) {} }
+  function clearU() { document.querySelectorAll('.scr.hm-u').forEach(function (x) { x.classList.remove('hm-u'); }); document.querySelectorAll('.hm-hide').forEach(function (x) { x.classList.remove('hm-hide'); }); }
+  function pageFor(t) {
+    var sec = t.closest('.scr'); if (!sec) return;
+    clearU(); sec.classList.add('hm-u');
+    var node = t;
+    while (node && node !== sec) {
+      var par = node.parentElement; if (!par) break;
+      Array.prototype.forEach.call(par.children, function (c) { if (c !== node && c.tagName !== 'SCRIPT' && c.tagName !== 'STYLE') c.classList.add('hm-hide'); });
+      if (par === sec) break; node = par;
+    }
+    try { $('main').scrollTop = 0; } catch (e) {} window.scrollTo(0, 0);
+  }
+  function wire() {
+    var _goS = window.goS;
+    window.goS = function (id) { clearU(); var tt = document.getElementById('toast'); if (tt) tt.classList.remove('on'); var r = _goS.apply(this, arguments); mark(id); return r; };
+    var _o = window.oUtil;
+    window.oUtil = function (id) { var r = _o.apply(this, arguments); var t = $('up-' + id); if (t && t.classList.contains('on')) pageFor(t); return r; };
+    var _c = window.cUtil;
+    window.cUtil = function () { var r = _c ? _c.apply(this, arguments) : undefined; clearU(); try { $('main').scrollTop = 0; } catch (e) {} window.scrollTo(0, 0); return r; };
+    var on = document.querySelector('.scr.on'); mark(on ? on.id.replace(/^s-/, '') : 'dashboard');
+  }
+  function start() { home(); more(); wire(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 120); }); else setTimeout(start, 120);
 })();
