@@ -1087,7 +1087,7 @@ select.fi{cursor:pointer;}
 </style>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link rel="stylesheet" href="haramain-pro.css?v=10">
+<link rel="stylesheet" href="haramain-pro.css?v=11">
 <link rel="stylesheet" href="haramain-onboarding.css?v=3">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/svg+xml" href="logo.svg">
@@ -1645,7 +1645,7 @@ select.fi{cursor:pointer;}
     <!-- ══ PAYMENTS SCREEN ══ -->
     <section class="scr" id="s-payments">
       <div class="scr-hdr">
-        <div><div class="scr-hdr-title">Pi Payments</div><div class="scr-hdr-sub">Send, request and support with Pi</div></div>
+        <div><div class="scr-hdr-title">Wallet</div><div class="scr-hdr-sub">Live Pi rate · Haramain Pay · verified receipts</div></div>
       </div>
 
       <!-- Wallet -->
@@ -4445,9 +4445,9 @@ function loadLostForm(){
 
 /* ══ EMERGENCY SOS ══ */
 function activateSOS(){
-  if(!confirm('Activate Emergency SOS? This will alert emergency services and share your location.')) return;
-  addNotif('🚨','SOS ACTIVATED','Emergency services alerted. GPS location shared. Stay calm.','NOW');
-  toast('🚨 SOS Activated! Help is coming.');
+  if(!confirm('Open emergency options? Haramain shows the numbers to call and lets you share your location. It does not call anyone by itself.')) return;
+  addNotif('🚨','SOS opened','Call 911 (Saudi emergency) or 997 (ambulance) now, and share your location with family.','now');
+  toast('🚨 Call 911 now · 997 for an ambulance');
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(function(pos){
       var lat=pos.coords.latitude, lng=pos.coords.longitude;
@@ -4912,9 +4912,9 @@ activateSOS = function() {
     '\n📍 Location: https://www.google.com/maps?q=' + trackerLat + ',' + trackerLng :
     '\n📡 Enable tracker for GPS location';
 
-  addNotif('🚨', 'SOS EMERGENCY ACTIVATED',
+  addNotif('🚨', 'SOS: call for help',
     '📞 Saudi Emergency: 911 · Ambulance: 997\n👤 ' + (user?user.username:'Pilgrim') + ' · ID: ' + myPilgrimId + locText, 'NOW');
-  toast('🚨 SOS Activated! Call 911 or 997 immediately.');
+  toast('🚨 Call 911 or 997 now');
 
   if (hasLocation) {
     window.open('https://www.google.com/maps?q=' + trackerLat + ',' + trackerLng);
@@ -5663,8 +5663,8 @@ function activateFullSOS() {
   });
 
   // Notification
-  addNotif('🆘', 'SOS ACTIVATED', 'Emergency services alerted · Contacts notified · GPS: ' + (emerLat || '--') + ', ' + (emerLng || '--'), 'NOW');
-  toast('🆘 SOS Activated! Help is coming.');
+  addNotif('🆘', 'SOS message ready', 'Send the SMS that opened to your emergency contacts, then call 911 · GPS: ' + (emerLat || '--') + ', ' + (emerLng || '--'), 'now');
+  toast('🆘 Send the SMS, then call 911');
 
   addPts(0, 'Emergency SOS activated');
 }
@@ -5773,7 +5773,7 @@ function toggleNoMovement() {
 function checkNoMovement() {
   var elapsed = (Date.now() - lastMovementTime) / 60000;
   if (elapsed >= 10) {
-    addNotif('🆘', 'No Movement Detected', 'No movement for 10+ minutes. Are you OK? Emergency contacts will be notified in 60 seconds.', 'NOW');
+    addNotif('🆘', 'No Movement Detected', 'No movement for 10+ minutes. Are you OK? If you need help, tap SOS or call 911.', 'NOW');
     toast('🆘 No movement detected — are you OK?');
   }
 }
@@ -8163,15 +8163,17 @@ function orderQurbani(){
 }
 </script>
 <script>/* Testnet copy: same code, a clear label so nobody mistakes test Pi for real Pi */(function(){if(!/(^|[.-])testnet[.-]/i.test(location.hostname))return;document.title="[Testnet] "+document.title;var b=document.createElement("div");b.textContent="TESTNET";b.setAttribute("aria-label","Testnet: test Pi only");b.style.cssText="position:fixed;left:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:99999;padding:3px 10px;border-radius:999px;background:#B45309;color:#fff;font:800 11px/1.4 system-ui,sans-serif;letter-spacing:.06em;pointer-events:none;opacity:.92";(document.body||document.documentElement).appendChild(b);})();</script>
-<script src="pi-price-widget.js?v=2"></script>
+<script src="pi-price-widget.js?v=3"></script>
 <script src="prayer-calc.js?v=1"></script>
 <script src="haramain-pro.js?v=6"></script>
-<script src="haramain-daily.js?v=2"></script>
+<script src="haramain-daily.js?v=3"></script>
 <script src="haramain-tools.js?v=1"></script>
 <script src="haramain-quran.js?v=1"></script>
 <script src="haramain-live.js?v=1"></script>
 <script src="haramain-adhkar.js?v=1"></script>
-<script src="haramain-wallet.js?v=2"></script>
+<script src="haramain-receipt.js?v=1"></script>
+<script src="haramain-wallet.js?v=3"></script>
+<script src="haramain-notify.js?v=1"></script>
 <script src="haramain-nav.js?v=1"></script>
 <script src="haramain-habit.js?v=1"></script>
 <script src="haramain-onboarding.js?v=3"></script>

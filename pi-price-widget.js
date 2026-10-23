@@ -55,7 +55,7 @@
     }
     m.el.firstChild.onclick = function () { open(o); };
   }
-  function paintAll() { S.mounts = S.mounts.filter(function (m) { return document.body.contains(m.el); }); S.mounts.forEach(paint); }
+  function paintAll() { try { window.dispatchEvent(new Event('pi-price')); } catch (e) {} S.mounts = S.mounts.filter(function (m) { return document.body.contains(m.el); }); S.mounts.forEach(paint); }
 
   function open(o) {
     S.lastOpt = o; var d = S.d, w = document.createElement('div'); w.className = 'pp-wrap';
@@ -86,7 +86,11 @@
   window.PiPrice = {
     mount: function (el, o) { if (!el) return; o = o || {}; loadFx(); o.accent = o.accent || '#0E7A52'; var m = { el: el, o: o }; S.mounts.push(m); paint(m); load(); },
     get: function () { return S.d; },
-    refresh: function () { S.last = 0; load(); }
+    refresh: function () { S.last = 0; load(); },
+    local: function () { var c = local(); return { code: c, sym: lsym(c), rate: localVal(S.d) }; },
+    fx: function () { return S.fx || null; },
+    open: function (o) { open(o || {}); },
+    watch: function () { loadFx(); load(); }
   };
   setInterval(function () { if (!document.hidden) load(); }, 60000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });

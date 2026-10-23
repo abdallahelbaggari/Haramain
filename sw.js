@@ -2,9 +2,9 @@
    Pages: network first, cached copy only when offline (so a new deploy is always picked up).
    Versioned files (?v=), icons, logo and onboarding photos: cache first.
    Server functions (payments, prices, live location, AI…) are never cached. */
-var CACHE = 'haramain-v1';
+var CACHE = 'haramain-v2';
 var SHELL = ['/', '/index.html', '/logo.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
-var LIVE = /^\/(approve|complete|cancel-payment|pi-price|fx|ai|alerts|live|family|lf|quran|quran-audio|validation-key\.txt)(\/|$|\?)/;
+var LIVE = /^\/(approve|complete|cancel-payment|pi-price|fx|ai|alerts|live|family|lf|quran|quran-audio|verify|validation-key\.txt)(\/|$|\?)/;
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL).catch(function () {}); }).then(function () { return self.skipWaiting(); }));
@@ -28,5 +28,12 @@ self.addEventListener('fetch', function (e) {
     return res;
   }).catch(function () {
     return caches.match(r).then(function (hit) { return hit || (r.mode === 'navigate' ? caches.match('/index.html').then(function (h) { return h || caches.match('/'); }) : Response.error()); });
+  }));
+});
+self.addEventListener('notificationclick', function (e) {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (cs) {
+    for (var i = 0; i < cs.length; i++) { if ('focus' in cs[i]) return cs[i].focus(); }
+    return self.clients.openWindow ? self.clients.openWindow('/') : null;
   }));
 });

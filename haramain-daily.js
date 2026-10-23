@@ -45,7 +45,7 @@
   function tone() { try { var A = window.AudioContext || window.webkitAudioContext; var c = new A(); [0, .35].forEach(function (s, i) { var o = c.createOscillator(), g = c.createGain(); o.frequency.value = i ? 784 : 659; o.connect(g); g.connect(c.destination); g.gain.setValueAtTime(.0001, c.currentTime + s); g.gain.exponentialRampToValueAtTime(.18, c.currentTime + s + .03); g.gain.exponentialRampToValueAtTime(.0001, c.currentTime + s + .32); o.start(c.currentTime + s); o.stop(c.currentTime + s + .34); }); } catch (e) {} }
   function notify(title, body) {
     tone();
-    try { if ('Notification' in window && Notification.permission === 'granted') new Notification(title, { body: body, icon: 'logo.svg', tag: 'hm-prayer' }); } catch (e) {}
+    try { if (window.hmSysNotify) hmSysNotify('🕌 ' + title, body, 'hm-prayer'); } catch (e) {}
     try { addNotif('🕌', title, body, 'now'); } catch (e) {}
     banner(title, body);
   }
