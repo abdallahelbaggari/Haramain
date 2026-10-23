@@ -29,6 +29,7 @@
     if (!window.Pi || !Pi.createPayment || Pi._hmWrapped) return;
     var orig = Pi.createPayment.bind(Pi); Pi._hmWrapped = true;
     Pi.createPayment = function (data, cb) {
+      if (data && data.metadata && data.metadata.type === 'transfer') return orig(data, cb);   // in-app transfers keep their own receipts
       var rec = { amount: data.amount, memo: data.memo, kind: (data.metadata && data.metadata.type) || 'payment', dir: 'out', ts: Date.now(), name: fullName(), user: uname(), net: NETN };
       var p = price(); if (p && p.usd) { rec.usd = p.usd; rec.sar = p.sar; }
       var c = Object.assign({}, cb);
@@ -48,10 +49,10 @@
     var d = new Date(r.ts), when = [['Date', d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })], ['Time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })]];
     var sub = r.usd ? '≈ ' + (r.amount * r.sar).toFixed(2) + ' SAR · $' + (r.amount * r.usd).toFixed(2) + (r.lr && r.lc && r.lc !== 'SAR' && r.lc !== 'USD' ? ' · ' + (r.ls || r.lc + ' ') + num(r.amount * r.lr, r.amount * r.lr < 10 ? 2 : 0) : '') + ' at payment time' : '';
     if (r.kind === 'p2p' && r.send) {
-      return { title: 'Transfer receipt', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
+      return { title: r.dir === 'in' ? 'Transfer received' : 'Transfer receipt', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
         rows: [['From', (r.name || '—') + (r.user ? ' (@' + r.user + ')' : '')], ['To', (r.toName ? r.toName + ' · ' : '') + short(r.to)], ['Narration', r.narr || '—'], ['Reference', r.ref]]
           .concat(when, [['Network', r.net], ['Recipient address', r.to, 1], ['Transaction ID', r.txid, 1]]),
-        thanks: 'Sent with Haramain', note: 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
+        thanks: r.dir === 'in' ? 'Received with Haramain' : 'Sent with Haramain', note: r.inapp ? 'Paid in Haramain and delivered from the Haramain app wallet. Check it on the Pi blockchain with the code above.' : 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
     }
     if (r.kind === 'p2p') {
       var inn = r.dir === 'in';
@@ -357,7 +358,7 @@
         [['🤲', 'Zakat', "oUtil('zakat')"], ['💝', 'Sadaqah', "oUtil('sadaqah')"], ['🐑', 'Qurbani', "oUtil('qurbani')"], ['⭐', 'Support Haramain', 'buyPrem()']].map(function (t) { return '<button type="button" class="nv-t" onclick="' + t[2] + '"><span class="nv-i">' + t[0] + '</span><span class="nv-l">' + t[1] + '</span></button>'; }).join('') + '</div></div>' +
       '<div class="wf-sec" id="wf-act"><div class="wf-sec-h"><b>🧾 Activity &amp; receipts</b></div><div class="wf-tabs">' +
         [['all', 'All'], ['in', 'Received'], ['out', 'Paid']].map(function (t) { return '<button type="button" data-f="' + t[0] + '" onclick="hmTxFilter(\'' + t[0] + '\')">' + t[1] + '</button>'; }).join('') + '</div><div id="wl-tx"></div></div>' +
-      '<div class="wf-safe">🔒 <span><b>Your Pi stays in your Pi Wallet.</b> Haramain never holds funds and will never ask for your passphrase. Your balance is shown in Pi Wallet.</span></div>';
+      '<div class="wf-safe">🔒 <span><b>You approve every payment yourself.</b> Haramain never asks for your passphrase and cannot move Pi from your wallet. Sending to a Haramain user passes through the Haramain app wallet for a few seconds, and every step is recorded on the Pi blockchain. Your balance is shown in Pi Wallet.</span></div>';
     var w = $('wc-pi'); if (w) { w.value = 1; convert('pi'); }
     drawTx();
   }

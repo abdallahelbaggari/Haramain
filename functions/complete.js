@@ -1,3 +1,4 @@
+import { payout } from './_lib/transfers.js';
 /* ═══════════════════════════════════════════════════════════════
    HARAMAIN · functions/complete.js · Cloudflare Pages Function
    Route: /functions/complete
@@ -96,12 +97,23 @@ export async function onRequestPost(context) {
     console.log("[Haramain] complete status:", res.status);
     console.log("[Haramain] complete raw:", text);
 
+    /* In-app transfer: once Pi confirms the sender's payment, pay the recipient from the app wallet */
+    let transfer = null;
+    if (res.ok) {
+      try {
+        const g = await fetch(`https://api.minepi.com/v2/payments/${paymentId}`, { headers: { "Authorization": `Key ${PI_API_KEY}` } });
+        const gp = g.ok ? await g.json() : null;
+        if (gp && gp.metadata && gp.metadata.type === 'transfer') transfer = await payout(context.env, context.request, paymentId);
+      } catch (e) { transfer = { ok: false, retry: true, error: 'Payout will be retried' }; }
+    }
+
     /* completed: res.ok for honest logging
        status: 200 always for Pi SDK          */
     return new Response(
       JSON.stringify({
         completed: res.ok,
-        pi_status: res.status
+        pi_status: res.status,
+        transfer
       }),
       {
         status: 200, /* Always 200 — never 500 to Pi SDK */

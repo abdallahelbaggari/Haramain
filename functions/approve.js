@@ -1,3 +1,4 @@
+import { checkTransferPayment } from './_lib/transfers.js';
 /* ═══════════════════════════════════════════════════════════════
    HARAMAIN · functions/approve.js · Cloudflare Pages Function
 
@@ -104,6 +105,10 @@ export async function onRequestPost(context) {
         const amt = Number(pay && pay.amount);
         const PRICES = {'copa_pass': 1, 'spl_pass': 1, 'fan_pass': 1, 'pilgrim_pass': 1};
         const st = (pay && pay.status) || {};
+        if (md.type === 'transfer') {
+          const why = await checkTransferPayment(context.env, pay);
+          if (why) return new Response(JSON.stringify({ approved: false, error: why }), { status: 200, headers: cors });
+        }
         if (st.developer_approved) {
           return new Response(JSON.stringify({ approved: true, step: 'already_approved' }), { status: 200, headers: cors });
         }
