@@ -294,7 +294,7 @@
   window.hmTxFilter = function (f) { filter = f; drawTx(); };
   function heroPrice() {
     var p = price(), l = loc(), e = $('wf-price'); if (!e) return;
-    if (!p || !p.usd) { e.innerHTML = '<div class="wf-p-k"><i class="wf-live"></i>Pi price</div><div class="wf-p-v">Loading…</div>'; return; }
+    if (!p || !p.usd) { var bz = window.PiPrice && PiPrice.busy && PiPrice.busy(); e.innerHTML = '<div class="wf-p-k"><i class="wf-live' + (bz ? '' : ' off') + '"></i>Pi price</div>' + (bz ? '<div class="wf-p-v">Loading…</div>' : '<div class="wf-p-v" style="font-size:15px">Rate unavailable right now <button type="button" class="wf-cur-b" onclick="event.stopPropagation();PiPrice.refresh()">Retry</button></div>'); return; }
     var ch = typeof p.change24h === 'number' ? p.change24h : null, ago = p.updated ? Math.max(0, Math.round((Date.now() - Date.parse(p.updated)) / 60000)) : null;
     e.innerHTML = '<div class="wf-p-k"><i class="wf-live' + (p.stale ? ' off' : '') + '"></i>' + (p.stale ? 'Last known Pi price' : 'Pi price · live') + (ch !== null ? '<span class="wf-ch ' + (ch >= 0 ? 'up' : 'dn') + '">' + (ch >= 0 ? '▲ ' : '▼ ') + Math.abs(ch).toFixed(2) + '%</span>' : '') + '</div>' +
       (l.rate && l.code !== 'SAR' && l.code !== 'USD' ? '<div class="wf-p-v">1 π = <b>' + esc(l.sym) + num(l.rate, l.rate < 10 ? 3 : 2) + '</b><button type="button" class="wf-cur-b" onclick="event.stopPropagation();hmPickCurrency()">' + esc(l.code) + ' ▾</button></div>' +
@@ -308,7 +308,9 @@
     return { inn: +inn.toFixed(4), out: +out.toFixed(4) };
   }
   function convert(from) {
-    var p = price(), l = loc(); if (!p || !p.sar) return;
+    var p = price(), l = loc();
+    ['wc-sar', 'wc-loc'].forEach(function (i) { var e = $(i); if (e) e.placeholder = p && p.sar ? '0' : '—'; });
+    if (!p || !p.sar) return;
     var pi = $('wc-pi'), sar = $('wc-sar'), lc = $('wc-loc'); if (!pi) return;
     var v = from === 'pi' ? parseFloat(pi.value) : from === 'sar' ? parseFloat(sar.value) / p.sar : (l.rate ? parseFloat(lc.value) / l.rate : NaN);
     if (!(v >= 0)) v = 0;
@@ -337,7 +339,7 @@
     top.innerHTML =
       '<div class="wf-card"><div class="wf-row"><img src="icons/icon-192.png" alt=""><div class="wf-who"><small>Haramain Wallet</small><b>' + esc(fullName()) + '<button type="button" onclick="hmEditName()" aria-label="Edit name">✎</button></b><span>' + (uname() ? '@' + esc(uname()) : 'Guest · sign in with Pi to pay') + '</span></div>' + (prem ? '<span class="wf-badge">⭐ Supporter</span>' : '') + '</div>' +
         '<div class="wf-price" id="wf-price" role="button" tabindex="0" onclick="PiPrice.open && PiPrice.open()"></div>' +
-        '<div class="wf-stats"><div><small>Received this month</small><b>+' + st.inn + ' π</b></div><div><small>Paid this month</small><b>−' + st.out + ' π</b></div></div>' +
+        '<div class="wf-stats"><div><small>Received this month</small><b>' + (st.inn > 0 ? '+' : '') + st.inn + ' π</b></div><div><small>Paid this month</small><b>' + (st.out > 0 ? '−' : '') + st.out + ' π</b></div></div>' +
         '<div class="wf-net">' + NETN + ' · haramain.pi</div></div>' +
       '<div class="wf-acts"><button type="button" class="tx-only" onclick="hmSendSheet()"><span>💸</span>Send</button><button type="button" class="tx-only" onclick="hmGetPaid()"><span>📩</span>Request</button><button type="button" onclick="document.getElementById(\'wf-act\').scrollIntoView({behavior:\'smooth\',block:\'start\'})"><span>🧾</span>Receipts</button><button type="button" onclick="hmPickCurrency()"><span>💱</span>Currency</button></div>';
     heroPrice();

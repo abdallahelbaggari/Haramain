@@ -98,6 +98,7 @@
     mount: function (el, o) { if (!el) return; o = o || {}; loadFx(); o.accent = o.accent || '#0E7A52'; var m = { el: el, o: o }; S.mounts.push(m); paint(m); load(); },
     get: function () { return S.d; },
     refresh: function () { S.last = 0; load(); },
+    busy: function () { return S.busy; },
     local: function () { var c = local(); return { code: c, sym: lsym(c), name: cname(c), rate: localVal(S.d) }; },
     currencies: allCurs,
     rateIn: function (c) { var d = S.d; if (!d) return null; if (c === 'SAR') return d.sar; if (c === 'USD') return d.usd; if (S.fx && S.fx[c] && d.sar) return d.sar * S.fx[c]; if (c === 'NGN') return d.ngn; return null; },

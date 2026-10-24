@@ -3591,29 +3591,18 @@ function updateLandingWeather(){
 }
 
 function fetchLandingPrayer(){
-  var today=new Date();
-  var d=today.getDate()+'-'+(today.getMonth()+1)+'-'+today.getFullYear();
-  fetch('https://api.aladhan.com/v1/timings/'+d+'?latitude=21.3891&longitude=39.8579&method=4')
-    .then(function(r){return r.json();}).then(function(data){
-      if(data.code===200){
-        var t=data.data.timings;
-        var now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
-        var prayers=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
-        var next=null,minD=Infinity;
-        prayers.forEach(function(p){
-          var parts=(t[p]||'00:00').split(':');
-          var pMin=parseInt(parts[0])*60+parseInt(parts[1]);
-          var diff=pMin-nowMin; if(diff<0)diff+=1440;
-          if(diff<minD){minD=diff;next={name:p,time:t[p],diff:diff};}
-        });
-        if(next){
-          var lp=document.getElementById('lc-prayer');
-          if(lp)lp.textContent=next.time;
-          var ln=document.getElementById('lc-prayer-name');
-          if(ln)ln.textContent=next.name+' · '+(Math.floor(next.diff/60)+'h '+next.diff%60+'m away');
-        }
-      }
-    }).catch(function(){});
+  // Next prayer in Makkah, calculated on the phone (Umm al-Qura style, Makkah time UTC+3): instant and works offline
+  if(!window.HM_PRAYER)return;
+  var now=new Date(), mk=new Date(now.getTime()+(now.getTimezoneOffset()+180)*60000);
+  var t=HM_PRAYER(mk,21.4225,39.8262,3,false), nowMin=mk.getHours()*60+mk.getMinutes(), next=null, minD=Infinity;
+  ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(function(p){
+    var q=(t[p]||'00:00').split(':'), diff=(+q[0])*60+(+q[1])-nowMin; if(diff<0)diff+=1440;
+    if(diff<minD){minD=diff;next={name:p,time:t[p],diff:diff};}
+  });
+  if(!next)return;
+  var lp=document.getElementById('lc-prayer'); if(lp)lp.textContent=next.name+' '+next.time;
+  var ln=document.getElementById('lc-prayer-name'); if(ln)ln.textContent='Makkah time · in '+(next.diff>=60?Math.floor(next.diff/60)+'h ':'')+next.diff%60+'m';
+  clearTimeout(window._lpT); window._lpT=setTimeout(fetchLandingPrayer,60000);
 }
 
 function calcRisk(){
@@ -8124,7 +8113,7 @@ function orderQurbani(){
 }
 </script>
 <script>/* Testnet copy: same code, a clear label so nobody mistakes test Pi for real Pi */(function(){if(!/(^|[.-])testnet[.-]/i.test(location.hostname))return;document.title="[Testnet] "+document.title;var b=document.createElement("div");b.textContent="TESTNET";b.setAttribute("aria-label","Testnet: test Pi only");b.style.cssText="position:fixed;left:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:99999;padding:3px 10px;border-radius:999px;background:#B45309;color:#fff;font:800 11px/1.4 system-ui,sans-serif;letter-spacing:.06em;pointer-events:none;opacity:.92";(document.body||document.documentElement).appendChild(b);})();</script>
-<script src="pi-price-widget.js?v=4"></script>
+<script src="pi-price-widget.js?v=5"></script>
 <script src="prayer-calc.js?v=1"></script>
 <script src="haramain-pro.js?v=6"></script>
 <script src="haramain-daily.js?v=3"></script>
@@ -8133,7 +8122,7 @@ function orderQurbani(){
 <script src="haramain-live.js?v=1"></script>
 <script src="haramain-adhkar.js?v=1"></script>
 <script src="haramain-receipt.js?v=2"></script>
-<script src="haramain-wallet.js?v=10"></script>
+<script src="haramain-wallet.js?v=11"></script>
 <script src="haramain-transfer.js?v=4"></script>
 <script src="haramain-notify.js?v=1"></script>
 <script src="haramain-nav.js?v=3"></script>
