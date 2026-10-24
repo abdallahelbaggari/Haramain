@@ -18,7 +18,7 @@
   var loc = function () { return window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'NGN', sym: '₦', rate: null }; };
   var r7 = function (n) { return Math.round(Number(n) * 1e7) / 1e7; };
   var api = function (path, body) { return fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}).then(function (r) { return r.json(); }); };
-  var CFG = { enabled: false, fee: 0.01, max: 500 };
+  var CFG = { enabled: false, fee: 0.01, max: 50 };
 
   function conv(a) { var p = price(); if (!p || !p.sar || !(a > 0)) return ''; var l = loc(); return '≈ ' + num(a * p.sar, 2) + ' SAR · $' + num(a * p.usd, 2) + (l.rate && l.code !== 'SAR' && l.code !== 'USD' ? ' · ' + l.sym + num(a * l.rate, a * l.rate < 10 ? 2 : 0) : ''); }
   function sheet(title, inner) {
@@ -192,7 +192,7 @@
   });
 
   function start() {
-    api('/transfer?a=status').then(function (d) { if (d && d.ok) { CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 500; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
+    api('/transfer?a=status').then(function (d) { if (d && d.ok) { CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 50; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
     var n = 0, iv = setInterval(function () { register(); openPending(); if ((registered && !pendingReq) || ++n > 90) clearInterval(iv); }, 2000);
     setInterval(function () { if (!document.hidden) sync(); }, 60000);
     var _goS = window.goS; window.goS = function (id) { var r = _goS.apply(this, arguments); if (id === 'payments') { register(); sync(); } return r; };

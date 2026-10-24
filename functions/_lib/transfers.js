@@ -1,7 +1,7 @@
 // Haramain in-app transfers: a sender pays Haramain (U2A, approved in Pi's own pop-up inside the app),
 // then Haramain's app wallet pays the recipient (A2U, official Pi flow). Server-side only.
 // Secrets (Cloudflare → Settings → Variables and Secrets): PI_API_KEY, APP_WALLET_SEED ('S…').
-// Switch: TRANSFERS_ENABLED = 1. Optional: MAX_TRANSFER (π, default 500). D1 binding: HM_DB.
+// On when APP_WALLET_SEED is set (pause with TRANSFERS_ENABLED = 0). Optional: MAX_TRANSFER (π, default 50). D1 binding: HM_DB.
 import { keypairFromSeed, buildPayment, accountToBytes } from './stellar.js';
 
 export const FEE = 0.01;                 // added to the sender's payment, covers the payout's blockchain fee
@@ -13,8 +13,10 @@ const NET = (t) => t ? { passphrase: 'Pi Testnet', horizon: 'https://api.testnet
 export const USER_RE = /^[A-Za-z0-9_.-]{2,40}$/;
 const round7 = (n) => Math.round(Number(n) * 1e7) / 1e7;
 
-export function enabled(env) { return String(env.TRANSFERS_ENABLED || '') === '1' && !!env.APP_WALLET_SEED && !!env.PI_API_KEY && !!env.HM_DB; }
-export function maxTransfer(env) { const m = Number(env.MAX_TRANSFER); return m > 0 ? m : 500; }
+// On automatically once the app wallet key is added; TRANSFERS_ENABLED = 0 pauses transfers at any time.
+export function enabled(env) { return String(env.TRANSFERS_ENABLED || '') !== '0' && !!env.APP_WALLET_SEED && !!env.PI_API_KEY && !!env.HM_DB; }
+// Starts at 50 π per transfer for safety; raise it with MAX_TRANSFER (for example 500).
+export function maxTransfer(env) { const m = Number(env.MAX_TRANSFER); return m > 0 ? m : 50; }
 
 export async function piApi(env, path, method, body) {
   const r = await fetch(PI + path, { method: method || 'GET', headers: { Authorization: 'Key ' + env.PI_API_KEY, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
