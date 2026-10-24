@@ -68,17 +68,12 @@
   function redraw() { try { if ($('s-payments') && $('s-payments').classList.contains('on')) goS('payments'); } catch (e) {} }
 
   /* ── the Send sheet ── */
-  var sendAddr = window.hmSendSheet;   // the wallet-address version (needs Pi Wallet)
-  window.hmSendAddress = sendAddr;
-  window.hmPay = function () { if (sendAddr) sendAddr(); setTimeout(function () { var e = $('sd-to'); if (e) e.placeholder = 'Paste the Haramain Pay link here'; }, 60); };
-  window.hmSendSheet = function () {
-    if (!CFG.enabled) {
-      var w0 = sheet('💸 Send Pi',
-        '<div class="hm-sheet-b">In-app sending to Haramain users is being switched on. Meanwhile you can send to any wallet address with Pi Wallet.</div>' +
-        '<button type="button" class="hm-sheet-a" id="tr-addr">Send to a wallet address</button>');
-      $('tr-addr').onclick = function () { w0.remove(); sendAddr && sendAddr(); };
-      return;
-    }
+  /* Pi Wallet cannot be opened from inside an app, so every payment happens here in Haramain */
+  window.hmPay = function () { hmSendSheet(); };
+  window.sendPi = function () { hmSendSheet(); };
+  window.hmSendSheet = function (pre) {
+    pre = pre || {};
+    if (!CFG.enabled) { say('Sending Pi is not available yet'); return; }
     var w = sheet('💸 Send Pi',
       '<div class="hm-sheet-b">Send Pi to any Haramain user. You approve in Pi’s own pop-up right here, and the money arrives in their Pi wallet with a Haramain receipt for both of you.</div>' +
       '<label class="wf-l">To</label><div class="tr-to"><span>@</span><input id="tr-u" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="username"></div><div class="wf-hint" id="tr-uh"></div>' +
@@ -86,7 +81,6 @@
       '<label class="wf-l">Narration</label><input class="fi" id="tr-x" maxlength="80" placeholder="What is it for? e.g. Hotel deposit, gift for Umrah">' +
       '<div class="tr-sum" id="tr-sum"></div>' +
       '<button type="button" class="hm-sheet-a" id="tr-go">Continue</button>' +
-      '<button type="button" class="tr-alt" id="tr-addr">Send to a wallet address instead ›</button>' +
       '<div class="wf-hint" style="margin-top:8px">🔒 You approve every payment yourself in Pi’s pop-up. Haramain never sees your passphrase.</div>');
     var u = $('tr-u'), a = $('tr-a'), ok = null, timer = null;
     var sum = function () {
@@ -107,7 +101,9 @@
         }).catch(function () { $('tr-uh').textContent = 'No connection. Try again.'; });
       }, 450);
     };
-    $('tr-addr').onclick = function () { w.remove(); sendAddr && sendAddr(); };
+    if (pre.u) { u.value = String(pre.u).replace(/^@/, '').slice(0, 40); u.oninput(); }
+    if (pre.a > 0) { a.value = r7(pre.a); sum(); }
+    if (pre.x) $('tr-x').value = String(pre.x).slice(0, 80);
     $('tr-go').onclick = function () {
       var v = r7(a.value), x = $('tr-x').value.trim();
       if (!me() || !window.HM_TOKEN) { say('Sign in with Pi first'); try { w.remove(); piLogin(); } catch (e) {} return; }
@@ -117,8 +113,40 @@
       if (!x) return say('Add a narration: what is this payment for?');
       w.remove(); pay(ok, v, x);
     };
-    setTimeout(function () { u.focus(); }, 80);
+    if (!pre.u) setTimeout(function () { u.focus(); }, 80);
   };
+
+  /* ── Request Pi: a link that opens Haramain with the payment filled in ── */
+  var enc = function (o) { return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+  var dec = function (t) { try { t = t.replace(/-/g, '+').replace(/_/g, '/'); while (t.length % 4) t += '='; return JSON.parse(decodeURIComponent(escape(atob(t)))); } catch (e) { return null; } };
+  window.hmGetPaid = function () {
+    if (!CFG.enabled) { say('Requesting Pi is not available yet'); return; }
+    if (!me() || !window.HM_TOKEN) { say('Sign in with Pi first'); try { piLogin(); } catch (e) {} return; }
+    var w = sheet('📩 Request Pi',
+      '<div class="hm-sheet-b">Share a link. When the other person opens it, Haramain fills in your @username, the amount and the reason, and they approve in Pi’s pop-up.</div>' +
+      '<label class="wf-l">Amount</label><div class="wf-amt"><input id="rq-a" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><span>π</span></div><div class="wf-conv" id="rq-c"></div>' +
+      '<label class="wf-l">What is it for?</label><input class="fi" id="rq-x" maxlength="80" placeholder="e.g. Hotel deposit, shared taxi, prayer mat">' +
+      '<button type="button" class="hm-sheet-a" id="rq-go">Share request</button>');
+    var a = $('rq-a'); a.oninput = function () { $('rq-c').textContent = conv(r7(a.value)); }; setTimeout(function () { a.focus(); }, 80);
+    $('rq-go').onclick = function () {
+      var v = r7(a.value), x = $('rq-x').value.trim();
+      if (!(v >= 0.01)) return say('Enter the amount in π');
+      if (!x) return say('Say what the payment is for');
+      var url = location.origin + '/#send=' + enc({ u: me(), a: v, x: x });
+      var t = '@' + me() + ' is requesting ' + num(v, 7) + ' π for ' + x + ' on Haramain. Tap to pay securely:\n' + url;
+      if (navigator.share) navigator.share({ title: 'Haramain', text: t }).catch(function () {}); else { try { navigator.clipboard.writeText(t); say('✅ Request copied'); } catch (e) { window.open('https://wa.me/?text=' + encodeURIComponent(t)); } }
+      w.remove();
+    };
+  };
+  /* opened from a request link: fill the Send sheet once signed in */
+  var pendingReq = null;
+  (function () { var m = /#send=([A-Za-z0-9_-]+)/.exec(location.hash || ''); if (!m) return; var o = dec(m[1]); if (o && /^[A-Za-z0-9_.-]{2,40}$/.test(String(o.u || '')) && typeof o.a === 'number' && o.a > 0 && o.a <= 1e6) pendingReq = { u: o.u, a: o.a, x: String(o.x || '').slice(0, 80) }; try { history.replaceState(null, '', location.pathname); } catch (e) {} })();
+  function openPending() {
+    if (!pendingReq || !CFG.enabled || !me() || !window.HM_TOKEN) return;
+    var r = pendingReq; pendingReq = null;
+    try { goS('payments'); } catch (e) {}
+    setTimeout(function () { hmSendSheet(r); }, 400);
+  }
 
   function pay(to, amt, narr) {
     if (typeof Pi === 'undefined' || !Pi.createPayment) return say('Open Haramain in the Pi Browser to send Pi');
@@ -164,8 +192,8 @@
   });
 
   function start() {
-    api('/transfer?a=status').then(function (d) { if (d && d.ok) { CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 500; } sync(); }).catch(function () {});
-    var n = 0, iv = setInterval(function () { register(); if (registered || ++n > 90) clearInterval(iv); }, 2000);
+    api('/transfer?a=status').then(function (d) { if (d && d.ok) { CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 500; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
+    var n = 0, iv = setInterval(function () { register(); openPending(); if ((registered && !pendingReq) || ++n > 90) clearInterval(iv); }, 2000);
     setInterval(function () { if (!document.hidden) sync(); }, 60000);
     var _goS = window.goS; window.goS = function (id) { var r = _goS.apply(this, arguments); if (id === 'payments') { register(); sync(); } return r; };
   }

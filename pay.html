@@ -73,6 +73,9 @@ h2{font-size:15px;margin:22px 4px 10px}
   var inv = dec((location.hash || '').slice(1));
   if (inv) { inv.a = typeof inv.a === 'number' ? inv.a : NaN; inv.d = +inv.d || Date.now(); inv.i = String(inv.i || '').slice(0, 80); inv.n = String(inv.n || '').slice(0, 50); inv.u = String(inv.u || '').replace(/[^A-Za-z0-9_.-]/g, '').slice(0, 40); }
   var ok = inv && /^G[A-Z2-7]{55}$/.test(inv.t || '') && isFinite(inv.a) && inv.a > 0 && inv.a <= 1e7 && /^HM-[A-Z0-9]{6}$/.test(inv.r || '');
+  /* Pi Wallet cannot be opened from apps, so requests are now paid inside Haramain */
+  if (ok && inv.u) { var e2 = btoa(unescape(encodeURIComponent(JSON.stringify({ u: inv.u, a: inv.a, x: inv.i })))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); location.replace('/#send=' + e2); return; }
+  if (ok) { $('app').innerHTML = '<div class="card"><div class="bad"><b style="color:#13261E;font-size:16px">Pay this request in Haramain</b><br><br>Payments now happen inside the Haramain app. Ask the seller for their Haramain @username, then open Haramain → Wallet → Send.<br><br><a class="btn btn-g" href="/">Open Haramain</a></div></div>'; return; }
   if (!ok) { $('app').innerHTML = '<div class="card"><div class="bad"><b style="color:#13261E;font-size:16px">This payment link is not complete</b><br><br>Ask the seller to send the Haramain Pay link again.</div></div>'; return; }
   var TEST = inv.k === 'test', NETN = TEST ? 'Pi Testnet' : 'Pi Mainnet';
   if (TEST) { $('net').textContent = 'Pi Testnet · test Pi'; $('net').classList.add('test'); }

@@ -337,20 +337,15 @@
         '<div class="wf-price" id="wf-price" role="button" tabindex="0" onclick="PiPrice.open && PiPrice.open()"></div>' +
         '<div class="wf-stats"><div><small>Received this month</small><b>+' + st.inn + ' π</b></div><div><small>Paid this month</small><b>−' + st.out + ' π</b></div></div>' +
         '<div class="wf-net">' + NETN + ' · haramain.pi</div></div>' +
-      '<div class="wf-acts"><button type="button" onclick="hmSendSheet()"><span>💸</span>Send</button><button type="button" onclick="hmGetPaid()"><span>💰</span>Get paid</button><button type="button" onclick="hmPay()"><span>💳</span>Pay link</button><button type="button" onclick="document.getElementById(\'wf-act\').scrollIntoView({behavior:\'smooth\',block:\'start\'})"><span>🧾</span>Receipts</button></div>';
+      '<div class="wf-acts"><button type="button" class="tx-only" onclick="hmSendSheet()"><span>💸</span>Send</button><button type="button" class="tx-only" onclick="hmGetPaid()"><span>📩</span>Request</button><button type="button" onclick="document.getElementById(\'wf-act\').scrollIntoView({behavior:\'smooth\',block:\'start\'})"><span>🧾</span>Receipts</button><button type="button" onclick="hmPickCurrency()"><span>💱</span>Currency</button></div>';
     heroPrice();
     var sends = get('sends', []);
     var items = sales.map(function (s, i) { return { k: 'in', d: s.d, s: s, i: i }; }).concat(sends.map(function (s, i) { return { k: 'out', d: s.d, s: s, i: i }; })).sort(function (a, b) { return b.d - a.d; }).slice(0, 8);
     var openN = sales.filter(function (s) { return !s.paid; }).length + sends.filter(function (s) { return !s.paid; }).length;
     $('wl-rest').innerHTML =
-      '<div class="wf-sec"><div class="wf-sec-h"><b>🛍️ Haramain Pay · send &amp; get paid</b>' + (openN ? '<button type="button" class="wf-link" onclick="hmCheckSales()">Check now</button>' : '') + '</div>' +
-        (items.length ? items.map(function (x) {
-          var s = x.s, paid = !!s.paid, inn = x.k === 'in';
-          return '<div class="wf-sale"><div class="wf-sale-i ' + (paid ? 'ok' : '') + '">' + (paid ? '✓' : inn ? '⏳' : '↑') + '</div><div class="wf-sale-t"><b>' + esc(inn ? s.i : 'To ' + (s.n || short(s.t))) + '</b><small>' + (inn ? '' : esc(s.x) + ' · ') + s.r + ' · ' + new Date(s.d).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · ' + (paid ? (inn ? 'Paid' : 'Sent ✓') : (inn ? 'Waiting for payment' : 'Waiting for your approval')) + '</small></div><div class="wf-sale-a"><b class="' + (inn ? 'in' : '') + '">' + (inn ? '+' : '−') + s.a + ' π</b>' +
-            (paid ? '<button type="button" onclick="hmReceiptByTx(\'' + s.paid + '\')">Receipt</button>' : inn ? '<button type="button" onclick="hmReqOpen(' + x.i + ')">Share</button>' : '<button type="button" onclick="hmShowSend(' + x.i + ')">Confirm</button>') + '</div></div>';
-        }).join('') :
-        '<div class="wf-how"><div><span>1</span>Send Pi or create a payment request here</div><div><span>2</span>Approve the payment in Pi Wallet</div><div><span>3</span>Haramain verifies it on the Pi blockchain and makes your receipt</div></div>') +
-        '<div class="wf-two"><button type="button" class="wf-cta" style="margin-top:12px" onclick="hmSendSheet()">💸 Send Pi</button><button type="button" class="wf-cta wf-cta2" style="margin-top:12px" onclick="hmGetPaid()">💰 Get paid</button></div></div>' +
+      '<div class="wf-sec tx-only"><div class="wf-sec-h"><b>💸 Send &amp; request Pi</b></div>' +
+        '<div class="wf-how"><div><span>1</span>Choose a Haramain user by @username</div><div><span>2</span>Approve in Pi’s pop-up, right here in Haramain</div><div><span>3</span>They receive it in seconds, with a receipt for both of you</div></div>' +
+        '<div class="wf-two"><button type="button" class="wf-cta" style="margin-top:12px" onclick="hmSendSheet()">💸 Send Pi</button><button type="button" class="wf-cta wf-cta2" style="margin-top:12px" onclick="hmGetPaid()">📩 Request Pi</button></div></div>' +
       '<div class="wf-sec"><div class="wf-sec-h"><b>💱 Converter · live rate</b><button type="button" class="wf-link" onclick="hmPickCurrency()">' + esc(l.code) + ' ▾</button></div>' +
         '<div class="wf-conv3"><label><span>π</span><input id="wc-pi" type="number" inputmode="decimal" placeholder="1" oninput="hmConv(\'pi\')"></label><label><span>SAR</span><input id="wc-sar" type="number" inputmode="decimal" placeholder="0" oninput="hmConv(\'sar\')"></label>' +
         (l.code !== 'SAR' ? '<label><span>' + esc(l.code) + '</span><input id="wc-loc" type="number" inputmode="decimal" placeholder="0" oninput="hmConv(\'loc\')"></label>' : '') + '</div></div>' +
