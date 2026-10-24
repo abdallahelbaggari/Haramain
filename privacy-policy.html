@@ -1,21 +1,85 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Privacy Policy · Haramain</title><meta name="theme-color" content="#FFFFFF">
+<title>Privacy Policy · Haramain</title><meta name="description" content="How Haramain handles your information."><meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="icons/favicon-32.png">
 <style>:root{color-scheme:light}body{margin:0;background:#F6F4EE;color:#13261E;font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{background:#fff;box-shadow:inset 0 -3px 0 #0E7A52}.w{max-width:720px;margin:0 auto;padding:18px 20px}
-header .w{display:flex;align-items:center;gap:10px}header span{font-size:26px}header b{font-size:18px;letter-spacing:.08em;color:#0E7A52}
-h1{font-size:28px;line-height:1.2;margin:8px 0 4px}h2{font-size:18px;margin:28px 0 6px;color:#0E7A52}.muted{color:#5E6B63;font-size:14px}
-.note{background:#fff;border:1px solid #E3DED0;border-radius:14px;padding:14px 16px;margin:16px 0}a{color:#0E7A52;font-weight:600}ul{padding-left:20px}</style></head>
-<body><header><div class="w"><span>🕋</span><b>HARAMAIN</b></div></header><main class="w"><h1>Privacy Policy</h1><p class="muted">Last updated 22 October 2026 (shared features added)</p>
-<h2>Saved only on your phone</h2><p>Your checklist, Tawaf and Sa'i counts, dhikr, prayer log, water log, health card, medications, emergency contacts, notes, documents, memories, budget and settings are saved in your browser's storage on this device. We do not receive them. Clearing the app's data deletes them.</p>
-<h2>Pi sign-in</h2><p>When you sign in with Pi, the Pi app shares your Pi username and a user ID with Haramain. We never see your passphrase, seed phrase or private keys.</p>
-<h2>Payments</h2><p>The optional Supporter Pass is a Pi payment made in the Pi app. Our server checks the payment with Pi Network (amount, status and transaction ID) before approving and completing it.</p>
-<h2>Haramain Pay</h2><p>When you create a payment request, the amount, item, the name you enter, your Pi username and the Pi wallet address you enter are written into the payment link you share; we do not store them on a server. Your requests, receipts and saved wallet address stay on your phone. To confirm a payment, our server looks up public payment records on the Pi blockchain for that wallet address. Pi blockchain records are public and permanent.</p>
-<h2>Sending Pi to Haramain users</h2><p>When you sign in with Pi, your Pi username and user ID are saved on our server so other users can send Pi to your @username. For each in-app transfer we record the sender, the recipient, the amount, the narration, the payment IDs and the blockchain transaction IDs, so the payout can be completed, checked and, if needed, refunded. Transfers are recorded on the public Pi blockchain.</p>
-<h2>Location</h2><p>If you allow location, your position is used to calculate prayer times and the Qibla direction (your coordinates are sent to the AlAdhan prayer-time service), to show your zone in the tracker, and to add a map link when you choose to share a check-in or emergency message. We do not store your location on a server.</p>
-<h2>Live location sharing</h2><p>If you tap “Share live with family”, your position is sent to our server and shown to anyone who has your link, until you tap Stop or for at most 12 hours. When sharing ends, the location is deleted from our server.</p>
-<h2>Family groups</h2><p>If you create or join a family group, the name you enter, your check-ins and (when you choose to share it) your last location are stored on our server and shown only to members of that group. Members who are inactive for 7 days are removed automatically, and you can leave a group at any time.</p>
-<h2>Lost &amp; Found board</h2><p>Notices you post are public to all Haramain users, together with your Pi username and any contact you choose to add. Notices are removed after 30 days, when you mark them resolved, or when several users report them.</p>
-<h2>Questions and translations</h2><p>Text you type in Ask or Translate is sent through our server to an AI service to produce the answer. Please do not include personal details. We do not keep these messages.</p>
-<h2>Public information</h2><p>The app loads public data such as Makkah weather, Quran text and the Pi price. No personal data is sent with these requests. Directions open your own maps app.</p>
-<h2>What we do not do</h2><ul><li>No advertising trackers and no selling of data.</li><li>No collection of passport numbers or identity documents on our servers.</li></ul>
-<h2>Changes</h2><p>We will update this page if the app changes how it uses data.</p><p class="muted" style="margin-top:32px">Contact: <a href="mailto:support.haramain@gmail.com">support.haramain@gmail.com</a> · haramain.pi · <a href="privacy-policy.html">Privacy</a> · <a href="terms-of-service.html">Terms</a></p></main></body></html>
+header{background:#fff;box-shadow:inset 0 -3px 0 #0E7A52;position:sticky;top:0;z-index:2}.w{max-width:760px;margin:0 auto;padding:16px 20px}
+header .w{display:flex;align-items:center;gap:10px}header img{width:34px;height:34px;border-radius:9px}header b{font-size:16px;letter-spacing:.2em;color:#0E7A52}
+h1{font-size:28px;line-height:1.2;margin:10px 0 4px}h2{font-size:19px;margin:30px 0 6px;color:#0E7A52}h3{font-size:16px;margin:18px 0 4px}.muted{color:#5E6B63;font-size:14px}
+.note{background:#fff;border:1px solid #E3DED0;border-radius:14px;padding:14px 16px;margin:16px 0}a{color:#0E7A52;font-weight:600}ul{padding-left:20px}li{margin:4px 0}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #E3DED0;border-radius:12px;overflow:hidden;font-size:14px;margin:10px 0}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid #EFEBE0;vertical-align:top}th{background:#F4FAF6;color:#0E7A52}
+nav.toc{columns:2;font-size:14px}nav.toc a{display:block;padding:2px 0}@media(max-width:560px){nav.toc{columns:1}table{font-size:13px}}
+footer{margin:36px 0 10px;font-size:14px;color:#5E6B63}</style></head>
+<body><header><div class="w"><img src="icons/icon-192.png" alt=""><b>HARAMAIN</b></div></header><main class="w">
+<h1>Privacy Policy</h1><p class="muted">Effective 24 October 2026 · haramain.pi</p>
+
+<div class="note"><b>In short:</b> most of what you keep in Haramain stays only on your phone. We use our server only for the features that need it (payments and transfers, shared live location, family groups, the Lost &amp; Found board and the assistant), we keep that data only as long as needed, we never sell data, we never show ads that track you, and we never see your Pi passphrase or private keys.</div>
+
+<nav class="toc"><a href="#who">1. Who we are</a><a href="#phone">2. Kept only on your phone</a><a href="#server">3. What our server processes</a><a href="#pi">4. Pi sign-in and payments</a><a href="#transfers">5. Sending Pi to Haramain users</a><a href="#loc">6. Location</a><a href="#third">7. Services we use</a><a href="#never">8. What we never do</a><a href="#security">9. How we protect data</a><a href="#keep">10. How long we keep data</a><a href="#rights">11. Your choices and rights</a><a href="#kids">12. Children</a><a href="#intl">13. Where data is processed</a><a href="#changes">14. Changes and contact</a></nav>
+
+<h2 id="who">1. Who we are</h2>
+<p>Haramain (haramain.pi) is an independent Hajj and Umrah companion app for the Pi Browser, operated by its developer. Contact: <a href="mailto:support.haramain@gmail.com">support.haramain@gmail.com</a>. Haramain is not run by Pi Network or by any government.</p>
+
+<h2 id="phone">2. Kept only on your phone</h2>
+<p>These stay in your browser's storage on your device. We do not receive them: your checklist, Tawaf and Sa'i counts, dhikr and adhkar progress, prayer log, daily goals and badges, Quran bookmarks and reading position, water log, health card, medications, emergency contacts, notes, documents and photos you add, memories, budget, itinerary, saved payment receipts, your full name for receipts, and your settings. Clearing the app's data or uninstalling the Pi Browser deletes them. Because they live on your device, anyone who can unlock your phone may see them, so keep your phone locked.</p>
+
+<h2 id="server">3. What our server processes</h2>
+<table><tr><th>Feature</th><th>What we process</th><th>Why</th></tr>
+<tr><td>Pi sign-in</td><td>Pi username and Pi user ID</td><td>To recognise you and, if you use transfers, to let others send Pi to your @username</td></tr>
+<tr><td>Payments</td><td>Pi payment ID, amount, memo, status, blockchain transaction ID</td><td>To approve and complete payments with Pi Network</td></tr>
+<tr><td>Transfers</td><td>Sender and recipient usernames and IDs, amount, narration, payment and transaction IDs, status</td><td>To deliver, verify and, if needed, refund a transfer</td></tr>
+<tr><td>Live location (only when you start it)</td><td>Your name as you type it, position and accuracy</td><td>To show your position to people who have your link</td></tr>
+<tr><td>Family groups (only if you join one)</td><td>The name you enter, check-ins, last shared location</td><td>To show them to members of your group</td></tr>
+<tr><td>Lost &amp; Found board</td><td>Your notice, Pi username, any contact you add</td><td>To show the notice to all Haramain users</td></tr>
+<tr><td>Assistant and translator</td><td>The text you type (not stored)</td><td>To produce an answer</td></tr>
+<tr><td>Abuse protection</td><td>A one-way scrambled code made from your IP address, kept for one hour (the IP itself is not stored)</td><td>To limit how often the assistant can be used</td></tr>
+<tr><td>Receipt checks</td><td>A transaction ID or wallet address you check</td><td>To read public records from the Pi blockchain</td></tr></table>
+
+<h2 id="pi">4. Pi sign-in and payments</h2>
+<p>When you sign in with Pi, the Pi app shares your Pi username and a user ID with Haramain. Payments are made in Pi's own payment window. Our server checks each payment with Pi Network (amount, status and transaction ID) before approving and completing it. We never see your passphrase, seed phrase, private keys or wallet balance.</p>
+
+<h2 id="transfers">5. Sending Pi to Haramain users</h2>
+<p>If you send Pi to another Haramain user, you pay Haramain in Pi's payment window and Haramain's app wallet then pays the recipient through Pi Network's official app-to-user payments. To do this, we keep the transfer record listed in section 3. Transfers are written to the public Pi blockchain, where wallet addresses, amounts, memos and times are visible to anyone and cannot be deleted by us or by you.</p>
+
+<h2 id="loc">6. Location</h2>
+<p>Location is used only when you allow it in your browser and use a feature that needs it: prayer times and the Qibla direction (your approximate coordinates are sent to the AlAdhan prayer-time service), your position on the live map, family check-ins and emergency messages you choose to send. When you share live location, it is deleted from our server as soon as you tap Stop, and at the latest after 12 hours. Directions open your own maps app.</p>
+
+<h2 id="third">7. Services we use</h2>
+<ul><li><b>Pi Network</b>: sign-in, payments and app-to-user payouts.</li>
+<li><b>Cloudflare</b>: hosting, server functions and the database for shared features.</li>
+<li><b>Google Gemini</b> (or Anthropic as a backup): answers for the assistant and translator. We send only the text you type.</li>
+<li><b>Public data services</b>, which receive no personal data from us: AlAdhan (prayer times), Open-Meteo (weather), AlQuran Cloud and EveryAyah (Quran text and recitation), OKX and CoinGecko (Pi price), open.er-api.com (currency rates), GDACS (alerts), OpenStreetMap and CARTO (maps), Pi blockchain explorers (receipt checks), and Google Fonts, cdnjs and jsDelivr (fonts and code libraries).</li></ul>
+<p>Each service handles requests under its own privacy policy.</p>
+
+<h2 id="never">8. What we never do</h2>
+<ul><li>We never sell, rent or trade personal data.</li><li>We do not use advertising trackers or build advertising profiles.</li><li>We never ask for or store your Pi passphrase, seed phrase or private keys.</li><li>We do not upload your passport, documents or health card to our servers.</li><li>We do not read your contacts, messages or files outside Haramain.</li></ul>
+
+<h2 id="security">9. How we protect data</h2>
+<ul><li>All connections use HTTPS, and the app sends standard browser security headers and a content policy that blocks scripts from unknown sites.</li>
+<li>Secret keys live only on our server and are never sent to your phone.</li>
+<li>Payments and payouts are checked with Pi Network before anything is approved or paid, and each payout is made only once.</li>
+<li>Shared features use random secret codes, sign-in checks with Pi, member-only access and automatic deletion.</li>
+<li>Receipts can be checked against the public blockchain so altered receipts can be detected.</li></ul>
+<p>No system is perfectly secure. If we learn of a breach affecting your data, we will inform affected users in the app and act to contain it.</p>
+
+<h2 id="keep">10. How long we keep data</h2>
+<table><tr><th>Data</th><th>Kept</th></tr>
+<tr><td>Live location</td><td>Until you stop sharing, at most 12 hours</td></tr>
+<tr><td>Family group membership</td><td>Until you leave; inactive members are removed after 7 days</td></tr>
+<tr><td>Lost &amp; Found notices</td><td>30 days, or until resolved or removed after reports</td></tr>
+<tr><td>Assistant questions</td><td>Not stored</td></tr>
+<tr><td>Abuse-protection codes</td><td>One hour</td></tr>
+<tr><td>Payment and transfer records, Pi username and user ID</td><td>As long as needed to provide the service, handle refunds and disputes, prevent fraud and meet legal obligations, then deleted</td></tr></table>
+
+<h2 id="rights">11. Your choices and rights</h2>
+<ul><li>Delete everything on your phone by clearing Haramain's data in the Pi Browser.</li><li>Stop live sharing, leave a family group or mark your notice resolved at any time.</li><li>Write to <a href="mailto:support.haramain@gmail.com">support.haramain@gmail.com</a> to ask for a copy of the data our server holds about you, to correct it, or to delete it. We reply within 30 days. Records on the public Pi blockchain cannot be deleted.</li><li>You can stop using Haramain at any time.</li></ul>
+<p>Depending on where you live (for example under Saudi Arabia's Personal Data Protection Law, the EU's GDPR or Nigeria's Data Protection Act), you may have further rights, and you can complain to your data protection authority.</p>
+
+<h2 id="kids">12. Children</h2>
+<p>Haramain is not directed at children under 13, and we do not knowingly collect their data. Payments and transfers are only for users who are adults where they live. If you believe a child has shared data with us, contact us and we will delete it.</p>
+
+<h2 id="intl">13. Where data is processed</h2>
+<p>Our server runs on Cloudflare's global network, so data may be processed in countries other than yours. We use providers that protect data with industry-standard security.</p>
+
+<h2 id="changes">14. Changes and contact</h2>
+<p>We will update this page when the app changes how it uses data, and change the date at the top. Important changes are announced in the app. Questions: <a href="mailto:support.haramain@gmail.com">support.haramain@gmail.com</a>.</p>
+<footer>© Haramain 2026 · haramain.pi · <a href="privacy-policy.html">Privacy</a> · <a href="terms-of-service.html">Terms</a></footer></main></body></html>

@@ -1,17 +1,83 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Terms of Service · Haramain</title><meta name="theme-color" content="#FFFFFF">
+<title>Terms of Service · Haramain</title><meta name="description" content="The rules for using Haramain."><meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="icons/favicon-32.png">
 <style>:root{color-scheme:light}body{margin:0;background:#F6F4EE;color:#13261E;font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{background:#fff;box-shadow:inset 0 -3px 0 #0E7A52}.w{max-width:720px;margin:0 auto;padding:18px 20px}
-header .w{display:flex;align-items:center;gap:10px}header span{font-size:26px}header b{font-size:18px;letter-spacing:.08em;color:#0E7A52}
-h1{font-size:28px;line-height:1.2;margin:8px 0 4px}h2{font-size:18px;margin:28px 0 6px;color:#0E7A52}.muted{color:#5E6B63;font-size:14px}
-.note{background:#fff;border:1px solid #E3DED0;border-radius:14px;padding:14px 16px;margin:16px 0}a{color:#0E7A52;font-weight:600}ul{padding-left:20px}</style></head>
-<body><header><div class="w"><span>🕋</span><b>HARAMAIN</b></div></header><main class="w"><h1>Terms of Service</h1><p class="muted">Last updated 22 October 2026</p><div class="note"><b>Independent app.</b> Haramain (haramain.pi) is an independent app for the Pi Network. It is not affiliated with the Saudi government, the Ministry of Hajj and Umrah, the General Authority for the Affairs of the Two Holy Mosques, or Pi Core Team.</div>
-<h2>General guidance</h2><p>Haramain gives general information about Hajj and Umrah. It is not a religious authority, a travel agent, a medical service or an emergency service. For religious rulings, ask a qualified scholar. In an emergency in Saudi Arabia, call 911 or 997.</p>
-<h2>Accuracy</h2><p>Prayer times, Islamic dates and weather come from calculation methods and public services and can differ slightly from official announcements. Islamic dates follow the Umm al-Qura calendar and may change by one day after moon sighting. Always follow official instructions on site and your Hajj group.</p>
-<h2>Pi payments</h2><p>Every tool in the app is free. The Supporter Pass (1π) is optional: it supports the app and adds a Supporter badge to your Pilgrim ID, and it does not unlock other features. Sending Pi to other people happens in Pi Wallet. Completed Pi payments cannot be reversed by us.</p>
-<h2>Haramain Pay</h2><p>Haramain Pay helps buyers and sellers pay each other in Pi and confirms payments on the Pi blockchain. Payments go directly from the buyer’s Pi Wallet to the seller’s Pi Wallet: Haramain never holds, controls or refunds Pi, is not a party to any sale, and is not responsible for the goods, services or prices agreed between users. Check who you are paying before you pay. Blockchain payments cannot be reversed. A verified receipt confirms that the payment reached the address in the request; it does not guarantee the sale.</p>
-<h2>Sending Pi to Haramain users</h2><p>When you send Pi to another Haramain user, you pay Haramain in the Pi app and Haramain’s app wallet then pays the recipient through Pi Network’s official app-to-user payments, normally within seconds. A blockchain fee of 0.01 π is added to each transfer. Haramain only pays out after Pi confirms your payment. If a payout cannot be completed, Haramain keeps retrying; if it still cannot be completed, you can contact us for a refund to your Pi account. Check the @username before sending: blockchain payments cannot be reversed once delivered. Transfers have a maximum amount per payment and can be paused for safety.</p>
-<h2>Your use</h2><p>Use the app lawfully and respectfully. Do not use sharing features to send false or harmful information.</p>
-<h2>Pi Network</h2><p>Pi sign-in and payments are also subject to Pi Network's own terms.</p>
-<h2>Liability</h2><p>The app is provided as is. To the extent the law allows, we are not responsible for loss caused by relying on its information.</p>
-<h2>Changes</h2><p>We may update these terms; the date above shows the latest version.</p><p class="muted" style="margin-top:32px">Contact: <a href="mailto:support.haramain@gmail.com">support.haramain@gmail.com</a> · haramain.pi · <a href="privacy-policy.html">Privacy</a> · <a href="terms-of-service.html">Terms</a></p></main></body></html>
+header{background:#fff;box-shadow:inset 0 -3px 0 #0E7A52;position:sticky;top:0;z-index:2}.w{max-width:760px;margin:0 auto;padding:16px 20px}
+header .w{display:flex;align-items:center;gap:10px}header img{width:34px;height:34px;border-radius:9px}header b{font-size:16px;letter-spacing:.2em;color:#0E7A52}
+h1{font-size:28px;line-height:1.2;margin:10px 0 4px}h2{font-size:19px;margin:30px 0 6px;color:#0E7A52}.muted{color:#5E6B63;font-size:14px}
+.note{background:#fff;border:1px solid #E3DED0;border-radius:14px;padding:14px 16px;margin:16px 0}a{color:#0E7A52;font-weight:600}ul{padding-left:20px}li{margin:4px 0}
+nav.toc{columns:2;font-size:14px}nav.toc a{display:block;padding:2px 0}@media(max-width:560px){nav.toc{columns:1}}
+footer{margin:36px 0 10px;font-size:14px;color:#5E6B63}</style></head>
+<body><header><div class="w"><img src="icons/icon-192.png" alt=""><b>HARAMAIN</b></div></header><main class="w">
+<h1>Terms of Service</h1><p class="muted">Effective 24 October 2026 · haramain.pi</p>
+
+<div class="note"><b>Please read these terms.</b> By using Haramain you agree to them. If you do not agree, please do not use the app. Key points: Haramain gives general guidance, not religious rulings or emergency services; Pi payments are approved by you in Pi's own window and blockchain payments cannot be reversed; you must not use Haramain for fraud or other illegal activity.</div>
+
+<nav class="toc"><a href="#about">1. About Haramain</a><a href="#who">2. Who may use it</a><a href="#guidance">3. Guidance, not authority</a><a href="#pi">4. Pi sign-in and your security</a><a href="#payments">5. Pi payments</a><a href="#transfers">6. Sending Pi to Haramain users</a><a href="#prohibited">7. Prohibited uses</a><a href="#shared">8. Shared features</a><a href="#ai">9. Assistant and translator</a><a href="#info">10. Prices, dates and other information</a><a href="#ip">11. Content and ownership</a><a href="#avail">12. Availability and changes</a><a href="#liability">13. Disclaimers and liability</a><a href="#end">14. Suspension and termination</a><a href="#law">15. Governing law and disputes</a><a href="#contact">16. Changes and contact</a></nav>
+
+<h2 id="about">1. About Haramain</h2>
+<p>Haramain (haramain.pi) is an independent Hajj and Umrah companion app for the Pi Browser, operated by its developer ("we"). It is not operated, endorsed or sponsored by Pi Network, the Government of Saudi Arabia, the Ministry of Hajj and Umrah, or any religious authority. Pi sign-in and payments are also subject to Pi Network's own terms.</p>
+
+<h2 id="who">2. Who may use it</h2>
+<p>You must be at least 13 years old to use Haramain. To make payments or transfers, you must be an adult where you live and allowed to use Pi Network. You are responsible for following the laws that apply to you.</p>
+
+<h2 id="guidance">3. Guidance, not authority</h2>
+<ul><li><b>Religious content</b> is general guidance. For rulings about your own worship, ask a qualified scholar.</li>
+<li><b>Haramain is not an emergency service.</b> In Saudi Arabia call 911 (unified emergency) or 997 (ambulance). The SOS tools show numbers and help you share your location; they do not contact anyone by themselves.</li>
+<li><b>Haramain is not a medical service, travel agent or Hajj operator.</b> Always follow official instructions, your Hajj group and the authorities on site.</li></ul>
+
+<h2 id="pi">4. Pi sign-in and your security</h2>
+<p>You sign in with your Pi account. Keep your phone, Pi account and passphrase secure. Haramain will never ask for your passphrase, seed phrase or private keys; anyone who does is not Haramain. You are responsible for activity on your device.</p>
+
+<h2 id="payments">5. Pi payments</h2>
+<ul><li>Every tool in Haramain is free. The Supporter Pass is optional; it supports the app and adds a Supporter badge, and does not unlock other features or give any financial return.</li>
+<li>Haramain does not offer Pi rewards, interest, investment or returns of any kind.</li>
+<li>You approve every payment yourself in Pi's own payment window. Completed blockchain payments cannot be reversed. If a payment was charged in error by the app, contact us and we will review it.</li>
+<li>Haramain is not a bank, exchange, wallet provider or money service. Your Pi balance is held in your own Pi Wallet.</li></ul>
+
+<h2 id="transfers">6. Sending Pi to Haramain users</h2>
+<ul><li><b>How it works:</b> you pay Haramain in Pi's payment window, and Haramain's app wallet then pays the recipient through Pi Network's official app-to-user payments, normally within seconds. Haramain pays out only after Pi Network confirms your payment, and only once per payment.</li>
+<li><b>Fee:</b> a blockchain fee of 0.01 π is added to each transfer and shown before you approve. The recipient receives the full amount you enter.</li>
+<li><b>Check before you send:</b> make sure the @username, amount and narration are right. Once delivered, a transfer cannot be reversed by us.</li>
+<li><b>If a payout fails:</b> Haramain keeps retrying. If it still cannot be delivered, contact us within 30 days and we will refund the amount to your Pi account, less any blockchain fees already spent.</li>
+<li><b>Limits and safety:</b> transfers have a maximum per payment. We may pause, limit or refuse transfers, or hold a transfer for review, to protect users, prevent fraud or comply with Pi Network's rules or the law.</li>
+<li><b>Not a party to your deals:</b> if you pay someone for goods or services, the agreement is between you and them. Haramain is not responsible for what is sold, its quality or delivery.</li>
+<li><b>Receipts</b> show what was recorded on the Pi blockchain. A verified receipt proves the payment was made; it does not guarantee any sale.</li></ul>
+
+<h2 id="prohibited">7. Prohibited uses</h2>
+<p>You must not use Haramain to:</p>
+<ul><li>commit fraud, scams or impersonation, or trick people into sending Pi;</li>
+<li>launder money, finance terrorism, evade sanctions, or pay for anything illegal;</li>
+<li>gamble, or offer investment schemes or promised returns;</li>
+<li>post false, harmful, hateful or private information about others on shared features;</li>
+<li>attack, overload, scrape, reverse-engineer for misuse, or bypass the security or limits of the app or its servers;</li>
+<li>create fake accounts or abuse the assistant, live location or Lost &amp; Found board.</li></ul>
+<p>We may remove content, block accounts and, where required, report activity to Pi Network or the authorities.</p>
+
+<h2 id="shared">8. Shared features</h2>
+<p>Lost &amp; Found notices are visible to all Haramain users; live location is visible to anyone who has your link; family check-ins are visible to your group. Share only what you are comfortable sharing. You keep ownership of what you post and allow us to display it in the app for its purpose. Notices may be removed after reports or after 30 days.</p>
+
+<h2 id="ai">9. Assistant and translator</h2>
+<p>Answers and translations are produced automatically and can be wrong or incomplete. Check important information with official sources or a qualified person. Do not type personal or sensitive details.</p>
+
+<h2 id="info">10. Prices, dates and other information</h2>
+<p>Prayer times, Islamic dates (Umm al-Qura calendar), weather and Pi and currency rates come from calculations and public services and may differ from official announcements or market prices. Pi prices are for information only and are not financial advice.</p>
+
+<h2 id="ip">11. Content and ownership</h2>
+<p>The Haramain name, logo, design and code belong to the developer. Quran text and recitations, maps and other data belong to their respective sources and are used under their terms. Do not copy or republish the app or its design without permission.</p>
+
+<h2 id="avail">12. Availability and changes</h2>
+<p>We work to keep Haramain available but cannot guarantee it will always be available, error-free or offline-ready. We may change, add or remove features at any time.</p>
+
+<h2 id="liability">13. Disclaimers and liability</h2>
+<p>Haramain is provided "as is". To the fullest extent the law allows, we are not liable for indirect or consequential losses, or for losses caused by relying on information in the app, by events outside our control, by Pi Network or other third-party services, by your device or account being compromised, or by payments you approved to the wrong person. Where we are found liable, our total liability is limited to the amount you paid to Haramain in the 12 months before the claim. Nothing in these terms limits rights you have under law that cannot be limited. You agree to cover losses we suffer because you broke these terms or the law.</p>
+
+<h2 id="end">14. Suspension and termination</h2>
+<p>You can stop using Haramain at any time. We may suspend or end your access if you break these terms or the law, or to protect other users. Completed transfers and refunds owed to you are not affected.</p>
+
+<h2 id="law">15. Governing law and disputes</h2>
+<p>These terms are governed by the laws of the Federal Republic of Nigeria, where Haramain is operated, without limiting any consumer rights you have where you live. If you have a problem, please contact us first so we can try to resolve it within 30 days.</p>
+
+<h2 id="contact">16. Changes and contact</h2>
+<p>We may update these terms and will change the date at the top; important changes are announced in the app. Continuing to use Haramain means you accept the updated terms. Contact: <a href="mailto:support.haramain@gmail.com">support.haramain@gmail.com</a>.</p>
+<footer>© Haramain 2026 · haramain.pi · <a href="privacy-policy.html">Privacy</a> · <a href="terms-of-service.html">Terms</a></footer></main></body></html>
