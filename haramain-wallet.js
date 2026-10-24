@@ -51,10 +51,14 @@
     var d = new Date(r.ts), when = [['Date', d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })], ['Time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })]];
     var sub = r.usd ? '≈ ' + (r.amount * r.sar).toFixed(2) + ' SAR · $' + (r.amount * r.usd).toFixed(2) + (r.lr && r.lc && r.lc !== 'SAR' && r.lc !== 'USD' ? ' · ' + (r.ls || r.lc + ' ') + num(r.amount * r.lr, r.amount * r.lr < 10 ? 2 : 0) : '') + ' at payment time' : '';
     if (r.kind === 'p2p' && r.send) {
+      if (r.refund) return { title: 'Automatic refund', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
+        rows: [['From', 'Haramain app wallet (automatic)'], ['To', (r.toName ? r.toName + ' · ' : '') + short(r.to)], ['Reason', 'Your transfer to ' + (r.other || 'the recipient') + ' could not be delivered'], ['For', r.narr || '—'], ['Reference', r.ref]]
+          .concat(when, [['Network', r.net], ['Your address', r.to, 1], ['Transaction ID', r.txid, 1]]),
+        thanks: 'Refunded by Haramain', note: 'Refunded automatically by Haramain’s published rules, with no manual decision. Check it on the Pi blockchain with the code above.' };
       return { title: r.dir === 'in' ? 'Transfer received' : 'Transfer receipt', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
         rows: [['From', (r.name || '—') + (r.user ? ' (@' + r.user + ')' : '')], ['To', (r.toName ? r.toName + ' · ' : '') + short(r.to)], ['Narration', r.narr || '—'], ['Reference', r.ref]]
           .concat(when, [['Network', r.net], ['Recipient address', r.to, 1], ['Transaction ID', r.txid, 1]]),
-        thanks: r.dir === 'in' ? 'Received with Haramain' : 'Sent with Haramain', note: r.inapp ? 'Paid in Haramain and delivered from the Haramain app wallet. Check it on the Pi blockchain with the code above.' : 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
+        thanks: r.dir === 'in' ? 'Received with Haramain' : 'Sent with Haramain', note: r.inapp ? 'Paid in Haramain and delivered automatically from the Haramain app wallet through Pi Network’s official payments. Check it on the Pi blockchain with the code above.' : 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
     }
     if (r.kind === 'p2p') {
       var inn = r.dir === 'in';
@@ -357,7 +361,7 @@
         [['🤲', 'Zakat', "oUtil('zakat')"], ['💝', 'Sadaqah', "oUtil('sadaqah')"], ['🐑', 'Qurbani', "oUtil('qurbani')"], ['⭐', 'Support Haramain', 'buyPrem()']].map(function (t) { return '<button type="button" class="nv-t" onclick="' + t[2] + '"><span class="nv-i">' + t[0] + '</span><span class="nv-l">' + t[1] + '</span></button>'; }).join('') + '</div></div>' +
       '<div class="wf-sec" id="wf-act"><div class="wf-sec-h"><b>🧾 Activity &amp; receipts</b></div><div class="wf-tabs">' +
         [['all', 'All'], ['in', 'Received'], ['out', 'Paid']].map(function (t) { return '<button type="button" data-f="' + t[0] + '" onclick="hmTxFilter(\'' + t[0] + '\')">' + t[1] + '</button>'; }).join('') + '</div><div id="wl-tx"></div></div>' +
-      '<div class="wf-safe">🔒 <span><b>You approve every payment yourself.</b> Haramain never asks for your passphrase and cannot move Pi from your wallet. Sending to a Haramain user passes through the Haramain app wallet for a few seconds, and every step is recorded on the Pi blockchain. Your balance is shown in Pi Wallet.</span></div>';
+      '<div class="wf-safe">🔒 <span><b>You approve every payment yourself.</b> Haramain never asks for your passphrase and cannot move Pi from your wallet. Sending to a Haramain user passes through the Haramain app wallet for a few seconds and is handled automatically by fixed rules: it is delivered, or refunded to you, and every step is recorded on the Pi blockchain. Your balance is shown in Pi Wallet.</span></div>';
     var w = $('wc-pi'); if (w) { w.value = 1; convert('pi'); }
     drawTx();
   }
@@ -367,7 +371,7 @@
     R.forEach(function (r, i) { var d = r.dir || 'out'; if (filter === 'all' || filter === d) rows.push([r, i]); });
     document.querySelectorAll('.wf-tabs button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-f') === filter); });
     var html = rows.length ? rows.slice(0, 60).map(function (x) {
-      var r = x[0], inn = r.dir === 'in', title = r.kind === 'p2p' ? (inn ? 'From ' + short(r.other) : 'To ' + (r.toName || r.seller || short(r.to))) : (TYPES[r.kind] || r.memo || 'Pi payment');
+      var r = x[0], inn = r.dir === 'in', title = r.refund ? 'Refund · transfer to ' + short(r.other) : r.kind === 'p2p' ? (inn ? 'From ' + short(r.other) : 'To ' + (r.toName || r.seller || short(r.to))) : (TYPES[r.kind] || r.memo || 'Pi payment');
       var icon = r.kind === 'pilgrim_pass' ? '⭐' : inn ? '↓' : '↑';
       return '<div class="wl-tx"><span class="wl-txi ' + (inn ? 'in' : 'out') + '">' + icon + '</span><div class="wl-txt"><b>' + esc(title) + '</b><small>' + (r.kind === 'p2p' ? esc(r.item || '') + ' · ' : '') + new Date(r.ts).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + ' · ' + esc(r.status || 'Completed') + '</small></div><div class="wl-txa"><b class="' + (inn ? 'in' : '') + '">' + (inn ? '+' : '−') + r.amount + ' π</b><button type="button" onclick="hmReceipt(' + x[1] + ')">Receipt</button></div></div>';
     }).join('') : '<div class="wl-empty"><span>🧾</span><b>' + (filter === 'in' ? 'No payments received yet' : filter === 'out' ? 'No payments made yet' : 'No activity yet') + '</b><small>Payments in Haramain and Haramain Pay sales appear here with a receipt you can share as an image.</small></div>';

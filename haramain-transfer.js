@@ -46,6 +46,18 @@
       usd: p && p.usd, sar: p && p.sar, lc: l.code, lr: l.rate, ls: l.sym });
     put('rcpts', R.slice(0, 200)); return true;
   }
+  /* automatic refund (delivery was not possible): a receipt verified on the Pi blockchain */
+  function saveRefund(t) {
+    if (!t.refund_txid) return false;
+    var ok = saveReceipt({ amount: t.amount, narr: t.narr || '', from: 'Haramain', to: me(), to_addr: t.refund_addr, pid: t.pid, done_ts: t.done_ts, txid: t.refund_txid }, 'in');
+    if (ok) { var R = get('rcpts', []); if (R[0] && R[0].txid === t.refund_txid) { R[0].refund = true; R[0].name = 'Haramain (automatic refund)'; R[0].other = '@' + t.to; put('rcpts', R); } }
+    return ok;
+  }
+  function refundNote(t) {
+    var m = num(t.amount, 7) + ' π returned to you: your transfer to @' + t.to + ' could not be delivered.';
+    try { addNotif('↩️', 'Refunded automatically', m, 'now'); } catch (e) {}
+    if (window.hmSysNotify) hmSysNotify('↩️ Refunded automatically', m, 'hm-ref-' + t.pid);
+  }
   /* fetch my sent and received transfers: add receipts, finish any payout still pending */
   function sync() {
     if (!window.HM_TOKEN || !CFG.enabled) return;
@@ -54,23 +66,17 @@
       (d.items || []).forEach(function (t) {
         if (t.status === 'paid') {
           if (saveReceipt(t, t.dir) && t.dir === 'in') {
-            news++; var msg = num(t.amount, 7) + ' π from @' + t.from + (t.narr ? ' · ' + t.narr : '');
+            news++; say('💰 You received Pi'); var msg = num(t.amount, 7) + ' π from @' + t.from + (t.narr ? ' · ' + t.narr : '');
             try { addNotif('💰', 'You received Pi', msg, 'now'); } catch (e) {}
             if (window.hmSysNotify) hmSysNotify('💰 You received Pi', msg, 'hm-in-' + t.pid);
           }
-        } else if (t.dir === 'out' && t.status === 'refund_needed') {
-          var seen = get('held', []);
-          if (seen.indexOf(t.pid) < 0) {
-            seen.push(t.pid); put('held', seen.slice(-50));
-            var hm = num(t.amount, 7) + ' π to @' + t.to + ' could not be delivered and is on hold. Your Pi is safe: email support.haramain@gmail.com with reference ' + t.pid.slice(0, 12) + ' for a refund.';
-            try { addNotif('⏸️', 'Transfer on hold', hm, 'now'); } catch (e) {}
-            if (window.hmSysNotify) hmSysNotify('⏸️ Transfer on hold', hm, 'hm-hold-' + t.pid);
-          }
-        } else if (t.dir === 'out' && (t.status === 'failed' || t.status === 'received' || t.status === 'paying')) {
-          api('/transfer', { a: 'payout', paymentId: t.pid }).then(function (x) { if (x.ok && x.row) { saveReceipt(x.row, 'out'); redraw(); } }).catch(function () {});
+        } else if (t.status === 'refunded' && t.dir === 'out') {
+          if (saveRefund(t)) { news++; refundNote(t); }
+        } else if (t.dir === 'out' && /^(failed|received|paying|refunding|refund_failed|refund_needed)$/.test(t.status)) {
+          api('/transfer', { a: 'payout', paymentId: t.pid }).then(function (x) { if (x.ok && x.row) { saveReceipt(x.row, 'out'); redraw(); } else if (x.refunded && x.row && saveRefund(x.row)) { refundNote(x.row); redraw(); } }).catch(function () {});
         }
       });
-      if (news) { say('💰 You received Pi'); redraw(); }
+      if (news) redraw();
     }).catch(function () {});
   }
   function redraw() { try { if ($('s-payments') && $('s-payments').classList.contains('on')) goS('payments'); } catch (e) {} }
@@ -196,13 +202,15 @@
             var t = d && d.transfer;
             var finish = function (row) { saveReceipt(row, 'out'); st.remove(); var msg = num(amt, 7) + ' π to @' + to + ' · ' + narr; try { addNotif('✅', 'Transfer sent', msg, 'now'); } catch (e) {} if (window.hmSysNotify) hmSysNotify('✅ Transfer sent', msg, 'hm-out-' + pid); redraw(); if (window.hmReceiptByTx) hmReceiptByTx(row.txid); };
             if (t && t.ok && t.row) return finish(t.row);
+            if (t && t.refunded && t.row) { if (saveRefund(t.row)) refundNote(t.row); redraw(); return step(3, '↩️ This transfer could not be delivered, so ' + num(amt, 7) + ' π was refunded to you automatically on the Pi blockchain.', 'err'); }
             var tries = 0;
             (function retry() {
               api('/transfer', { a: 'payout', paymentId: pid }).then(function (x) {
                 if (x.ok && x.row && x.row.txid) return finish(x.row);
-                if (++tries < 12) { step(3, 'Paying @' + esc(to) + '… (' + tries + ')'); setTimeout(retry, 8000); }
-                else step(3, 'Your payment is safe and recorded. The payout to @' + esc(to) + ' is taking longer; Haramain keeps trying and will notify you.', 'wait');
-              }).catch(function () { if (++tries < 12) setTimeout(retry, 8000); });
+                if (x.refunded && x.row) { if (saveRefund(x.row)) refundNote(x.row); redraw(); return step(3, '↩️ This transfer could not be delivered, so ' + num(amt, 7) + ' π was refunded to you automatically on the Pi blockchain.', 'err'); }
+                if (++tries < 40) { step(3, 'Paying @' + esc(to) + '… the Pi blockchain is busy, retrying automatically.'); setTimeout(retry, 8000); }
+                else step(3, 'Your payment is safe and recorded on the Pi blockchain. Haramain keeps trying automatically: @' + esc(to) + ' is paid, or you are refunded, and you will be notified.', 'wait');
+              }).catch(function () { if (++tries < 40) setTimeout(retry, 8000); });
             })();
           }).catch(function () { step(2, 'Connection problem. Your payment is recorded; Haramain will finish it when you reopen the wallet.', 'err'); });
         },
