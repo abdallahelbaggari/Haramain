@@ -2,14 +2,31 @@
 //   GET  ?a=status                          → { enabled, max, fee, payments } (are transfers / payments switched on?)
 //   POST {a:'payout', paymentId}            → pays the recipient for a completed transfer (idempotent; also run by /complete)
 //   POST {a:'list', accessToken}            → the signed-in user's sent and received transfers
-import { H, json, me, db, payout, pub, enabled, maxTransfer, FEE, isTest } from './_lib/transfers.js';
+//   POST {a:'check', accessToken, to, amt}  → would this transfer be accepted? (limits, holds, first-time payee) before the Pi pop-up opens
+import { H, json, me, db, payout, pub, enabled, maxTransfer, FEE, isTest, limits, rateOk, checkTransferPayment, checkLimits, userByName, paidBefore, USER_RE } from './_lib/transfers.js';
 export async function onRequestGet({ request, env }) {
-  return json({ ok: true, payments: !!env.PI_API_KEY, enabled: enabled(env), max: maxTransfer(env), fee: FEE, net: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' });
+  return json({ ok: true, payments: !!env.PI_API_KEY, enabled: enabled(env), max: maxTransfer(env), daily: limits(env).day, fee: FEE, net: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' });
 }
 export async function onRequestPost({ request, env }) {
   const b = await request.json().catch(() => ({}));
-  if (b.a === 'payout') return json(await payout(env, request, String(b.paymentId || '')));
+  if (b.a === 'payout') {
+    if (!(await rateOk(env, request, 'payout', 300))) return json({ ok: false, retry: true, error: 'Busy, trying again shortly' });
+    return json(await payout(env, request, String(b.paymentId || '')));
+  }
+  if (b.a === 'check') {
+    if (!(await rateOk(env, request, 'check', 120))) return json({ ok: false, error: 'Too many attempts. Please wait a while and try again.' });
+    if (!enabled(env)) return json({ ok: false, error: 'Sending Pi is not available right now' });
+    const u = await me(b.accessToken); if (!u) return json({ ok: false, error: 'Sign in with Pi first' });
+    const to = String(b.to || '').replace(/^@/, ''), amt = Math.round(Number(b.amt) * 1e7) / 1e7;
+    if (!USER_RE.test(to) || !(amt > 0)) return json({ ok: false, error: 'Check the username and amount' });
+    const pay = { identifier: '', user_uid: u.uid, amount: Math.round((amt + FEE) * 1e7) / 1e7, metadata: { type: 'transfer', to, amt } };
+    const why = (await checkTransferPayment(env, pay)) || (await checkLimits(env, pay));
+    if (why) return json({ ok: false, error: why });
+    const r = await userByName(await db(env), to);
+    return json({ ok: true, to: r.username, first: !(await paidBefore(env, u.uid, r.uid)) });
+  }
   if (b.a === 'list') {
+    if (!(await rateOk(env, request, 'list', 240))) return json({ ok: false, error: 'Busy' });
     if (!env.HM_DB) return json({ ok: false, setup: true });
     const u = await me(b.accessToken); if (!u) return json({ ok: false, error: 'Sign in with Pi first' });
     const d = await db(env), net = { name: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' };

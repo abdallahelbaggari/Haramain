@@ -104,3 +104,4 @@ html body .hm-sheet-wrap{height:var(--hm-vvh,100vh);bottom:auto}
 /* Send / Request appear only when in-app transfers are switched on */
 html:not(.hm-tx-on) .tx-only{display:none!important}
 html body .wf-acts{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:1fr}
+.tr-warn{display:grid;gap:6px;margin:12px 0 4px}.tr-warn div{padding:9px 12px;border-radius:12px;background:#FFF8E8;color:#6B5216;font-size:13px;line-height:1.5}.tr-warn div:last-child{background:#F6F4EE;color:#4B5A52}

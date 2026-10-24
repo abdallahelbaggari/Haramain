@@ -17,6 +17,52 @@ const round7 = (n) => Math.round(Number(n) * 1e7) / 1e7;
 export function enabled(env) { return String(env.TRANSFERS_ENABLED || '') !== '0' && !!env.APP_WALLET_SEED && !!env.PI_API_KEY && !!env.HM_DB; }
 // Starts at 50 π per transfer for safety; raise it with MAX_TRANSFER (for example 500).
 export function maxTransfer(env) { const m = Number(env.MAX_TRANSFER); return m > 0 ? m : 50; }
+const numEnv = (v, d) => { const n = Number(v); return n > 0 ? n : d; };
+// Safety limits, all adjustable in Cloudflare without code: DAILY_LIMIT (π per sender per 24 h), DAILY_COUNT (transfers per sender per 24 h),
+// GLOBAL_DAILY_LIMIT (π paid out by Haramain per 24 h, caps any loss from a bug or abuse). BLOCKED_USERS: usernames or user IDs on hold (comma separated).
+export function limits(env) { return { max: maxTransfer(env), day: numEnv(env.DAILY_LIMIT, 200), count: numEnv(env.DAILY_COUNT, 20), global: numEnv(env.GLOBAL_DAILY_LIMIT, 2000) }; }
+export function onHold(env, ...ids) {
+  const list = String(env.BLOCKED_USERS || '').toLowerCase().split(/[\s,;]+/).filter(Boolean);
+  return ids.some((x) => x && list.includes(String(x).toLowerCase().replace(/^@/, '')));
+}
+const DAY = 86400000, LIVE = "(status IN ('received', 'paying', 'paid', 'failed') OR (status = 'approved' AND ts > ?))";
+
+/* Per-sender and app-wide 24-hour limits. Returns '' if fine, or the reason to refuse. */
+export async function checkLimits(env, pay) {
+  const L = limits(env), d = await db(env), now = Date.now(), amt = round7((pay.metadata || {}).amt), uid = String(pay.user_uid || ''), pid = String(pay.identifier || '');
+  const mine = await d.prepare('SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) AS s, COUNT(*) AS n FROM transfers WHERE from_uid = ? AND pid <> ? AND ts > ? AND ' + LIVE).bind(uid, pid, now - DAY, now - 3600000).first();
+  if (mine.n >= L.count) return 'You have reached today’s limit of ' + L.count + (L.count === 1 ? ' transfer.' : ' transfers.') + ' Please try again tomorrow.';
+  if (mine.s + amt > L.day + 1e-9) { const left = Math.max(0, round7(L.day - mine.s)); return 'The daily limit is ' + L.day + ' π per person. You can still send ' + left + ' π today.'; }
+  const all = await d.prepare('SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) AS s FROM transfers WHERE pid <> ? AND ts > ? AND ' + LIVE).bind(pid, now - DAY, now - 3600000).first();
+  if (all.s + amt > L.global + 1e-9) return 'Haramain has reached today’s transfer capacity. Please try again tomorrow.';
+  return '';
+}
+/* Called when Haramain approves a transfer: records it at once so limits count it before it completes. */
+export async function reserve(env, pay) {
+  const d = await db(env), md = pay.metadata || {}, to = await userByName(d, md.to), fromU = await d.prepare('SELECT username FROM users WHERE uid = ?').bind(String(pay.user_uid)).first();
+  await d.prepare('INSERT OR IGNORE INTO transfers (pid, from_uid, from_user, to_uid, to_user, amount, narr, status, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .bind(String(pay.identifier), String(pay.user_uid), fromU ? fromU.username : '', to ? to.uid : '', to ? to.username : String(md.to), String(round7(md.amt)), String(md.narr || '').slice(0, 80), 'approved', Date.now()).run();
+}
+/* Has this sender paid this recipient before? (to warn about first-time payees, a common scam pattern) */
+export async function paidBefore(env, fromUid, toUid) {
+  const r = await (await db(env)).prepare("SELECT 1 AS x FROM transfers WHERE from_uid = ? AND to_uid = ? AND status = 'paid' LIMIT 1").bind(String(fromUid), String(toUid)).first();
+  return !!r;
+}
+/* Light abuse protection: at most `max` calls per hour per bucket from one network. The IP is never stored, only a salted one-way hash. */
+export async function rateOk(env, request, bucket, max) {
+  try {
+    const d = env.HM_DB; if (!d) return true;
+    await d.exec('CREATE TABLE IF NOT EXISTS rl (k TEXT PRIMARY KEY, n INTEGER, w INTEGER)');
+    const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'x', w = Math.floor(Date.now() / 3600000);
+    const h = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(bucket + '|' + ip + '|' + (env.PI_API_KEY || 'hm'))))].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+    await d.prepare('INSERT INTO rl (k, n, w) VALUES (?, 1, ?) ON CONFLICT(k) DO UPDATE SET n = CASE WHEN rl.w = excluded.w THEN rl.n + 1 ELSE 1 END, w = excluded.w').bind(bucket + ':' + h, w).run();
+    const r = await d.prepare('SELECT n FROM rl WHERE k = ?').bind(bucket + ':' + h).first();
+    if (Math.random() < 0.02) await d.prepare('DELETE FROM rl WHERE w < ?').bind(w - 1).run();
+    return !r || r.n <= max;
+  } catch (e) { return true; }
+}
+/* Tells Pi to cancel a payment Haramain refused, so it never blocks the user's next payment. */
+export async function cancelPayment(env, pid) { try { await piApi(env, '/payments/' + encodeURIComponent(pid) + '/cancel', 'POST', {}); } catch (e) {} }
 
 export async function piApi(env, path, method, body) {
   const r = await fetch(PI + path, { method: method || 'GET', headers: { Authorization: 'Key ' + env.PI_API_KEY, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
@@ -40,12 +86,16 @@ export async function userByName(d, name) { return d.prepare('SELECT uid, userna
 export async function checkTransferPayment(env, pay) {
   if (!enabled(env)) return 'Transfers are not switched on';
   const md = (pay && pay.metadata) || {}, amt = round7(md.amt), paid = Number(pay && pay.amount);
-  if (!(amt >= 0.01) || amt > maxTransfer(env)) return 'Amount out of range';
+  if (!(amt >= 0.01)) return 'The smallest transfer is 0.01 π';
+  if (amt > maxTransfer(env)) return 'The most you can send at once is ' + maxTransfer(env) + ' π';
   if (!(paid + 1e-9 >= round7(amt + FEE))) return 'Payment does not cover the amount and fee';
   if (!USER_RE.test(String(md.to || ''))) return 'Bad recipient';
   const d = await db(env), to = await userByName(d, md.to);
   if (!to) return 'Recipient is not a Haramain user';
   if (to.uid === String(pay.user_uid)) return 'You cannot send to yourself';
+  const fromU = await d.prepare('SELECT username FROM users WHERE uid = ?').bind(String(pay.user_uid)).first();
+  if (onHold(env, pay.user_uid, fromU && fromU.username)) return 'This account is on hold. Please contact support.haramain@gmail.com';
+  if (onHold(env, to.uid, to.username)) return 'This recipient cannot receive transfers right now';
   return '';
 }
 
@@ -70,7 +120,9 @@ export async function payout(env, request, pid) {
       .bind(pid, String(pay.user_uid), fromU ? fromU.username : '', to ? to.uid : '', to ? to.username : String(md.to), String(round7(md.amt)), String(md.narr || '').slice(0, 80), bad ? 'refund_needed' : 'received', now).run();
     row = await d.prepare('SELECT * FROM transfers WHERE pid = ?').bind(pid).first();
   }
+  if (bad && row.status !== 'paid' && row.status !== 'refund_needed') { await d.prepare("UPDATE transfers SET status = 'refund_needed', err = ? WHERE pid = ?").bind(bad, pid).run(); row.status = 'refund_needed'; }
   if (bad || row.status === 'refund_needed') return { ok: false, error: bad || 'Needs a refund', row: pub(row, net) };
+  if (row.status === 'approved') { await d.prepare("UPDATE transfers SET status = 'received' WHERE pid = ? AND status = 'approved'").bind(pid).run(); row.status = 'received'; }
 
   // 2. Take the job (one worker at a time per transfer)
   const lock = await d.prepare("UPDATE transfers SET status = 'paying', err = NULL WHERE pid = ? AND (status IN ('received', 'failed') OR (status = 'paying' AND ts < ?))").bind(pid, now - 120000).run();

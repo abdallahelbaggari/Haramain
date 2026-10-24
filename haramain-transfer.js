@@ -18,7 +18,7 @@
   var loc = function () { return window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'NGN', sym: '₦', rate: null }; };
   var r7 = function (n) { return Math.round(Number(n) * 1e7) / 1e7; };
   var api = function (path, body) { return fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}).then(function (r) { return r.json(); }); };
-  var CFG = { enabled: false, fee: 0.01, max: 50 };
+  var CFG = { enabled: false, fee: 0.01, max: 50, daily: 200 };
 
   function conv(a) { var p = price(); if (!p || !p.sar || !(a > 0)) return ''; var l = loc(); return '≈ ' + num(a * p.sar, 2) + ' SAR · $' + num(a * p.usd, 2) + (l.rate && l.code !== 'SAR' && l.code !== 'USD' ? ' · ' + l.sym + num(a * l.rate, a * l.rate < 10 ? 2 : 0) : ''); }
   function sheet(title, inner) {
@@ -58,6 +58,14 @@
             try { addNotif('💰', 'You received Pi', msg, 'now'); } catch (e) {}
             if (window.hmSysNotify) hmSysNotify('💰 You received Pi', msg, 'hm-in-' + t.pid);
           }
+        } else if (t.dir === 'out' && t.status === 'refund_needed') {
+          var seen = get('held', []);
+          if (seen.indexOf(t.pid) < 0) {
+            seen.push(t.pid); put('held', seen.slice(-50));
+            var hm = num(t.amount, 7) + ' π to @' + t.to + ' could not be delivered and is on hold. Your Pi is safe: email support.haramain@gmail.com with reference ' + t.pid.slice(0, 12) + ' for a refund.';
+            try { addNotif('⏸️', 'Transfer on hold', hm, 'now'); } catch (e) {}
+            if (window.hmSysNotify) hmSysNotify('⏸️ Transfer on hold', hm, 'hm-hold-' + t.pid);
+          }
         } else if (t.dir === 'out' && (t.status === 'failed' || t.status === 'received' || t.status === 'paying')) {
           api('/transfer', { a: 'payout', paymentId: t.pid }).then(function (x) { if (x.ok && x.row) { saveReceipt(x.row, 'out'); redraw(); } }).catch(function () {});
         }
@@ -81,7 +89,7 @@
       '<label class="wf-l">Narration</label><input class="fi" id="tr-x" maxlength="80" placeholder="What is it for? e.g. Hotel deposit, gift for Umrah">' +
       '<div class="tr-sum" id="tr-sum"></div>' +
       '<button type="button" class="hm-sheet-a" id="tr-go">Continue</button>' +
-      '<div class="wf-hint" style="margin-top:8px">🔒 You approve every payment yourself in Pi’s pop-up. Haramain never sees your passphrase.</div>');
+      '<div class="wf-hint" style="margin-top:8px">🔒 You approve every payment yourself in Pi’s pop-up. Haramain never sees your passphrase.<br>Limits for your safety: up to ' + CFG.max + ' π per transfer and ' + CFG.daily + ' π a day.</div>');
     var u = $('tr-u'), a = $('tr-a'), ok = null, timer = null;
     var sum = function () {
       var v = r7(a.value); $('tr-c').textContent = conv(v);
@@ -95,6 +103,7 @@
       timer = setTimeout(function () {
         api('/users?u=' + encodeURIComponent(name)).then(function (d) {
           if (u.value.trim().replace(/^@/, '') !== name) return;
+          if (!d.ok) { $('tr-uh').innerHTML = '<span class="tr-bad">' + esc(d.error || 'Could not check right now. Try again.') + '</span>'; return; }
           if (d.exists && d.username.toLowerCase() === (me() || '').toLowerCase()) { $('tr-uh').innerHTML = '<span class="tr-bad">That is you.</span>'; return; }
           if (d.exists) { ok = d.username; $('tr-uh').innerHTML = '<span class="tr-ok">✓ @' + esc(d.username) + ' is on Haramain</span>'; }
           else $('tr-uh').innerHTML = '<span class="tr-bad">@' + esc(name) + ' has not used Haramain yet. Ask them to open Haramain and sign in with Pi once.</span>';
@@ -111,7 +120,12 @@
       if (!(v >= 0.01)) return say('The smallest transfer is 0.01 π');
       if (v > CFG.max) return say('The most you can send at once is ' + CFG.max + ' π');
       if (!x) return say('Add a narration: what is this payment for?');
-      w.remove(); pay(ok, v, x);
+      var btn = $('tr-go'); btn.disabled = true; btn.textContent = 'Checking…';
+      api('/transfer', { a: 'check', accessToken: window.HM_TOKEN, to: ok, amt: v }).then(function (d) {
+        btn.disabled = false; btn.textContent = 'Continue';
+        if (!d || !d.ok) return say((d && d.error) || 'This transfer cannot be sent right now');
+        w.remove(); review(d.to || ok, v, x, { first: d.first, fromLink: !!pre.u });
+      }).catch(function () { btn.disabled = false; btn.textContent = 'Continue'; say('No connection. Check your internet and try again.'); });
     };
     if (!pre.u) setTimeout(function () { u.focus(); }, 80);
   };
@@ -148,16 +162,32 @@
     setTimeout(function () { hmSendSheet(r); }, 400);
   }
 
+  /* ── review: one clear last look before Pi's pop-up (stops most mistakes and scams) ── */
+  function review(to, amt, narr, o) {
+    var warn = [];
+    if (o.first) warn.push('⚠️ First time sending to <b>@' + esc(to) + '</b>. Only send to people you know and trust. Haramain staff will never ask you to send Pi.');
+    if (o.fromLink) warn.push('🔗 This came from a payment request link. Check the name and amount are what you agreed.');
+    warn.push('Transfers cannot be reversed once delivered.');
+    var w = sheet('Check before you send',
+      '<div class="wf-req"><div class="wf-req-a">' + num(amt, 7) + ' π</div><div class="wf-req-c">' + esc(conv(amt)) + '</div><div class="wf-req-i">To @' + esc(to) + ' · ' + esc(narr) + '</div></div>' +
+      '<div class="tr-sum"><div><span>To</span><b>@' + esc(to) + '</b></div><div><span>They receive</span><b>' + num(amt, 7) + ' π</b></div><div><span>Blockchain fee</span><b>' + CFG.fee + ' π</b></div><div class="tot"><span>You pay</span><b>' + num(r7(amt + CFG.fee), 7) + ' π</b></div></div>' +
+      '<div class="tr-warn">' + warn.map(function (x) { return '<div>' + x + '</div>'; }).join('') + '</div>' +
+      '<button type="button" class="hm-sheet-a" id="tr-ok">Confirm and send</button><button type="button" class="tr-alt" id="tr-edit">Edit</button>');
+    $('tr-ok').onclick = function () { w.remove(); pay(to, amt, narr); };
+    $('tr-edit').onclick = function () { w.remove(); hmSendSheet({ u: to, a: amt, x: narr }); };
+  }
+
   function pay(to, amt, narr) {
     if (typeof Pi === 'undefined' || !Pi.createPayment) return say('Open Haramain in the Pi Browser to send Pi');
     var st = sheet('💸 Sending ' + num(amt, 7) + ' π to @' + esc(to),
       '<div class="wf-req"><div class="wf-req-a">' + num(amt, 7) + ' π</div><div class="wf-req-c">' + esc(conv(amt)) + '</div><div class="wf-req-i">To @' + esc(to) + ' · ' + esc(narr) + '</div></div>' +
       '<div class="tr-steps"><div id="trs1" class="on">1 · Approve in Pi’s pop-up</div><div id="trs2">2 · Confirming your payment</div><div id="trs3">3 · Paying @' + esc(to) + ' on the blockchain</div></div><div class="wf-status wait" id="tr-st">Waiting for your approval…</div>');
+    var refused = false;
     var step = function (n, msg, cls) { for (var i = 1; i <= 3; i++) { var e = $('trs' + i); if (e) e.className = i < n ? 'done' : i === n ? 'on' : ''; } var s = $('tr-st'); if (s) { s.className = 'wf-status ' + (cls || 'wait'); s.innerHTML = msg; } };
     try {
       Pi.createPayment({ amount: r7(amt + CFG.fee), memo: ('Haramain transfer to @' + to).slice(0, 60), metadata: { type: 'transfer', to: to, amt: amt, narr: narr } }, {
         onReadyForServerApproval: function (pid) {
-          api('/approve', { paymentId: pid }).then(function (d) { if (d && d.approved === false) step(1, '✕ ' + esc(d.error || 'This transfer was refused.') + ' You have not been charged.', 'err'); }).catch(function () {});
+          api('/approve', { paymentId: pid }).then(function (d) { if (d && d.approved === false) { refused = true; step(1, '✕ ' + esc(d.error || 'This transfer was refused.') + ' You have not been charged.', 'err'); } }).catch(function () {});
         },
         onReadyForServerCompletion: function (pid, txid) {
           step(2, 'Confirming your payment on the blockchain…');
@@ -176,8 +206,8 @@
             })();
           }).catch(function () { step(2, 'Connection problem. Your payment is recorded; Haramain will finish it when you reopen the wallet.', 'err'); });
         },
-        onCancel: function () { step(1, 'You cancelled. Nothing was paid.', 'err'); },
-        onError: function (err) { step(1, '✕ ' + esc((err && err.message) || 'Payment error') + '. Nothing was paid.', 'err'); }
+        onCancel: function () { if (!refused) step(1, 'You cancelled. Nothing was paid.', 'err'); },
+        onError: function (err) { if (refused) return; step(1, '✕ ' + esc((err && err.message) || 'Payment error') + '. Nothing was paid.', 'err'); }
       });
     } catch (e) { step(1, '✕ ' + esc(e.message || e), 'err'); }
   }
@@ -192,7 +222,7 @@
   });
 
   function start() {
-    api('/transfer?a=status').then(function (d) { if (d && d.ok) { window.HM_PAY_READY = d.payments !== false; CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 50; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
+    api('/transfer?a=status').then(function (d) { if (d && d.ok) { window.HM_PAY_READY = d.payments !== false; CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 50; CFG.daily = d.daily || 200; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
     var n = 0, iv = setInterval(function () { register(); openPending(); if ((registered && !pendingReq) || ++n > 90) clearInterval(iv); }, 2000);
     setInterval(function () { if (!document.hidden) sync(); }, 60000);
     var _goS = window.goS; window.goS = function (id) { var r = _goS.apply(this, arguments); if (id === 'payments') { register(); sync(); } return r; };

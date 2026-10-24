@@ -17,7 +17,7 @@ export async function onRequestGet(context) {
       success: true,
       message: "complete.js is working",
       route: "/functions/complete",
-      pi_api_key_present: !!key
+      ready: !!key
     }),
     {
       status: 200,
@@ -38,7 +38,6 @@ export async function onRequestPost(context) {
     "Content-Type": "application/json"
   };
 
-  console.log("[Haramain] complete.js POST called");
 
   try {
 
@@ -47,7 +46,6 @@ export async function onRequestPost(context) {
     const txid = body.txid;
 
     console.log("[Haramain] paymentId:", paymentId);
-    console.log("[Haramain] txid:", txid);
 
     if (!paymentId) {
       console.log("[Haramain] Missing paymentId — bad request");
@@ -70,7 +68,6 @@ export async function onRequestPost(context) {
     }
 
     const PI_API_KEY = context.env.PI_API_KEY;
-    console.log("[Haramain] PI_API_KEY present:", !!PI_API_KEY);
 
     if (!PI_API_KEY) {
       console.error("[Haramain] PI_API_KEY missing");
@@ -95,7 +92,6 @@ export async function onRequestPost(context) {
     const text = await res.text();
 
     console.log("[Haramain] complete status:", res.status);
-    console.log("[Haramain] complete raw:", text);
 
     /* In-app transfer: once Pi confirms the sender's payment, pay the recipient from the app wallet */
     let transfer = null;

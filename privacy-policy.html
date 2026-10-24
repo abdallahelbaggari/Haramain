@@ -26,12 +26,12 @@ footer{margin:36px 0 10px;font-size:14px;color:#5E6B63}</style></head>
 <table><tr><th>Feature</th><th>What we process</th><th>Why</th></tr>
 <tr><td>Pi sign-in</td><td>Pi username and Pi user ID</td><td>To recognise you and, if you use transfers, to let others send Pi to your @username</td></tr>
 <tr><td>Payments</td><td>Pi payment ID, amount, memo, status, blockchain transaction ID</td><td>To approve and complete payments with Pi Network</td></tr>
-<tr><td>Transfers</td><td>Sender and recipient usernames and IDs, amount, narration, payment and transaction IDs, status</td><td>To deliver, verify and, if needed, refund a transfer</td></tr>
+<tr><td>Transfers</td><td>Sender and recipient usernames and IDs, amount, narration, payment and transaction IDs, status</td><td>To deliver, verify and, if needed, refund a transfer, to apply daily safety limits and to warn you about first-time recipients</td></tr>
 <tr><td>Live location (only when you start it)</td><td>Your name as you type it, position and accuracy</td><td>To show your position to people who have your link</td></tr>
 <tr><td>Family groups (only if you join one)</td><td>The name you enter, check-ins, last shared location</td><td>To show them to members of your group</td></tr>
 <tr><td>Lost &amp; Found board</td><td>Your notice, Pi username, any contact you add</td><td>To show the notice to all Haramain users</td></tr>
 <tr><td>Assistant and translator</td><td>The text you type (not stored)</td><td>To produce an answer</td></tr>
-<tr><td>Abuse protection</td><td>A one-way scrambled code made from your IP address, kept for one hour (the IP itself is not stored)</td><td>To limit how often the assistant can be used</td></tr>
+<tr><td>Abuse protection</td><td>A one-way scrambled code made from your IP address, kept for one hour (the IP itself is not stored)</td><td>To limit how often the assistant, username look-ups and payments can be used, so the app cannot be abused</td></tr>
 <tr><td>Receipt checks</td><td>A transaction ID or wallet address you check</td><td>To read public records from the Pi blockchain</td></tr></table>
 
 <h2 id="pi">4. Pi sign-in and payments</h2>
@@ -56,7 +56,7 @@ footer{margin:36px 0 10px;font-size:14px;color:#5E6B63}</style></head>
 <h2 id="security">9. How we protect data</h2>
 <ul><li>All connections use HTTPS, and the app sends standard browser security headers and a content policy that blocks scripts from unknown sites.</li>
 <li>Secret keys live only on our server and are never sent to your phone.</li>
-<li>Payments and payouts are checked with Pi Network before anything is approved or paid, and each payout is made only once.</li>
+<li>Payments and payouts are checked with Pi Network before anything is approved or paid, and each payout is made only once. If a payment cannot be checked, it is not approved.</li><li>Transfers have per-transfer and daily limits and an overall daily cap, accounts involved in fraud can be put on hold, and the app warns you before paying someone for the first time.</li>
 <li>Shared features use random secret codes, sign-in checks with Pi, member-only access and automatic deletion.</li>
 <li>Receipts can be checked against the public blockchain so altered receipts can be detected.</li></ul>
 <p>No system is perfectly secure. If we learn of a breach affecting your data, we will inform affected users in the app and act to contain it.</p>

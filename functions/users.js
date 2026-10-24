@@ -1,9 +1,10 @@
 // /users — lets Haramain users receive in-app transfers.
 //   POST {accessToken}  → registers the signed-in Pi user (checked with Pi), so others can send to their @username
 //   GET  ?u=<username>  → { ok, exists } (never returns ids)
-import { H, json, me, db, userByName, USER_RE } from './_lib/transfers.js';
+import { H, json, me, db, userByName, USER_RE, rateOk } from './_lib/transfers.js';
 export async function onRequestPost({ request, env }) {
   if (!env.HM_DB) return json({ ok: false, setup: true });
+  if (!(await rateOk(env, request, 'reg', 30))) return json({ ok: false, error: 'Busy' });
   const b = await request.json().catch(() => ({}));
   const u = await me(b.accessToken); if (!u) return json({ ok: false, error: 'Sign in with Pi first' });
   const d = await db(env);
@@ -15,6 +16,7 @@ export async function onRequestGet({ request, env }) {
   if (!env.HM_DB) return json({ ok: false, setup: true });
   const name = (new URL(request.url).searchParams.get('u') || '').replace(/^@/, '');
   if (!USER_RE.test(name)) return json({ ok: true, exists: false });
+  if (!(await rateOk(env, request, 'lookup', 150))) return json({ ok: false, error: 'Too many lookups. Please wait a while.' });
   const r = await userByName(await db(env), name);
   return json({ ok: true, exists: !!r, username: r ? r.username : '' });
 }

@@ -1,161 +1,42 @@
-import { checkTransferPayment } from './_lib/transfers.js';
-/* ═══════════════════════════════════════════════════════════════
-   HARAMAIN · functions/approve.js · Cloudflare Pages Function
+/* HARAMAIN · /approve · Cloudflare Pages Function
+   Checks every Pi payment with Pi Network before approving it. Fails closed: if a payment cannot be checked,
+   it is not approved, and any refused payment is cancelled at once so it never blocks the user's next payment.
+   Secret: PI_API_KEY (Cloudflare → Settings → Variables and Secrets). */
+import { checkTransferPayment, checkLimits, reserve, cancelPayment, rateOk } from './_lib/transfers.js';
 
-   Route: /functions/approve
-   Test:  https://haramain.pages.dev/functions/approve (GET)
-   
-   Pi Network Mainnet · sandbox:false
-   PI_API_KEY: Cloudflare → Settings → Variables → Secret
-═══════════════════════════════════════════════════════════════ */
+const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
+const out = (o) => new Response(JSON.stringify(o), { status: 200, headers: cors });
+const PRICES = { pilgrim_pass: 1, copa_pass: 1, spl_pass: 1, fan_pass: 1 };
 
-/* GET: health check
-   Visit https://haramain.pages.dev/functions/approve in browser
-   Should return { success: true, pi_api_key_present: true }
-*/
-export async function onRequestGet(context) {
-  const key = context.env.PI_API_KEY;
-  return new Response(
-    JSON.stringify({
-      success: true,
-      message: "approve.js is working",
-      route: "/functions/approve",
-      pi_api_key_present: !!key
-    }),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
-      }
-    }
-  );
-}
+/* Health check: is the server ready to approve payments? (never reveals anything about the key) */
+export async function onRequestGet({ env }) { return out({ success: true, ready: !!env.PI_API_KEY }); }
 
-/* POST: approve payment */
-export async function onRequestPost(context) {
-
-  const cors = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json"
-  };
-
-  console.log("[Haramain] approve.js POST called");
-
+export async function onRequestPost({ request, env }) {
+  let b = {}; try { b = await request.json(); } catch (e) { return out({ approved: false, error: 'Bad request' }); }
+  const pid = String(b.paymentId || '');
+  if (!/^[A-Za-z0-9_-]{6,80}$/.test(pid)) return out({ approved: false, error: 'Invalid payment id' });
+  if (!env.PI_API_KEY) return out({ approved: false, error: 'Payments are not switched on yet' });
+  if (!(await rateOk(env, request, 'approve', 120))) return out({ approved: false, error: 'Too many attempts. Please wait a while and try again.' });
+  const K = { Authorization: 'Key ' + env.PI_API_KEY };
   try {
-
-    /* Parse body */
-    let paymentId = null;
-    let expectedAmount = null;
-    try {
-      const body = await context.request.json();
-      paymentId = body.paymentId || null;
-      expectedAmount = body.expectedAmount || null;
-    } catch(e) {
-      console.error("[Haramain] Body parse error:", e.message);
-      return new Response(JSON.stringify({ approved: true, step: "body_parse_error" }), { status: 200, headers: cors });
-    }
-
-    console.log("[Haramain] paymentId:", paymentId);
-    console.log("[Haramain] expectedAmount:", expectedAmount);
-
-    if (paymentId && !/^[A-Za-z0-9_-]{6,80}$/.test(String(paymentId))) {
-      return new Response(JSON.stringify({ approved: false, error: "invalid paymentId" }), { status: 200, headers: cors });
-    }
-    if (!paymentId) {
-      console.log("[Haramain] No paymentId");
-      return new Response(JSON.stringify({ approved: true, step: "no_payment_id" }), { status: 200, headers: cors });
-    }
-
-    /* Check API key */
-    const PI_API_KEY = context.env.PI_API_KEY;
-    console.log("[Haramain] PI_API_KEY present:", !!PI_API_KEY);
-
-    if (!PI_API_KEY) {
-      console.log("[Haramain] PI_API_KEY MISSING — set in Cloudflare Dashboard");
-      return new Response(JSON.stringify({ approved: true, step: "no_api_key" }), { status: 200, headers: cors });
-    }
-
-    /* GET payment state */
-    console.log("[Haramain] GET payment state...");
-    try {
-      const getRes = await fetch(`https://api.minepi.com/v2/payments/${paymentId}`, {
-        method: "GET",
-        headers: { "Authorization": `Key ${PI_API_KEY}` }
-      });
-      const getRaw = await getRes.text();
-      console.log("[Haramain] GET status:", getRes.status);
-      console.log("[Haramain] GET raw:", getRaw);
-    } catch(e) {
-      console.error("[Haramain] GET error:", e.message);
-    }
-
-    /* POST approve — use .text() to capture full response */
-    console.log("[Haramain] POST approve...");
-    /* Check the payment with Pi before approving it: a pass must be paid in full,
-       and every amount must be a real positive number. A rejected payment simply
-       expires and the user is not charged. */
-    try {
-      const chk = await fetch(`https://api.minepi.com/v2/payments/${paymentId}`, { headers: { 'Authorization': `Key ${PI_API_KEY}` } });
-      if (chk.ok) {
-        const pay = await chk.json();
-        const md = (pay && pay.metadata) || {};
-        const amt = Number(pay && pay.amount);
-        const PRICES = {'copa_pass': 1, 'spl_pass': 1, 'fan_pass': 1, 'pilgrim_pass': 1};
-        const st = (pay && pay.status) || {};
-        if (md.type === 'transfer') {
-          const why = await checkTransferPayment(context.env, pay);
-          if (why) return new Response(JSON.stringify({ approved: false, error: why }), { status: 200, headers: cors });
-        }
-        if (st.developer_approved) {
-          return new Response(JSON.stringify({ approved: true, step: 'already_approved' }), { status: 200, headers: cors });
-        }
-        if (!(amt > 0) || amt > 100000 || (PRICES[md.type] && amt + 1e-9 < PRICES[md.type])) {
-          console.warn('Payment rejected: amount does not match', paymentId, amt, md.type);
-          return new Response(JSON.stringify({ approved: false, error: 'Payment amount does not match the price' }), { status: 200, headers: cors });
-        }
-      }
-    } catch (e) { console.warn('Payment check skipped:', e && e.message); }
-    const piRes = await fetch(
-      `https://api.minepi.com/v2/payments/${paymentId}/approve`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Key ${PI_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({})
-      }
-    );
-
-    const piStatus = piRes.status;
-    const piRaw = await piRes.text();
-
-    console.log("[Haramain] POST approve status:", piStatus);
-    console.log("[Haramain] POST approve raw:", piRaw);
-
-    /* Always return 200 to Pi SDK */
-    return new Response(
-      JSON.stringify({ approved: piStatus >= 200 && piStatus < 300, pi_status: piStatus }),
-      { status: 200, headers: cors }
-    );
-
-  } catch(err) {
-    console.error("[Haramain] Error:", err.message);
-    return new Response(JSON.stringify({ approved: true, error: err.message }), { status: 200, headers: cors });
+    const chk = await fetch('https://api.minepi.com/v2/payments/' + encodeURIComponent(pid), { headers: K });
+    if (!chk.ok) return out({ approved: false, error: 'Pi could not confirm this payment. Please try again.' });
+    const pay = await chk.json(), md = (pay && pay.metadata) || {}, st = (pay && pay.status) || {}, amt = Number(pay && pay.amount);
+    if (st.developer_approved) return out({ approved: true, step: 'already_approved' });
+    if (st.cancelled || st.user_cancelled) return out({ approved: false, error: 'This payment was cancelled' });
+    let why = '';
+    if (!(amt > 0) || amt > 100000) why = 'Payment amount is not valid';
+    else if (PRICES[md.type] && amt + 1e-9 < PRICES[md.type]) why = 'Payment amount does not match the price';
+    else if (md.type === 'transfer') why = (await checkTransferPayment(env, pay)) || (await checkLimits(env, pay));
+    if (why) { await cancelPayment(env, pid); return out({ approved: false, error: why }); }
+    if (md.type === 'transfer') await reserve(env, pay);
+    const r = await fetch('https://api.minepi.com/v2/payments/' + encodeURIComponent(pid) + '/approve', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, K), body: '{}' });
+    return out({ approved: r.ok, pi_status: r.status });
+  } catch (e) {
+    console.error('approve failed', pid, e && e.message);
+    await cancelPayment(env, pid);
+    return out({ approved: false, error: 'Could not check this payment. Please try again.' });
   }
 }
 
-/* OPTIONS: CORS preflight */
-export async function onRequestOptions() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
-    }
-  });
-}
+export async function onRequestOptions() { return new Response(null, { status: 204, headers: cors }); }
