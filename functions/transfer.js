@@ -1,10 +1,10 @@
 // /transfer — in-app transfers between Haramain users.
-//   GET  ?a=status                          → { enabled, max, fee } (is the feature switched on?)
+//   GET  ?a=status                          → { enabled, max, fee, payments } (are transfers / payments switched on?)
 //   POST {a:'payout', paymentId}            → pays the recipient for a completed transfer (idempotent; also run by /complete)
 //   POST {a:'list', accessToken}            → the signed-in user's sent and received transfers
 import { H, json, me, db, payout, pub, enabled, maxTransfer, FEE, isTest } from './_lib/transfers.js';
 export async function onRequestGet({ request, env }) {
-  return json({ ok: true, enabled: enabled(env), max: maxTransfer(env), fee: FEE, net: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' });
+  return json({ ok: true, payments: !!env.PI_API_KEY, enabled: enabled(env), max: maxTransfer(env), fee: FEE, net: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' });
 }
 export async function onRequestPost({ request, env }) {
   const b = await request.json().catch(() => ({}));

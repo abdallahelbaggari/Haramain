@@ -192,7 +192,7 @@
   });
 
   function start() {
-    api('/transfer?a=status').then(function (d) { if (d && d.ok) { CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 50; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
+    api('/transfer?a=status').then(function (d) { if (d && d.ok) { window.HM_PAY_READY = d.payments !== false; CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 50; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
     var n = 0, iv = setInterval(function () { register(); openPending(); if ((registered && !pendingReq) || ++n > 90) clearInterval(iv); }, 2000);
     setInterval(function () { if (!document.hidden) sync(); }, 60000);
     var _goS = window.goS; window.goS = function (id) { var r = _goS.apply(this, arguments); if (id === 'payments') { register(); sync(); } return r; };

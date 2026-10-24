@@ -29,6 +29,8 @@
     if (!window.Pi || !Pi.createPayment || Pi._hmWrapped) return;
     var orig = Pi.createPayment.bind(Pi); Pi._hmWrapped = true;
     Pi.createPayment = function (data, cb) {
+      // Payments not switched on yet on the server: do not start a payment that could not be approved (it would block the user's next payment)
+      if (window.HM_PAY_READY === false) { try { cb && cb.onCancel && cb.onCancel(); } catch (e) {} setTimeout(function () { if (window.toast) toast('Pi payments open soon, in shaa Allah. Nothing was charged.'); }, 60); return; }
       if (data && data.metadata && data.metadata.type === 'transfer') return orig(data, cb);   // in-app transfers keep their own receipts
       var rec = { amount: data.amount, memo: data.memo, kind: (data.metadata && data.metadata.type) || 'payment', dir: 'out', ts: Date.now(), name: fullName(), user: uname(), net: NETN };
       var p = price(); if (p && p.usd) { rec.usd = p.usd; rec.sar = p.sar; }
