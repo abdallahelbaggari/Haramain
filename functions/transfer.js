@@ -3,9 +3,10 @@
 //   POST {a:'payout', paymentId}            → pays the recipient for a completed transfer (idempotent; also run by /complete)
 //   POST {a:'list', accessToken}            → the signed-in user's sent and received transfers
 //   POST {a:'check', accessToken, to, amt}  → would this transfer be accepted? (limits, holds, first-time payee) before the Pi pop-up opens
-import { H, json, me, db, payout, pub, enabled, maxTransfer, FEE, isTest, limits, rateOk, checkTransferPayment, checkLimits, userByName, paidBefore, USER_RE } from './_lib/transfers.js';
+import { H, json, me, db, payout, pub, enabled, maxTransfer, FEE, isTest, limits, rateOk, checkTransferPayment, checkLimits, userByName, paidBefore, USER_RE, walletReady } from './_lib/transfers.js';
 export async function onRequestGet({ request, env }) {
-  return json({ ok: true, payments: !!env.PI_API_KEY, enabled: enabled(env), max: maxTransfer(env), daily: limits(env).day, fee: FEE, net: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' });
+  const live = enabled(env) && (await walletReady(env, request)).ok;
+  return json({ ok: true, payments: !!env.PI_API_KEY, enabled: live, max: maxTransfer(env), daily: limits(env).day, fee: FEE, net: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' });
 }
 export async function onRequestPost({ request, env }) {
   const b = await request.json().catch(() => ({}));
@@ -20,7 +21,7 @@ export async function onRequestPost({ request, env }) {
     const to = String(b.to || '').replace(/^@/, ''), amt = Math.round(Number(b.amt) * 1e7) / 1e7;
     if (!USER_RE.test(to) || !(amt > 0)) return json({ ok: false, error: 'Check the username and amount' });
     const pay = { identifier: '', user_uid: u.uid, amount: Math.round((amt + FEE) * 1e7) / 1e7, metadata: { type: 'transfer', to, amt } };
-    const why = (await checkTransferPayment(env, pay)) || (await checkLimits(env, pay));
+    const why = (await checkTransferPayment(env, pay, request)) || (await checkLimits(env, pay));
     if (why) return json({ ok: false, error: why });
     const r = await userByName(await db(env), to);
     return json({ ok: true, to: r.username, first: !(await paidBefore(env, u.uid, r.uid)) });

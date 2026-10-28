@@ -83,9 +83,26 @@ export async function db(env) {
 }
 export async function userByName(d, name) { return d.prepare('SELECT uid, username FROM users WHERE username = ? COLLATE NOCASE').bind(String(name || '').replace(/^@/, '')).first(); }
 
+/* Is the app wallet usable on this network? Its secret key must open a wallet that exists, or Pi paid in could not be passed on.
+   Checked on the public Pi blockchain, cached 5 minutes. */
+const WCACHE = {};
+export async function walletReady(env, request) {
+  if (!enabled(env)) return { ok: false };
+  const net = NET(isTest(request)), seed = String(env.APP_WALLET_SEED).trim(), k = net.name + '|' + seed.slice(-8), c = WCACHE[k];
+  if (c && Date.now() - c.t < 300000) return c;
+  let kp; try { kp = await keypairFromSeed(seed); } catch (e) { return { ok: false }; }
+  let ok = false; try { ok = (await fetch(net.horizon + '/accounts/' + kp.address)).ok; } catch (e) { ok = c ? c.ok : false; }
+  return (WCACHE[k] = { ok, address: kp.address, t: Date.now() });
+}
+const UNAVAILABLE = 'Sending is temporarily unavailable. Nothing was charged.';
 /* Checks a transfer payment before Haramain approves it. Returns '' if fine, or the reason to refuse. */
-export async function checkTransferPayment(env, pay) {
+export async function checkTransferPayment(env, pay, request) {
   if (!enabled(env)) return 'Transfers are not switched on';
+  if (request) {
+    const w = await walletReady(env, request);
+    if (!w.ok) return UNAVAILABLE;
+    if (pay && pay.to_address && pay.to_address !== w.address) return UNAVAILABLE;   // the payment would go to a wallet Haramain cannot pay from
+  }
   const md = (pay && pay.metadata) || {}, amt = round7(md.amt), paid = Number(pay && pay.amount);
   if (!(amt >= 0.01)) return 'The smallest transfer is 0.01 π';
   if (amt > maxTransfer(env)) return 'The most you can send at once is ' + maxTransfer(env) + ' π';

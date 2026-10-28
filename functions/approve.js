@@ -27,7 +27,7 @@ export async function onRequestPost({ request, env }) {
     let why = '';
     if (!(amt > 0) || amt > 100000) why = 'Payment amount is not valid';
     else if (PRICES[md.type] && amt + 1e-9 < PRICES[md.type]) why = 'Payment amount does not match the price';
-    else if (md.type === 'transfer') why = (await checkTransferPayment(env, pay)) || (await checkLimits(env, pay));
+    else if (md.type === 'transfer') why = (await checkTransferPayment(env, pay, request)) || (await checkLimits(env, pay));
     if (why) { await cancelPayment(env, pid); return out({ approved: false, error: why }); }
     if (md.type === 'transfer') await reserve(env, pay);
     const r = await fetch('https://api.minepi.com/v2/payments/' + encodeURIComponent(pid) + '/approve', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, K), body: '{}' });
