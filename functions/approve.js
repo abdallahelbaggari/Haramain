@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
     if (st.developer_approved) return out({ approved: true, step: 'already_approved' });
     if (st.cancelled || st.user_cancelled) return out({ approved: false, error: 'This payment was cancelled' });
     let why = '';
-    if (!(amt > 0) || amt > 100000) why = 'Payment amount is not valid';
+    if (!(amt > 0)) why = 'Payment amount is not valid';
     else if (PRICES[md.type] && amt + 1e-9 < PRICES[md.type]) why = 'Payment amount does not match the price';
     else if (md.type === 'transfer') why = (await checkTransferPayment(env, pay, request)) || (await checkLimits(env, pay));
     if (why) { await cancelPayment(env, pid); return out({ approved: false, error: why }); }

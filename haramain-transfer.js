@@ -95,7 +95,7 @@
       '<label class="wf-l">Narration</label><input class="fi" id="tr-x" maxlength="80" placeholder="What is it for? e.g. Hotel deposit, gift for Umrah">' +
       '<div class="tr-sum" id="tr-sum"></div>' +
       '<button type="button" class="hm-sheet-a" id="tr-go">Continue</button>' +
-      '<div class="wf-hint" style="margin-top:8px">🔒 You approve every payment yourself in Pi’s pop-up. Haramain never sees your passphrase.<br>Limits for your safety: up to ' + CFG.max + ' π per transfer and ' + CFG.daily + ' π a day.</div>');
+      '<div class="wf-hint" style="margin-top:8px">🔒 You approve every payment yourself in Pi’s pop-up. Haramain never sees your passphrase.' + (CFG.max || CFG.daily ? '<br>Limits: ' + (CFG.max ? 'up to ' + CFG.max + ' π per transfer' : '') + (CFG.max && CFG.daily ? ' and ' : '') + (CFG.daily ? 'up to ' + CFG.daily + ' π a day' : '') + '.' : '<br>No transfer limits.') + '</div>');
     var u = $('tr-u'), a = $('tr-a'), ok = null, timer = null;
     var sum = function () {
       var v = r7(a.value); $('tr-c').textContent = conv(v);
@@ -124,7 +124,7 @@
       if (!me() || !window.HM_TOKEN) { say('Sign in with Pi first'); try { w.remove(); piLogin(); } catch (e) {} return; }
       if (!ok) return say('Enter a Haramain user’s @username');
       if (!(v >= 0.01)) return say('The smallest transfer is 0.01 π');
-      if (v > CFG.max) return say('The most you can send at once is ' + CFG.max + ' π');
+      if (CFG.max && v > CFG.max) return say('The most you can send at once is ' + CFG.max + ' π');
       if (!x) return say('Add a narration: what is this payment for?');
       var btn = $('tr-go'); btn.disabled = true; btn.textContent = 'Checking…';
       api('/transfer', { a: 'check', accessToken: window.HM_TOKEN, to: ok, amt: v }).then(function (d) {
@@ -230,7 +230,7 @@
   });
 
   function start() {
-    api('/transfer?a=status').then(function (d) { if (d && d.ok) { window.HM_PAY_READY = d.payments !== false; CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 50; CFG.daily = d.daily || 200; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
+    api('/transfer?a=status').then(function (d) { if (d && d.ok) { window.HM_PAY_READY = d.payments !== false; CFG.enabled = !!d.enabled; CFG.fee = d.fee || 0.01; CFG.max = d.max || 0; CFG.daily = d.daily || 0; } document.documentElement.classList.toggle('hm-tx-on', CFG.enabled); sync(); openPending(); }).catch(function () {});
     var n = 0, iv = setInterval(function () { register(); openPending(); if ((registered && !pendingReq) || ++n > 90) clearInterval(iv); }, 2000);
     setInterval(function () { if (!document.hidden) sync(); }, 60000);
     var _goS = window.goS; window.goS = function (id) { var r = _goS.apply(this, arguments); if (id === 'payments') { register(); sync(); } return r; };
