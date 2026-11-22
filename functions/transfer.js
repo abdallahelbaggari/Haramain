@@ -1,10 +1,13 @@
 // /transfer — in-app transfers between Haramain users.
+//   GET  ?a=check-setup                     → setup self-test (yes/no only, never a secret), shown on /setup.html
 //   GET  ?a=status                          → { enabled, max, fee, payments } (are transfers / payments switched on?)
 //   POST {a:'payout', paymentId}            → pays the recipient for a completed transfer (idempotent; also run by /complete)
 //   POST {a:'list', accessToken}            → the signed-in user's sent and received transfers
 //   POST {a:'check', accessToken, to, amt}  → would this transfer be accepted? (limits, holds, first-time payee) before the Pi pop-up opens
+import { keypairFromSeed } from './_lib/stellar.js';
 import { H, json, me, db, payout, pub, enabled, maxTransfer, FEE, isTest, limits, rateOk, checkTransferPayment, checkLimits, userByName, paidBefore, USER_RE, walletReady } from './_lib/transfers.js';
 export async function onRequestGet({ request, env }) {
+  if (new URL(request.url).searchParams.get('a') === 'check-setup') return json({ ok: true, check: await checkSetup(env, request) });
   const live = enabled(env) && (await walletReady(env, request)).ok;
   return json({ ok: true, payments: !!env.PI_API_KEY, enabled: live, max: maxTransfer(env), daily: limits(env).day, fee: FEE, net: isTest(request) ? 'Pi Testnet' : 'Pi Mainnet' });
 }
@@ -37,3 +40,17 @@ export async function onRequestPost({ request, env }) {
   return json({ ok: false, error: 'Unknown action' });
 }
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: H }); }
+
+/* Setup self-test for the app owner: yes/no answers only, never any secret or balance. */
+async function checkSetup(env, request) {
+  const test = isTest(request), net = test ? 'Pi Testnet' : 'Pi Mainnet', horizon = test ? 'https://api.testnet.minepi.com' : 'https://api.mainnet.minepi.com';
+  const seed = String(env.APP_WALLET_SEED || '').trim();
+  const r = { net, pi_api_key: !!String(env.PI_API_KEY || '').trim(), app_wallet_seed: /^S[A-Z2-7]{55}$/.test(seed), seed_raw_present: !!seed, seed_looks_like_address: /^G[A-Z2-7]{55}$/.test(seed),
+    database: !!env.HM_DB, paused: String(env.TRANSFERS_ENABLED || '').trim() === '0',
+    variable_names: Object.keys(env).filter((k) => typeof env[k] === 'string' && /^[A-Z0-9_]{2,64}$/i.test(k)).sort() };
+  if (r.pi_api_key) { try { const t = await fetch('https://api.minepi.com/v2/payments/incomplete_server_payments', { headers: { Authorization: 'Key ' + String(env.PI_API_KEY).trim() } }); r.pi_api_key_accepted = t.ok; r.pi_api_key_status = t.status; } catch (e) { r.pi_api_key_accepted = false; } }
+  if (r.app_wallet_seed) { try { const kp = await keypairFromSeed(seed); r.app_wallet_address = kp.address; r.app_wallet_found = (await fetch(horizon + '/accounts/' + kp.address)).ok; } catch (e) { r.app_wallet_found = false; } }
+  if (r.database) { try { await (await db(env)).prepare('SELECT 1 AS x').first(); r.database_works = true; } catch (e) { r.database_works = false; } }
+  r.ready = enabled(env) && r.pi_api_key_accepted !== false && r.app_wallet_found !== false && r.database_works !== false;
+  return r;
+}
