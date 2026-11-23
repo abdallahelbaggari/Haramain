@@ -72,8 +72,7 @@
       (p !== 'granted' && p !== 'unsupported' ? '<button type="button" class="wf-cta" onclick="hmAskNotify()">Allow notifications</button>' : '') +
       '<div class="nt-row"><div><b>Prayer time reminders</b><small>Sound and alert at each prayer time' + (rem.before ? ', and 10 minutes before' : '') + '.</small></div><button type="button" class="nt-sw' + (rem.on ? ' on' : '') + '" onclick="hmToggleRem(\'on\');setTimeout(function(){document.getElementById(\'nt-card\')&&window.hmNtCard()},50)" aria-pressed="' + !!rem.on + '"><i></i></button></div>' +
       '<div class="nt-row"><div><b>Payments received</b><small>Haramain Pay sales are confirmed on the Pi blockchain and announced here.</small></div><span class="nt-pill ok">On</span></div>' +
-      '<div class="nt-acts"><button type="button" class="wf-btn" onclick="hmTestNotify()">🔔 Send a test</button><button type="button" class="wf-btn" onclick="hmClearNotifs()">🗑 Clear all</button></div>' +
-      '<div class="wf-hint">Reminders work while Haramain is open or running in the background. A browser cannot wake a closed app.</div>';
+      '<div class="nt-acts"><button type="button" class="wf-btn" onclick="hmTestNotify()">🔔 Send a test</button><button type="button" class="wf-btn" onclick="hmClearNotifs()">🗑 Clear all</button></div>';
   }
   window.hmNtCard = drawCard;
 

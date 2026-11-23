@@ -77,25 +77,88 @@
       return cv;
     });
   }
-  function share(cv, fname, text) {
-    cv.toBlob(function (blob) {
-      try { var f = new File([blob], fname, { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { navigator.share({ files: [f], title: 'Haramain receipt', text: 'Haramain receipt' }).catch(function () {}); return; } } catch (e) {}
-      if (navigator.share) navigator.share({ title: 'Haramain receipt', text: text }).catch(function () {}); else window.open('https://wa.me/?text=' + encodeURIComponent(text));
-    }, 'image/png');
+  /* ── saving and sharing (works inside the Pi Browser) ──
+     The Pi Browser cannot save files made inside the page or share them as files, so Haramain keeps a private
+     copy for 30 days (/file) and uses its link: saving downloads from that link (Downloads and Gallery), sharing tries
+     a real image first, and a link is offered as an option. */
+  var upCache = {};
+  function T(m) { try { toast(m); } catch (e) {} }
+  function upload(blob, name, type) {
+    var k = name + '|' + blob.size;
+    if (!upCache[k]) upCache[k] = fetch('/file?type=' + encodeURIComponent(type) + '&name=' + encodeURIComponent(name), { method: 'POST', headers: { 'Content-Type': type }, body: blob })
+      .then(function (r) { return r.json(); }).then(function (d) { if (!d || !d.ok) throw new Error((d && d.error) || 'Could not save'); return d; })
+      .catch(function (e) { delete upCache[k]; throw e; });
+    return upCache[k];
   }
-  function sheet(spec, fname, text) {
-    try { toast('Preparing receipt…'); } catch (e) {}
+  function clickDl(href, name) { var a = document.createElement('a'); a.href = href; a.download = name; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); }
+  function blobSave(blob, name) { var u = URL.createObjectURL(blob); clickDl(u, name); setTimeout(function () { URL.revokeObjectURL(u); }, 15000); }
+  function canShareFile(f) { try { return !!(f && navigator.canShare && navigator.canShare({ files: [f] })); } catch (e) { return false; } }
+  function note(html) {
+    var old = document.getElementById('hmFileNote'); if (old) old.remove();
+    var d = document.createElement('div'); d.id = 'hmFileNote'; d.className = 'hm-fnote'; d.innerHTML = html + '<button type="button" class="hm-fnx" aria-label="Close">✕</button>';
+    d.querySelector('.hm-fnx').onclick = function () { d.remove(); };
+    var sheets = document.querySelectorAll('.hm-sheet'), host = sheets.length ? sheets[sheets.length - 1] : document.body;
+    host.appendChild(d); try { d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+    return d;
+  }
+  function save(blob, name, type, what, quiet) {
+    T('Saving ' + what + '…');
+    return upload(blob, name, type).then(function (d) {
+      clickDl(location.origin + d.file + '?dl=1', d.name || name);
+      if (quiet) return d;
+      var img = /^image\//.test(type);
+      var n = note('<b>✓ Saved to your phone</b><p>' + (img ? 'The image is in your phone’s <b>Downloads</b> and <b>Gallery</b>.' : 'Your ' + what + ' is in your phone’s <b>Downloads</b> folder.') + '</p>' +
+        '<button type="button" class="hm-fnb" data-x="o">' + (img ? 'Open the image' : 'Download again') + '</button>');
+      n.querySelector('[data-x="o"]').onclick = function () { if (img) location.href = d.page; else clickDl(location.origin + d.file + '?dl=1', d.name || name); };
+      return d;
+    }, function () { blobSave(blob, name); T(what.charAt(0).toUpperCase() + what.slice(1) + ' saved to Downloads'); });
+  }
+  function shareLink(blob, name, type, title, short) {
+    T('Preparing link…');
+    upload(blob, name, type).then(function (d) {
+      var link = location.origin + d.page, t = short || title;
+      if (navigator.share) navigator.share({ title: title, text: t, url: link }).catch(function () {});
+      else if (window.Pi && Pi.openShareDialog) { try { Pi.openShareDialog(title, t + '\n' + link); } catch (e) {} }
+      else { try { navigator.clipboard.writeText(t + '\n' + link); T('Link copied'); } catch (e) {} }
+    }, function () { T('No connection. Try again.'); });
+  }
+  function shareImage(blob, name, type, title, short) {
+    var f = null; try { f = new File([blob], name, { type: type }); } catch (e) {}
+    var fallback = function () {
+      save(blob, name, type, 'image', true);
+      var n = note('<b>Share the image</b><p>The image is saved to your phone’s <b>Gallery</b>. Open WhatsApp (or any app), tap attach, choose <b>Gallery</b> and pick the Haramain image.</p>' +
+        '<button type="button" class="hm-fnb hm-fnp" data-x="l">🔗 Share as a link instead</button>');
+      n.querySelector('[data-x="l"]').onclick = function () { n.remove(); shareLink(blob, name, type, title, short); };
+    };
+    if (f && navigator.share && (!navigator.canShare || canShareFile(f))) return navigator.share({ files: [f], title: title }).catch(function (e) { if (!e || e.name !== 'AbortError') fallback(); });
+    fallback();
+  }
+  function shareFile(blob, name, type, title, short) {
+    var f = null; try { f = new File([blob], name, { type: type }); } catch (e) {}
+    if (canShareFile(f)) return navigator.share({ files: [f], title: title }).catch(function () {});
+    shareLink(blob, name, type, title, short);
+  }
+  function toJpg(cv) { return new Promise(function (ok) { cv.toBlob(ok, 'image/jpeg', 0.92); }); }
+  function share(cv, fname, text) { toJpg(cv).then(function (b) { shareImage(b, fname.replace(/\.png$/, '.jpg'), 'image/jpeg', 'Haramain receipt', String(text || '').split('\n').slice(0, 2).join(' · ')); }); }
+  function sheet(spec, fname, text, title) {
+    var isInv = /^Invoice/.test(spec.title || '');
+    T(isInv ? 'Preparing invoice…' : 'Preparing receipt…');
+    fname = fname.replace(/\.png$/, '.jpg');
+    var short = 'Haramain · ' + (spec.title || 'Receipt') + ' · ' + spec.amount + ' π';
     return canvas(spec).then(function (cv) {
-      var url = cv.toDataURL('image/png');
+      var url = cv.toDataURL('image/jpeg', 0.92), jpg = toJpg(cv);
       var w = document.createElement('div'); w.className = 'hm-sheet-wrap';
-      w.innerHTML = '<div class="hm-sheet"><div class="hm-sheet-t">Receipt</div><img src="' + url + '" alt="Receipt" style="width:100%;border-radius:14px;border:1px solid #E6E1D3;display:block">' +
-        '<button type="button" class="hm-sheet-a rc-share">📤 Share receipt image</button>' +
-        '<a class="hm-sheet-x" style="text-align:center;text-decoration:none;display:block" href="' + url + '" download="' + fname + '">⬇️ Save image</a>' +
-        '<div class="hm-note" style="text-align:center">Tip: you can also press and hold the image to save it.</div><button type="button" class="hm-sheet-x">Close</button></div>';
+      w.innerHTML = '<div class="hm-sheet"><div class="hm-sheet-t">' + (title || (isInv ? 'Invoice' : 'Receipt')) + '</div><img src="' + url + '" alt="' + (isInv ? 'Invoice' : 'Receipt') + '" class="hm-rimg">' +
+        '<div class="hm-ract"><button type="button" class="hm-sheet-a rc-share">📤 Share image</button><button type="button" class="hm-rsave rc-save">⬇️ Save to gallery</button></div>' +
+        '<button type="button" class="hm-rlink rc-link">🔗 Share as a link</button><button type="button" class="hm-sheet-x">Close</button></div>';
       w.addEventListener('click', function (e) { if (e.target === w || (e.target.classList.contains('hm-sheet-x') && e.target.tagName === 'BUTTON')) w.remove(); });
       document.body.appendChild(w);
-      w.querySelector('.rc-share').onclick = function () { share(cv, fname, text); };
+      var g = function (sel, fn) { var e = w.querySelector(sel); if (e) e.onclick = function () { jpg.then(fn); }; };
+      g('.rc-share', function (b) { shareImage(b, fname, 'image/jpeg', 'Haramain ' + (isInv ? 'invoice' : 'receipt'), short); });
+      g('.rc-save', function (b) { save(b, fname, 'image/jpeg', isInv ? 'invoice' : 'receipt'); });
+      g('.rc-link', function (b) { shareLink(b, fname, 'image/jpeg', 'Haramain ' + (isInv ? 'invoice' : 'receipt'), short); });
     });
   }
+  window.HMFiles = { save: save, shareImage: shareImage, shareFile: shareFile, shareLink: shareLink };
   window.HMReceipt = { canvas: canvas, share: share, sheet: sheet };
 })();

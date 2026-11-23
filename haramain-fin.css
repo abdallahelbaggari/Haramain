@@ -1,0 +1,199 @@
+/* Haramain — fintech wallet, Business, receipts that save and share, 40 Hadith, and clearer, stronger colours. */
+
+/* ── wallet: trust strip, quick actions, overview, transactions ── */
+.hm-trust{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:12px 0 4px}
+.hm-trust span{font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:999px;background:#E7F6EE;color:#0A6B45;border:1px solid #BFE3CF}
+.hm-qa{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 6px}
+html:not(.hm-tx-on) .hm-qa{grid-template-columns:repeat(3,1fr)}
+.hm-qa button{border:0;background:none;color:var(--t1,#13261E);display:flex;flex-direction:column;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:0}
+.hm-qa i{width:58px;height:58px;border-radius:19px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:23px;font-weight:800;background:linear-gradient(135deg,#0E7A52,#07462F);color:#fff;box-shadow:0 10px 22px -12px rgba(7,70,47,.8)}
+.hm-qa i.g{background:linear-gradient(135deg,#16A36B,#0E7A52)}
+.hm-qa i.n{background:#fff;color:#0A6B45;border:1.5px solid #CFE3D8;box-shadow:none}
+.hm-qa i.b{background:linear-gradient(135deg,#C99A37,#94701F);color:#fff}
+.hm-qa-s{margin-top:14px}
+.hm-sh{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 9px}
+.hm-sh h3{margin:0;font-size:17px;font-weight:800;color:var(--t1,#13261E);padding-left:12px;position:relative}
+.hm-sh h3::before{content:"";position:absolute;left:0;top:50%;width:5px;height:1.05em;transform:translateY(-50%);border-radius:3px;background:linear-gradient(180deg,#0E7A52,#C99A37)}
+.hm-sh button{border:0;background:none;color:#0A6B45;font:inherit;font-size:14px;font-weight:800;cursor:pointer;padding:4px 0}
+.hm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hm-stats div{background:#F3F7F4;border-radius:14px;padding:10px 12px;min-width:0}
+.hm-stats small{display:block;color:#4B5A52;font-size:12.5px;font-weight:700;margin-bottom:3px}
+.hm-stats b{display:block;font-size:16px;font-family:'DM Mono',ui-monospace,Menlo,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#13261E}
+.hm-stats b.pos{color:#0E9F6F}
+.hm-list{background:#fff;border:1px solid var(--bd,#E6E1D3);border-radius:18px;overflow:hidden;margin-bottom:8px}
+.hm-li{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;border-bottom:1px solid #EEF1EE;background:none;font:inherit;text-align:left;color:#13261E;cursor:pointer}
+.hm-li:last-child{border-bottom:0}
+.hm-lic{width:42px;height:42px;flex:none;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;background:#FFF4E0;color:#94701F}
+.hm-lic.in{background:#E7F6EE;color:#0E9F6F}
+.hm-lit{flex:1;min-width:0}.hm-lit b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hm-lit small{display:block;font-size:12.5px;color:#4B5A52;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-lia{text-align:right;white-space:nowrap}.hm-lia b{display:block;font-family:'DM Mono',ui-monospace,Menlo,monospace;font-size:14.5px;color:#13261E}.hm-lia.in b{color:#0E9F6F}
+.hm-pill{display:inline-block;margin-top:3px;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:#EEF1EE;color:#4B5A52}
+.hm-pill.ok{background:rgba(16,185,129,.14);color:#0E9F6F}.hm-pill.wait{background:rgba(245,158,11,.16);color:#B26B00}.hm-pill.bad{background:rgba(239,68,68,.14);color:#D33A2C}
+.hm-day{font-size:12.5px;font-weight:800;color:#4B5A52;margin:12px 4px 6px;text-transform:uppercase;letter-spacing:.04em}
+.hm-sort{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#4B5A52;margin:4px 2px 2px}
+.hm-sort button{border:0;background:#E7F6EE;color:#0A6B45;font:inherit;font-size:12.5px;font-weight:800;padding:6px 10px;border-radius:999px}
+.hm-sale{display:flex;align-items:center;gap:12px;width:100%;padding:11px 0;border:0;border-bottom:1px solid #EEF1EE;background:none;font:inherit;text-align:left;color:#13261E;cursor:pointer}
+.hm-sale:last-of-type{border-bottom:0}
+.hm-si{width:38px;height:38px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#FFF4E0;font-size:16px}.hm-si.ok{background:#E7F6EE;color:#0E9F6F;font-weight:800}
+.hm-st{flex:1;min-width:0}.hm-st b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hm-st small{display:block;font-size:12px;color:#4B5A52;font-family:'DM Mono',ui-monospace,monospace}
+.hm-sa{text-align:right;white-space:nowrap}.hm-sa b{display:block;font-family:'DM Mono',ui-monospace,monospace;font-size:14.5px}
+.hm-secure{display:flex;flex-direction:column;gap:6px;margin:14px 0 6px;padding:14px;border-radius:18px;background:linear-gradient(150deg,#E7F6EE,#fff);border:1.5px solid #BFE3CF}
+.hm-secure b{font-size:14.5px;color:#13261E}.hm-secure span{font-size:13px;line-height:1.5;color:#3D4B44}
+.hm-secure button{align-self:flex-start;border:0;background:#0A6B45;color:#fff;font:inherit;font-size:13px;font-weight:800;padding:8px 14px;border-radius:999px;margin-top:4px;cursor:pointer}
+.wf-badge.wf-net-b{background:rgba(255,255,255,.16);color:#fff}
+
+/* ── receipts: image, share, save to gallery, link ── */
+.hm-rimg{width:100%;border-radius:14px;border:1px solid #E6E1D3;display:block}
+.hm-ract{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.hm-ract .hm-sheet-a{margin-top:0}
+.hm-rsave{padding:14px;border-radius:14px;border:1.5px solid #0A6B45;background:#fff;color:#0A6B45;font:inherit;font-weight:800;cursor:pointer}
+.hm-rlink{display:block;width:100%;margin-top:8px;padding:10px;border:0;background:none;color:#0A6B45;font:inherit;font-size:14px;font-weight:800;text-decoration:underline;cursor:pointer}
+.hm-fnote{position:relative;margin:12px 0;padding:14px 40px 14px 14px;border-radius:14px;background:#E7F6EE;border:1px solid #BFE3CF;color:#13261E;font-size:14px}
+.hm-fnote>b{display:block;margin-bottom:4px}.hm-fnote p{margin:0 0 8px;line-height:1.5}
+.hm-fnb{border:0;border-radius:10px;padding:9px 12px;background:#fff;color:#0A6B45;font:inherit;font-weight:800;cursor:pointer}.hm-fnp{background:#0A6B45;color:#fff}
+.hm-fnx{position:absolute;top:8px;right:8px;border:0;background:none;font-size:16px;color:#4B5A52;cursor:pointer}
+
+/* ── Business and invoices ── */
+.hm-sheet-l{max-width:560px}
+.hm-bz{margin:6px 0 12px;padding:18px;border-radius:20px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,rgba(230,189,92,.25),rgba(230,189,92,0) 55%),linear-gradient(150deg,#0E7A52 0%,#0A6B45 55%,#07462F 100%);box-shadow:0 16px 30px -18px rgba(7,70,47,.8)}
+.hm-bz small{display:block;font-size:12.5px;font-weight:700;opacity:.85}.hm-bz>b{display:block;font-size:32px;font-weight:800;margin:4px 0 2px;font-family:'DM Mono',ui-monospace,Menlo,monospace}
+.hm-bz>span{display:block;font-size:12.5px;opacity:.9}
+.hm-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:90px;margin-top:14px;align-items:end}
+.hm-bars div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.hm-bars i{display:block;width:100%;max-width:26px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,#F0C14B,#E6BD5C)}.hm-bars i.z{background:rgba(255,255,255,.22)}.hm-bars small{font-size:10.5px;opacity:.8}
+.hm-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hm-k{background:#fff;border:1.5px solid #E6E1D3;border-radius:16px;padding:11px 10px;min-width:0}
+.hm-k small{display:block;font-size:11.5px;font-weight:800;color:#4B5A52}.hm-k b{display:block;font-size:15px;margin:3px 0 2px;font-family:'DM Mono',ui-monospace,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-k span{display:block;font-size:11px;color:#4B5A52;line-height:1.35}.hm-k.warn{border-color:rgba(239,68,68,.45)}.hm-k.warn b{color:#D33A2C}
+.hm-kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #EEF1EE;font-size:14px}.hm-kv:last-child{border-bottom:0}
+.hm-kv span{color:#4B5A52;min-width:0}.hm-kv b{text-align:right;white-space:nowrap}.hm-kv.tot b{color:#0A6B45;font-size:16px}.hm-kv.tot span{font-weight:800;color:#13261E}
+.hm-ii{margin-top:12px;padding:12px 14px;border:1.5px solid #E6E1D3;border-radius:16px;background:#fff}.hm-ih{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.hm-ih .hm-pill{margin:0}
+.hm-lh,.hm-it{display:grid;grid-template-columns:minmax(0,1fr) 54px 84px 30px;gap:6px;align-items:center}
+.hm-lh{font-size:12px;font-weight:800;color:#4B5A52;margin:12px 2px 6px}
+.hm-it .fi{margin:0 0 8px;min-width:0;padding:.6rem .55rem}
+.hm-x{border:0;background:#EEF1EE;color:#4B5A52;width:30px;height:30px;border-radius:50%;font-size:13px;cursor:pointer;margin-bottom:8px}
+.hm-add{border:1.5px solid #CFE3D8;background:#fff;color:#0A6B45;font:inherit;font-size:14px;font-weight:800;padding:9px 14px;border-radius:12px;cursor:pointer}
+.hm-tot{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px;margin:12px 0;padding:14px;border-radius:14px;background:#E7F6EE;border:1.5px solid #BFE3CF}
+.hm-tot span{font-weight:800}.hm-tot b{font-size:22px;color:#0A6B45;font-family:'DM Mono',ui-monospace,monospace}.hm-tot small{flex-basis:100%;text-align:right;font-size:12px;color:#4B5A52}
+.hm-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #EEF1EE}.hm-sw:last-child{border-bottom:0}
+.hm-sw b{display:block;font-size:15px}.hm-sw small{display:block;font-size:12.5px;color:#4B5A52}.hm-sw input{width:24px;height:24px;flex:none;accent-color:#0A6B45}
+.hm-try{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.hm-try button{display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;border:1.5px solid #E6E1D3;background:#fff;color:#13261E;font:inherit;font-size:13.5px;font-weight:800;text-align:left;cursor:pointer}
+.hm-try i{width:34px;height:34px;flex:none;border-radius:11px;background:#0A6B45;color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal}
+
+/* ── stronger, clearer colours across the app ── */
+#hdr{background-image:linear-gradient(90deg,#0E7A52,#C99A37)!important;background-size:100% 3px!important;background-repeat:no-repeat!important;background-position:bottom!important}
+.nv-h,.sec-label{font-weight:800!important;color:#13261E!important}
+.nv-t{border:1.5px solid #E2DDCF!important;box-shadow:0 2px 6px -3px rgba(19,38,30,.18)}
+.nv-t .nv-i{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;margin:0 auto 6px;font-size:22px;background:var(--nvc,#E7F6EE)}
+.nv-g.nvc0{--nvc:linear-gradient(135deg,#DDF3E7,#BFE6D0)}
+.nv-g.nvc1{--nvc:linear-gradient(135deg,#FBEFD3,#F1D9A0)}
+.nv-g.nvc2{--nvc:linear-gradient(135deg,#FCE3DF,#F6C1B8)}
+.nv-g.nvc3{--nvc:linear-gradient(135deg,#DCEBFA,#B9D6F3)}
+.nv-l{font-weight:800!important;color:#13261E!important}
+.wf-sec{border-width:1.5px!important}
+.hm-qa.hm-qa-s{grid-template-columns:repeat(4,1fr)!important}
+
+/* ── Home: big Pi card, quick actions, Hadith and Dua of the day, tools with search ── */
+#hh-top{margin:2px 0 6px}
+.hh-pi{position:relative;overflow:hidden;margin:4px 0 6px;padding:20px 18px 16px;border-radius:24px;color:#fff;cursor:pointer;
+  background:radial-gradient(120% 100% at 100% 0%,rgba(240,193,75,.32),rgba(240,193,75,0) 55%),linear-gradient(150deg,#12935F 0%,#0A6B45 50%,#063B27 100%);box-shadow:0 20px 36px -20px rgba(6,59,39,.9)}
+.hh-pi::after{content:"π";position:absolute;right:-10px;bottom:-60px;font-size:220px;font-weight:800;color:rgba(255,255,255,.06);line-height:1}
+.hh-pi-t{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;opacity:.95}
+.hh-pi-t span{display:flex;align-items:center;gap:7px}.hh-pi-net{background:rgba(255,255,255,.15);padding:4px 10px;border-radius:999px}
+.hh-live{width:9px;height:9px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 4px rgba(74,222,128,.25)}.hh-live.off{background:#F0C14B;box-shadow:none}
+.hh-pi-v{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;margin:14px 0 4px}
+.hh-pi-v small{font-size:18px;font-weight:700;opacity:.85}.hh-pi-v b{font-size:46px;font-weight:800;letter-spacing:-.02em;line-height:1.05;font-family:'DM Sans',system-ui,sans-serif}
+.hh-pi-v em{font-style:normal;font-size:14px;font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(74,222,128,.2);color:#BBF7D0}.hh-pi-v em.dn{background:rgba(248,113,113,.22);color:#FECACA}
+.hh-pi-s{font-size:13.5px;opacity:.88;margin-bottom:14px}
+.hh-pi-a{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.hh-pi-a button{flex:1;min-width:0;border:0;border-radius:14px;padding:11px 8px;font:inherit;font-size:13.5px;font-weight:800;background:rgba(255,255,255,.16);color:#fff;cursor:pointer}
+.hh-pi-a button:first-child{background:#F0C14B;color:#13261E}
+.hh-sec{display:flex;justify-content:space-between;align-items:baseline;margin:18px 2px 10px}
+.hh-sec h3{margin:0;font-size:18px;font-weight:800;color:#13261E;padding-left:12px;position:relative}
+.hh-sec h3::before{content:"";position:absolute;left:0;top:50%;width:5px;height:1.05em;transform:translateY(-50%);border-radius:3px;background:linear-gradient(180deg,#0E7A52,#C99A37)}
+.hh-sec span{font-size:12.5px;font-weight:700;color:#4B5A52}
+.hh-qa{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 8px}
+.hh-qa button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:6px;font:inherit;font-size:12.5px;font-weight:800;color:#13261E;cursor:pointer;padding:0}
+.hh-qa i{width:58px;height:58px;border-radius:19px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:26px;box-shadow:0 10px 20px -12px rgba(19,38,30,.55)}
+.hh-qa .c-w i{background:linear-gradient(135deg,#F0C14B,#C99A37)}.hh-qa .c-g i{background:linear-gradient(135deg,#C9EEDB,#8FD3B0)}.hh-qa .c-o i{background:linear-gradient(135deg,#FBE7C1,#F0C982)}.hh-qa .c-r i{background:linear-gradient(135deg,#FDD5CF,#F59E8E)}
+.hh-days{display:grid;gap:10px;margin-top:16px}
+.hh-day{padding:16px;border-radius:20px;background:linear-gradient(150deg,#FFF8E8,#FFFFFF);border:1.5px solid #EFD9A4;box-shadow:0 8px 18px -14px rgba(148,112,31,.6)}
+.hh-dua{background:linear-gradient(150deg,#EAF7F0,#FFFFFF);border-color:#BFE3CF;box-shadow:0 8px 18px -14px rgba(10,107,69,.55)}
+.hh-day-k{font-size:12.5px;font-weight:800;letter-spacing:.04em;color:#94701F;text-transform:uppercase;margin-bottom:8px}.hh-dua .hh-day-k{color:#0A6B45}
+.hh-day-ar{font-family:'Amiri Quran','Amiri',serif;font-size:23px;line-height:1.9;color:#13261E;text-align:right;margin-bottom:6px}
+.hh-day-en{font-size:15px;line-height:1.6;color:#2E3B34}
+.hh-day-f{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12.5px;color:#4B5A52;font-weight:700}
+.hh-day-f button{border:0;background:none;color:#0A6B45;font:inherit;font-size:14px;font-weight:800;cursor:pointer;padding:4px 0}
+.hh-q{width:100%;height:50px;border-radius:16px!important;border:1.5px solid #CFE3D8!important;font-size:15px!important;margin:0 0 10px!important}
+.hh-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -2px 12px;padding:2px}
+.hh-chips::-webkit-scrollbar{display:none}
+.hh-chips button{flex:none;border:1.5px solid #E2DDCF;background:#fff;color:#13261E;border-radius:999px;padding:9px 14px;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer}
+.hh-chips button.on{background:linear-gradient(135deg,#0E7A52,#07462F);border-color:#0A6B45;color:#fff}
+#hh-top #nv-home .nv-h{display:none}#hh-top #nv-home.hh-searching .nv-h{display:block}
+
+/* ── bottom bar: Wallet in the centre ── */
+#bnav .bni-c{position:relative}
+#bnav .bni-c .bni-i{width:60px;height:60px;margin-top:-30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;
+  background:linear-gradient(145deg,#12935F,#07462F);box-shadow:0 0 0 4px #fff,0 0 0 6px #E6BD5C,0 12px 22px -8px rgba(7,70,47,.8)}
+#bnav .bni-c .bni-l{color:#0A6B45!important;font-weight:800}
+
+/* ── wallet tools, security, QR, hide amounts ── */
+.hm-wtools{display:flex;gap:8px;margin:4px 0 2px;overflow-x:auto;scrollbar-width:none}
+.hm-wtools button{flex:1;white-space:nowrap;border:1.5px solid #CFE3D8;background:#fff;color:#0A6B45;border-radius:12px;padding:9px 10px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+.hm-secg{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EEF1EE}
+.hm-secg>div:nth-child(2){flex:1;min-width:0}.hm-secg b{display:block;font-size:15px}.hm-secg small{display:block;font-size:12.5px;color:#4B5A52}
+.hm-sec-i{width:40px;height:40px;flex:none;border-radius:12px;background:#E7F6EE;display:flex;align-items:center;justify-content:center;font-size:19px}
+.hm-secg button{border:1.5px solid #CFE3D8;background:#fff;color:#0A6B45;border-radius:10px;padding:8px 12px;font:inherit;font-weight:800;cursor:pointer}.hm-secg button.on{background:#0A6B45;color:#fff;border-color:#0A6B45}
+.hm-tg{position:relative;width:48px;height:28px;flex:none}.hm-tg input{opacity:0;width:0;height:0}.hm-tg span{position:absolute;inset:0;border-radius:999px;background:#D5DDD8;transition:.2s}
+.hm-tg span::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}.hm-tg input:checked+span{background:#0A6B45}.hm-tg input:checked+span::after{left:23px}
+.hm-tips{margin-top:14px;padding:14px;border-radius:14px;background:#FFF8E8;border:1px solid #EFD9A4;font-size:13.5px;line-height:1.5}.hm-tips ul{margin:6px 0 0;padding-left:18px}.hm-tips li{margin-bottom:5px}
+.hm-pin{font-size:24px!important;letter-spacing:.5em;text-align:center;margin-top:12px!important}
+.hm-pin-msg{min-height:18px;text-align:center;color:#D33A2C;font-size:13px;font-weight:700}
+.hm-qr{display:flex;flex-direction:column;align-items:center;gap:4px;margin:14px 0;padding:18px;border-radius:20px;background:linear-gradient(150deg,#0E7A52,#07462F);color:#fff;text-align:center}
+.hm-qr canvas{background:#fff;padding:10px;border-radius:16px;margin-bottom:10px;max-width:100%}.hm-qr b{font-size:18px}.hm-qr span{font-size:13px;opacity:.85}
+html.hm-hide-amt .hm-amt,html.hm-hide-amt #wf-price .wf-p-v,html.hm-hide-amt #wf-price .wf-p-s,html.hm-hide-amt .hm-stats b,html.hm-hide-amt .hm-lia b,html.hm-hide-amt .hm-sa b,html.hm-hide-amt .hm-bz>b,html.hm-hide-amt .hm-k b{filter:blur(7px);user-select:none}
+
+/* ── richer colour across the app ── */
+.card.card-green{background:linear-gradient(150deg,#12935F,#0A6B45 55%,#063B27)!important;box-shadow:0 16px 30px -18px rgba(6,59,39,.85)!important}
+.card.card-gold{background:linear-gradient(150deg,#FFF6DF,#FFFFFF)!important;border:1.5px solid #EFD9A4!important}
+.sec-label{font-size:13px!important;letter-spacing:.06em}
+.ic{border:1.5px solid #E6E1D3!important;box-shadow:0 6px 14px -12px rgba(19,38,30,.35)}
+
+/* ── motion: buttons press, lift and shine; sections rise in; centre Wallet glows ── */
+@keyframes hmRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes hmPop{0%{opacity:0;transform:scale(.6)}70%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@keyframes hmShine{0%{transform:translateX(-120%) skewX(-20deg)}60%,100%{transform:translateX(220%) skewX(-20deg)}}
+@keyframes hmGlow{0%,100%{box-shadow:0 0 0 4px #fff,0 0 0 6px #E6BD5C,0 12px 22px -8px rgba(7,70,47,.8)}50%{box-shadow:0 0 0 4px #fff,0 0 0 9px rgba(230,189,92,.55),0 14px 26px -8px rgba(7,70,47,.9)}}
+@keyframes hmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes hmQrIn{from{opacity:0;transform:scale(.85) rotate(-2deg)}to{opacity:1;transform:none}}
+.hm-qa i,.hh-qa i{position:relative;overflow:hidden;transition:transform .18s cubic-bezier(.2,.9,.3,1.4),box-shadow .18s;animation:hmPop .5s cubic-bezier(.2,.9,.3,1.3) both}
+.hm-qa button:nth-child(2) i,.hh-qa button:nth-child(2) i{animation-delay:.05s}.hm-qa button:nth-child(3) i,.hh-qa button:nth-child(3) i{animation-delay:.1s}.hm-qa button:nth-child(4) i,.hh-qa button:nth-child(4) i{animation-delay:.15s}
+.hh-qa button:nth-child(5) i{animation-delay:.2s}.hh-qa button:nth-child(6) i{animation-delay:.25s}.hh-qa button:nth-child(7) i{animation-delay:.3s}.hh-qa button:nth-child(8) i{animation-delay:.35s}
+.hm-qa i::after,.hh-pi-a button:first-child::after,.wf-cta::after,.hm-sheet-a::after{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:hmShine 3.6s ease-in-out infinite;pointer-events:none}
+.hm-qa button:nth-child(2) i::after{animation-delay:.4s}.hm-qa button:nth-child(3) i::after{animation-delay:.8s}.hm-qa button:nth-child(4) i::after{animation-delay:1.2s}
+.hh-pi-a button:first-child,.wf-cta,.hm-sheet-a{position:relative;overflow:hidden}
+.hm-qa button:active i,.hh-qa button:active i{transform:scale(.88)}
+.hm-qa button:hover i,.hh-qa button:hover i{transform:translateY(-3px)}
+.wf-cta,.hm-sheet-a,.hh-pi-a button,.hm-wtools button,.hh-chips button,.hm-add,.hm-rsave,.hm-sort button{transition:transform .15s ease,filter .15s ease,box-shadow .15s ease}
+.wf-cta:active,.hm-sheet-a:active,.hh-pi-a button:active,.hm-wtools button:active,.hh-chips button:active,.hm-add:active,.hm-rsave:active,.nv-t:active,.hm-li:active,.hm-sale:active{transform:scale(.96);filter:brightness(.96)}
+.nv-t,.hm-li,.hm-sale{transition:transform .15s ease,background .15s ease}
+.hh-pi,.hm-bz,.wf-card{animation:hmRise .5s ease both}
+.hh-days>*,.hm-list,.wf-sec,.hm-secure,.hm-stats>div{animation:hmRise .45s ease both}
+.hh-days>*:nth-child(2){animation-delay:.08s}
+.hh-pi::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.12) 45%,transparent 60%);animation:hmShine 5s ease-in-out infinite;pointer-events:none}
+.hh-live{animation:hmFloat 2.4s ease-in-out infinite}
+#bnav .bni-c .bni-i{animation:hmGlow 2.8s ease-in-out infinite;transition:transform .18s cubic-bezier(.2,.9,.3,1.4)}
+#bnav .bni-c:active .bni-i{transform:scale(.9)}
+.hm-qr canvas{animation:hmQrIn .45s cubic-bezier(.2,.9,.3,1.2) both;box-shadow:0 14px 30px -14px rgba(0,0,0,.55)}
+.hm-qr-k{font-size:12px;font-weight:800;letter-spacing:.14em;color:#E6BD5C;margin-bottom:10px}
+.hm-sheet{animation:hmRise .28s ease both}
+/* tap ripple */
+.hm-rip{position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.45);animation:hmRipple .55s ease-out forwards;pointer-events:none}
+@keyframes hmRipple{to{transform:scale(2.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Arabic / Urdu: the English Home, Wallet, Business and receipt parts keep left-to-right reading (Arabic text stays right-to-left) */
+[dir=rtl] #hh-top,[dir=rtl] #wl-top,[dir=rtl] #wl-rest,[dir=rtl] .hm-sheet,[dir=rtl] #s-hadith,[dir=rtl] .scr-hdr{direction:ltr;text-align:left}
+[dir=rtl] .hh-day-ar,[dir=rtl] .hq-ay-ar,[dir=rtl] .hq-head-ar{direction:rtl;text-align:right}
+[dir=rtl] .hdr-user{direction:ltr;unicode-bidi:isolate}
+[dir=rtl] #greeting-bar-text{unicode-bidi:plaintext}

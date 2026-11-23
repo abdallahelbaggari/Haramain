@@ -52,6 +52,8 @@ h2{font-size:15px;margin:22px 4px 10px}
 .bad{padding:40px 10px;text-align:center;color:var(--m)}
 .foot{text-align:center;font-size:12px;color:var(--m);margin-top:20px}.foot a{color:var(--g);font-weight:700;text-decoration:none}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px}@keyframes s{to{transform:rotate(360deg)}}
+.items{border:1px solid #E6E1D3;border-radius:12px;padding:2px 12px;margin:6px 0}.items .row.tot b{font-size:17px;color:#0E7A52}.items .row.tot span{font-weight:800;color:#13261E}
+.hm-fnote{position:relative;margin:12px 0;padding:14px 40px 14px 14px;border-radius:14px;background:#E7F6EE;border:1px solid #BFE3CF;color:#13261E;font-size:14px;text-align:left}.hm-fnote>b{display:block;margin-bottom:4px}.hm-fnote p{margin:0 0 8px}.hm-fnb{border:0;border-radius:10px;padding:9px 12px;background:#fff;color:#0E7A52;font:inherit;font-weight:800}.hm-fnp{background:#0E7A52;color:#fff}.hm-fnx{position:absolute;top:8px;right:8px;border:0;background:none;font-size:16px;color:#4B5A52}
 </style>
 </head>
 <body>
@@ -60,7 +62,8 @@ h2{font-size:15px;margin:22px 4px 10px}
   <div id="app"><div class="bad">Loading payment request…</div></div>
   <div class="foot">Haramain never holds your Pi · <a href="/privacy-policy">Privacy</a> · <a href="/terms-of-service">Terms</a> · <a href="/">Open Haramain</a></div>
 </div>
-<script src="haramain-receipt.js?v=2"></script>
+<script src="haramain-qr.js?v=1"></script>
+<script src="haramain-receipt.js?v=3"></script>
 <script>
 (function () {
   'use strict';
@@ -74,7 +77,7 @@ h2{font-size:15px;margin:22px 4px 10px}
   if (inv) { inv.a = typeof inv.a === 'number' ? inv.a : NaN; inv.d = +inv.d || Date.now(); inv.i = String(inv.i || '').slice(0, 80); inv.n = String(inv.n || '').slice(0, 50); inv.u = String(inv.u || '').replace(/[^A-Za-z0-9_.-]/g, '').slice(0, 40); }
   var ok = inv && /^G[A-Z2-7]{55}$/.test(inv.t || '') && isFinite(inv.a) && inv.a > 0 && inv.a <= 1e7 && /^HM-[A-Z0-9]{6}$/.test(inv.r || '');
   /* Pi Wallet cannot be opened from apps, so requests are now paid inside Haramain */
-  if (ok && inv.u) { var e2 = btoa(unescape(encodeURIComponent(JSON.stringify({ u: inv.u, a: inv.a, x: inv.i })))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); location.replace('/#send=' + e2); return; }
+  if (ok && inv.u) { var e2 = btoa(unescape(encodeURIComponent(JSON.stringify({ u: inv.u, a: inv.a, x: ((inv.no ? 'Invoice ' + inv.no : inv.i).slice(0, 64) + ' · ' + inv.r) })))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); location.replace('/#send=' + e2); return; }
   if (ok) { $('app').innerHTML = '<div class="card"><div class="bad"><b style="color:#13261E;font-size:16px">Pay this request in Haramain</b><br><br>Payments now happen inside the Haramain app. Ask the seller for their Haramain @username, then open Haramain → Wallet → Send.<br><br><a class="btn btn-g" href="/">Open Haramain</a></div></div>'; return; }
   if (!ok) { $('app').innerHTML = '<div class="card"><div class="bad"><b style="color:#13261E;font-size:16px">This payment link is not complete</b><br><br>Ask the seller to send the Haramain Pay link again.</div></div>'; return; }
   var TEST = inv.k === 'test', NETN = TEST ? 'Pi Testnet' : 'Pi Mainnet';
@@ -92,21 +95,25 @@ h2{font-size:15px;margin:22px 4px 10px}
   function short(a) { return a.slice(0, 6) + '…' + a.slice(-6); }
   function draw() {
     $('app').innerHTML =
-      '<div class="card"><div class="hero"><div class="k">' + (mine ? 'Your payment request' : 'Payment request') + '</div>' +
+      '<div class="card"><div class="hero"><div class="k">' + (inv.no ? (mine ? 'Your invoice · ' : 'Invoice · ') + esc(inv.no) : (mine ? 'Your payment request' : 'Payment request')) + '</div>' +
         '<div class="who">' + (mine ? 'Waiting for payment' : 'from <b>' + esc(inv.n || 'Seller') + '</b>' + (inv.u ? ' · @' + esc(inv.u) : '')) + '</div>' +
         '<div class="amt">' + inv.a + ' π</div><div class="fx" id="fx">' + fxLine() + '</div></div>' +
-      '<div class="body"><div class="row"><span>For</span><b>' + esc(inv.i || 'Payment') + '</b></div>' +
+      '<div class="body">' + (inv.c ? '<div class="row"><span>Bill to</span><b>' + esc(inv.c) + '</b></div>' : '') +
+        (Array.isArray(inv.l) && inv.l.length ? '<div class="items">' + inv.l.slice(0, 12).map(function (x) { var q = +x[1] || 1, u = +x[2] || 0; return '<div class="row"><span>' + esc(q + ' × ' + x[0]) + '</span><b>' + +(q * u).toFixed(7) + ' π</b></div>'; }).join('') + '<div class="row tot"><span>Total</span><b>' + inv.a + ' π</b></div></div>'
+          : '<div class="row"><span>For</span><b>' + esc(inv.i || 'Payment') + '</b></div>') +
         '<div class="row"><span>Pay to</span><b>' + esc(inv.n || '—') + (inv.u ? ' (@' + esc(inv.u) + ')' : '') + '</b></div>' +
         '<div class="row"><span>Reference</span><b class="mono">' + inv.r + '</b></div>' +
         '<div class="row"><span>Network</span><b>' + NETN + '</b></div>' +
-        '<div class="row"><span>Requested</span><b>' + new Date(inv.d || Date.now()).toLocaleString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + '</b></div></div></div>' +
+        '<div class="row"><span>' + (inv.no ? 'Issued' : 'Requested') + '</span><b>' + new Date(inv.d || Date.now()).toLocaleString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + '</b></div>' +
+        (inv.due ? '<div class="row"><span>Due</span><b>' + esc(new Date(inv.due + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' })) + '</b></div>' : '') +
+        (inv.x ? '<div class="row"><span>Note</span><b>' + esc(inv.x) + '</b></div>' : '') + '</div></div>' +
       '<div id="pay"><h2>' + (mine ? 'Share this request with your buyer' : 'How to pay · about 1 minute') + '</h2>' +
       (mine ? '<div class="acts" style="margin-top:0"><button class="btn btn-g" id="sh">📤 Share link</button><button class="btn btn-s" id="cp" style="padding:10px">🔗 Copy link</button></div>' : '') +
       '<div class="steps">' +
         '<div class="step"><span class="n">1</span><div><b>Copy the seller’s wallet address</b><small>Or scan the QR code from another phone.</small><div id="qr"></div><div class="copy"><code>' + inv.t + '</code><button class="btn btn-s" data-c="' + inv.t + '">Copy</button></div></div></div>' +
         '<div class="step"><span class="n">2</span><div><b>Send exactly ' + inv.a + ' π in Pi Wallet</b><small>In Pi Wallet tap <b>Send</b>, paste the address, enter the amount and put the reference in the <b>memo</b>.</small>' +
           '<div class="copy"><code>' + inv.a + '</code><button class="btn btn-s" data-c="' + inv.a + '">Copy amount</button></div><div class="copy"><code>' + inv.r + '</code><button class="btn btn-s" data-c="' + inv.r + '">Copy memo</button></div>' +
-          '<a class="btn btn-gold btn-w" style="margin-top:10px" href="https://wallet.pinet.com">Open Pi Wallet</a><small style="display:block;margin-top:6px">After approving, tap Back to return here. Haramain then confirms your payment.</small></div></div>' +
+          '<a class="btn btn-gold btn-w" style="margin-top:10px" href="https://wallet.pinet.com">Open Pi Wallet</a><small style="display:block;margin-top:6px">Then tap Back to return here.</small></div></div>' +
         '<div class="step"><span class="n">3</span><div><b>' + (mine ? 'Haramain checks for the payment' : 'Come back and confirm') + '</b><small>Haramain looks for your payment on the Pi blockchain and makes a verified receipt for you and the seller.</small>' +
           '<button class="btn btn-g btn-w" style="margin-top:10px" id="chk">' + (mine ? '🔎 Check for payment' : '✅ I have paid · check now') + '</button>' +
           '<div class="status" id="st"></div>' +
@@ -124,9 +131,7 @@ h2{font-size:15px;margin:22px 4px 10px}
   function copy(v, b) { var done = function () { var o = b.textContent; b.textContent = '✓ Copied'; setTimeout(function () { b.textContent = o; }, 1400); }; try { navigator.clipboard.writeText(v).then(done, function () { fallback(v); done(); }); } catch (e) { fallback(v); done(); } }
   function fallback(v) { var t = document.createElement('textarea'); t.value = v; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e) {} t.remove(); }
   function qr() {
-    var s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-    s.onload = function () { try { new QRCode($('qr'), { text: inv.t, width: 168, height: 168, colorDark: '#07462F', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); } catch (e) {} };
-    document.head.appendChild(s);
+    try { var c = document.createElement('canvas'); $('qr').appendChild(c); HMQR.toCanvas(c, inv.t, { width: 168, margin: 1, color: { dark: '#07462F', light: '#ffffff' } }); } catch (e) {}
   }
   var timer = null, tries = 0;
   function status(cls, html) { var e = $('st'); if (!e) return; e.className = 'status ' + cls; e.innerHTML = html; }
@@ -171,11 +176,12 @@ h2{font-size:15px;margin:22px 4px 10px}
     $('pay').style.display = 'none';
     var d = $('done'); d.classList.add('on');
     d.innerHTML = '<div class="tick">✓</div><h3>' + (mine ? 'Payment received' : 'Payment complete') + '</h3><p>' + rec.amount + ' π · verified on the ' + NETN + ' blockchain</p><div id="rimg"><span class="spin"></span></div>' +
-      '<div class="acts"><button class="btn btn-g" id="rs">📤 Share receipt</button><a class="btn btn-s" id="rd" style="padding:10px">⬇️ Save image</a></div>' +
+      '<div class="acts"><button class="btn btn-g" id="rs">📤 Share receipt</button><button class="btn btn-s" id="rd" style="padding:10px">⬇️ Save to gallery</button></div>' +
       '<a class="btn btn-s btn-w" style="margin-top:8px" target="_blank" rel="noopener" href="https://blockexplorer.minepi.com/' + (TEST ? 'testnet' : 'mainnet') + '/transactions/' + tx.hash + '">View on Pi Block Explorer ›</a>';
     HMReceipt.canvas(spec(tx)).then(function (cv) {
       var url = cv.toDataURL('image/png'), fn = 'Haramain-receipt-' + tx.hash.slice(0, 8) + '.png';
-      $('rimg').innerHTML = '<img alt="Receipt" src="' + url + '">'; $('rd').href = url; $('rd').download = fn;
+      $('rimg').innerHTML = '<img alt="Receipt" src="' + url + '">';
+      $('rd').onclick = function () { cv.toBlob(function (b) { HMFiles.save(b, fn.replace(/\.png$/, '.jpg'), 'image/jpeg', 'receipt'); }, 'image/jpeg', 0.92); };
       $('rs').onclick = function () { HMReceipt.share(cv, fn, 'HARAMAIN · Verified payment\n' + rec.amount + ' π for ' + (inv.i || 'payment') + '\nReference ' + inv.r + '\nTransaction ' + tx.hash + '\nharamain.pi'); };
     });
   }

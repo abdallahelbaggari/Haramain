@@ -13,7 +13,8 @@
   var G = [
     ['🕌 Worship', [
       ['📖', 'Quran', "goS('quran')"], ['☀️', 'Morning Adhkar', "HMA.open('m')"], ['🌙', 'Evening Adhkar', "HMA.open('e')"], ['🕰️', 'Prayer times', "hmOpen('worship')"],
-      ['🧭', 'Qibla', "hmOpen('worship','qibla')"], ['🤲', 'Duas', "hmOpen('worship','dua-lib')"], ['📿', 'Tasbih', "hmOpen('worship','dhikr')"], ['✨', '99 Names', "hmOpen('worship','99names')"]]],
+      ['🧭', 'Qibla', "hmOpen('worship','qibla')"], ['🤲', 'Duas', "hmOpen('worship','dua-lib')"], ['📿', 'Tasbih', "hmOpen('worship','dhikr')"], ['✨', '99 Names', "hmOpen('worship','99names')"],
+      ['📜', '40 Hadith', "goS('hadith')"]]],
     ['🕋 Hajj & Umrah', [
       ['📘', 'Step-by-step guide', "hmOpen('guide')"], ['🕋', 'Tawaf counter', "hmOpen('worship','tawaf')"], ['🏃', "Sa'i counter", "hmOpen('worship','sai')"], ['🪨', 'Jamarat', "hmOpen('worship','jamarat')"],
       ['✅', 'Checklist', "hmOpen('checklist')"], ['🗓️', 'Itinerary', "hmOpen('itinerary')"], ['👘', 'Ihram guide', "hmOpen('utilities','ihram')"], ['💧', 'Zamzam', "hmOpen('utilities','zamzam')"]]],
@@ -21,12 +22,12 @@
       ['🆘', 'Emergency', "hmOpen('emergency')"], ['📍', 'Live location', "hmOpen('tracker')"], ['👨‍👩‍👧', 'Family', "hmOpen('family')"], ['🔍', 'Lost & Found', "hmOpen('lostfound')"],
       ['💊', 'Health card', "hmOpen('health-intel')"], ['🌡️', 'Heat safety', "hmOpen('profile','heat')"], ['🗺️', 'Places', "hmOpen('map')"], ['🌊', 'Crowd tips', "hmOpen('crowd')"]]],
     ['π Pi & tools', [
-      ['💎', 'Wallet', "hmOpen('payments')"], ['💱', 'Currency', "hmOpen('utilities','fx')"], ['📅', 'Date converter', "hmOpen('utilities','dates')"], ['🌍', 'Translator', "hmOpen('translation')"],
+      ['💎', 'Wallet', "hmOpen('payments')"], ['📊', 'Business', "hmOpen('payments');setTimeout(hmBusiness,80)"], ['💱', 'Currency', "hmOpen('utilities','fx')"], ['📅', 'Date converter', "hmOpen('utilities','dates')"], ['🌍', 'Translator', "hmOpen('translation')"],
       ['📂', 'Documents', "hmOpen('documents')"], ['🧮', 'Budget', "hmOpen('budget')"], ['🤲', 'Zakat', "hmOpen('payments','zakat')"], ['📸', 'Memories', "hmOpen('memories')"]]]
   ];
   function grid() {
-    return G.map(function (g) {
-      return '<div class="nv-g"><div class="nv-h">' + g[0] + '</div><div class="nv-grid">' + g[1].map(function (t) {
+    return G.map(function (g, gi) {
+      return '<div class="nv-g nvc' + gi + '"><div class="nv-h">' + g[0] + '</div><div class="nv-grid">' + g[1].map(function (t) {
         return '<button type="button" class="nv-t" onclick="' + t[2] + '"><span class="nv-i">' + t[0] + '</span><span class="nv-l">' + t[1] + '</span></button>';
       }).join('') + '</div></div>';
     }).join('');

@@ -89,13 +89,13 @@
     pre = pre || {};
     if (!CFG.enabled) { say('Sending Pi is not available yet'); return; }
     var w = sheet('💸 Send Pi',
-      '<div class="hm-sheet-b">Send Pi to any Haramain user. You approve in Pi’s own pop-up right here, and the money arrives in their Pi wallet with a Haramain receipt for both of you.</div>' +
+      '<div class="hm-sheet-b">Send Pi to any Haramain user, with a receipt for both of you.</div>' +
       '<label class="wf-l">To</label><div class="tr-to"><span>@</span><input id="tr-u" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="username"></div><div class="wf-hint" id="tr-uh"></div>' +
       '<label class="wf-l">Amount</label><div class="wf-amt"><input id="tr-a" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><span>π</span></div><div class="wf-conv" id="tr-c"></div>' +
       '<label class="wf-l">Narration</label><input class="fi" id="tr-x" maxlength="80" placeholder="What is it for? e.g. Hotel deposit, gift for Umrah">' +
       '<div class="tr-sum" id="tr-sum"></div>' +
       '<button type="button" class="hm-sheet-a" id="tr-go">Continue</button>' +
-      '<div class="wf-hint" style="margin-top:8px">🔒 You approve every payment yourself in Pi’s pop-up. Haramain never sees your passphrase.' + (CFG.max || CFG.daily ? '<br>Limits: ' + (CFG.max ? 'up to ' + CFG.max + ' π per transfer' : '') + (CFG.max && CFG.daily ? ' and ' : '') + (CFG.daily ? 'up to ' + CFG.daily + ' π a day' : '') + '.' : '<br>No transfer limits.') + '</div>');
+      '<div class="wf-hint" style="margin-top:8px">🔒 Secured by Pi Network. Haramain never asks for your passphrase.' + (CFG.max || CFG.daily ? '<br>Limits: ' + (CFG.max ? 'up to ' + CFG.max + ' π per transfer' : '') + (CFG.max && CFG.daily ? ' and ' : '') + (CFG.daily ? 'up to ' + CFG.daily + ' π a day' : '') + '.' : '<br>No transfer limits.') + '</div>');
     var u = $('tr-u'), a = $('tr-a'), ok = null, timer = null;
     var sum = function () {
       var v = r7(a.value); $('tr-c').textContent = conv(v);
@@ -143,7 +143,7 @@
     if (!CFG.enabled) { say('Requesting Pi is not available yet'); return; }
     if (!me() || !window.HM_TOKEN) { say('Sign in with Pi first'); try { piLogin(); } catch (e) {} return; }
     var w = sheet('📩 Request Pi',
-      '<div class="hm-sheet-b">Share a link. When the other person opens it, Haramain fills in your @username, the amount and the reason, and they approve in Pi’s pop-up.</div>' +
+      '<div class="hm-sheet-b">Share a payment link with your @username, amount and reason.</div>' +
       '<label class="wf-l">Amount</label><div class="wf-amt"><input id="rq-a" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><span>π</span></div><div class="wf-conv" id="rq-c"></div>' +
       '<label class="wf-l">What is it for?</label><input class="fi" id="rq-x" maxlength="80" placeholder="e.g. Hotel deposit, shared taxi, prayer mat">' +
       '<button type="button" class="hm-sheet-a" id="rq-go">Share request</button>');
@@ -160,7 +160,7 @@
   };
   /* opened from a request link: fill the Send sheet once signed in */
   var pendingReq = null;
-  (function () { var m = /#send=([A-Za-z0-9_-]+)/.exec(location.hash || ''); if (!m) return; var o = dec(m[1]); if (o && /^[A-Za-z0-9_.-]{2,40}$/.test(String(o.u || '')) && typeof o.a === 'number' && o.a > 0 && o.a <= 1e6) pendingReq = { u: o.u, a: o.a, x: String(o.x || '').slice(0, 80) }; try { history.replaceState(null, '', location.pathname); } catch (e) {} })();
+  (function () { var m = /#send=([A-Za-z0-9_-]+)/.exec(location.hash || ''); if (!m) return; var o = dec(m[1]); if (o && /^[A-Za-z0-9_.-]{2,40}$/.test(String(o.u || '')) && typeof o.a === 'number' && o.a >= 0 && o.a <= 1e6) pendingReq = { u: o.u, a: o.a, x: String(o.x || '').slice(0, 80) }; try { history.replaceState(null, '', location.pathname); } catch (e) {} })();
   function openPending() {
     if (!pendingReq || !CFG.enabled || !me() || !window.HM_TOKEN) return;
     var r = pendingReq; pendingReq = null;
@@ -187,7 +187,7 @@
     if (typeof Pi === 'undefined' || !Pi.createPayment) return say('Open Haramain in the Pi Browser to send Pi');
     var st = sheet('💸 Sending ' + num(amt, 7) + ' π to @' + esc(to),
       '<div class="wf-req"><div class="wf-req-a">' + num(amt, 7) + ' π</div><div class="wf-req-c">' + esc(conv(amt)) + '</div><div class="wf-req-i">To @' + esc(to) + ' · ' + esc(narr) + '</div></div>' +
-      '<div class="tr-steps"><div id="trs1" class="on">1 · Approve in Pi’s pop-up</div><div id="trs2">2 · Confirming your payment</div><div id="trs3">3 · Paying @' + esc(to) + ' on the blockchain</div></div><div class="wf-status wait" id="tr-st">Waiting for your approval…</div>');
+      '<div class="tr-steps"><div id="trs1" class="on">1 · Confirm payment</div><div id="trs2">2 · Confirming your payment</div><div id="trs3">3 · Paying @' + esc(to) + ' on the blockchain</div></div><div class="wf-status wait" id="tr-st">Waiting for confirmation…</div>');
     var refused = false;
     var step = function (n, msg, cls) { for (var i = 1; i <= 3; i++) { var e = $('trs' + i); if (e) e.className = i < n ? 'done' : i === n ? 'on' : ''; } var s = $('tr-st'); if (s) { s.className = 'wf-status ' + (cls || 'wait'); s.innerHTML = msg; } };
     try {
