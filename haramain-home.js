@@ -29,6 +29,7 @@
     var s = sec();
     var w = sheet('🛡️ Security center',
       '<div class="hm-secg"><div class="hm-sec-i">🙈</div><div><b>Hide amounts</b><small>Hide prices and amounts on screen in public places</small></div><label class="hm-tg"><input type="checkbox" ' + (s.hide ? 'checked' : '') + ' onchange="hmSecSet(\'hide\',this.checked)"><span></span></label></div>' +
+      '<div class="hm-secg"><div class="hm-sec-i">⟳</div><div><b>Resolve a pending payment</b><small>Finishes or clears an unfinished payment</small></div><button type="button" onclick="hmResolvePending(true)">Resolve</button></div>' +
       '<div class="hm-secg"><div class="hm-sec-i">🔔</div><div><b>Payment alerts</b><small>Sound and vibration for every payment</small></div><button type="button" onclick="hmFxSettings()">Open</button></div>' +
       '<div class="hm-tips"><b>Stay safe</b><ul>' +
         '<li>Haramain never asks for your Pi passphrase. Anyone who asks is a scammer.</li>' +

@@ -313,7 +313,7 @@
   }
   function stats() {
     var R = get('rcpts', []), m = new Date(); m.setDate(1); m.setHours(0, 0, 0, 0);
-    var inn = 0, out = 0, n = 0; R.forEach(function (r) { if (r.ts >= m.getTime()) { n++; if (r.dir === 'in') inn += +r.amount; else out += +r.amount; } });
+    var inn = 0, out = 0, n = 0; R.forEach(function (r) { if (r.ts >= m.getTime() && !r.refund) { n++; if (r.dir === 'in') inn += +r.amount; else out += +r.amount; } });
     return { inn: +inn.toFixed(4), out: +out.toFixed(4), n: n };
   }
   function convert(from) {
@@ -381,13 +381,16 @@
   function titleOf(r) { var inn = r.dir === 'in'; return r.refund ? 'Refund · transfer to ' + short(r.other) : r.kind === 'p2p' ? (inn ? 'From ' + (r.user && r.send ? '@' + r.user : short(r.other)) : 'To ' + (r.toName || r.seller || short(r.to))) : (TYPES[r.kind] || r.memo || 'Pi payment'); }
   function rows() {
     return get('rcpts', []).map(function (r, i) { return { raw: r, i: i, ts: r.ts, dir: r.dir === 'in' ? 'in' : 'out', title: titleOf(r), sub: (r.kind === 'p2p' ? (r.narr || r.item || '') : (r.kind === 'pilgrim_pass' ? 'In-app payment' : 'In-app payment')), amt: r.amount, st: r.refund ? 'Refunded' : (r.status || 'Completed') }; })
+      .concat((get('tpend', []) || []).filter(function (t) { return !get('rcpts', []).some(function (r) { return r.ref === t.pid; }); }).map(function (t, k) {
+        return { raw: { kind: 'p2p', amount: t.amount, narr: t.narr, ref: t.pid, pending: true }, i: -1, ts: t.ts, dir: 'out', title: 'To @' + t.to, sub: t.narr || 'Transfer', amt: t.amount, st: 'Processing' };
+      }))
       .sort(function (a, b) { return b.ts - a.ts; });
   }
   window.hmRows = rows;
   function pill(st) { return '<small class="hm-pill ' + (/complet|verified|paid/i.test(st) ? 'ok' : /pend|wait|process/i.test(st) ? 'wait' : /cancel|fail|refund/i.test(st) ? 'bad' : '') + '">' + esc(st) + '</small>'; }
   function txRow(x) {
     var inn = x.dir === 'in', icon = x.raw.kind === 'pilgrim_pass' ? '★' : inn ? '↙' : '↗';
-    return '<button type="button" class="hm-li" onclick="hmReceipt(' + x.i + ')"><span class="hm-lic ' + x.dir + '">' + icon + '</span><span class="hm-lit"><b>' + esc(x.title) + '</b><small>' + (x.sub ? esc(x.sub) + ' · ' : '') + new Date(x.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</small></span><span class="hm-lia ' + x.dir + '"><b>' + (inn ? '+' : '−') + x.amt + ' π</b>' + pill(x.st) + '</span></button>';
+    return '<button type="button" class="hm-li" onclick="' + (x.i < 0 ? 'toast(\'This transfer is still processing. The receipt appears when it is delivered.\')' : 'hmReceipt(' + x.i + ')') + '"><span class="hm-lic ' + x.dir + '">' + icon + '</span><span class="hm-lit"><b>' + esc(x.title) + '</b><small>' + (x.sub ? esc(x.sub) + ' · ' : '') + new Date(x.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</small></span><span class="hm-lia ' + x.dir + '"><b>' + (inn ? '+' : '−') + x.amt + ' π</b>' + pill(x.st) + '</span></button>';
   }
   function drawTx() {
     var R = rows().filter(function (r) { return !showAll || filter === 'all' || r.dir === filter; });

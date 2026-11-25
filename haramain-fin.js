@@ -207,6 +207,28 @@
       '<div class="wf-l">Try them</div><div class="hm-try">' + [['in', '💰', 'Pi received'], ['out', '↗', 'Pi sent'], ['ok', '✓', 'Payment complete'], ['err', '↩', 'Refund / problem']].map(function (x) { return '<button type="button" onclick="hmFx(\'' + x[0] + '\')"><i>' + x[1] + '</i>' + x[2] + '</button>'; }).join('') + '</div>' +
       '', 'hm-fx');
   };
+  /* An earlier payment left unfinished (weak network, app closed): ask Pi for it again so it is completed
+     (if it reached the blockchain) or cancelled (if it never did). Now and again after 2 minutes. */
+  var resolving = 0;
+  window.hmResolvePending = function (manual) {
+    if (!manual && Date.now() - resolving < 30000) return; resolving = Date.now();
+    var go = function () { try { if (window.Pi && typeof onIncompletePayment === 'function') Pi.authenticate(['username', 'payments', 'wallet_address'], onIncompletePayment).catch(function () {}); } catch (e) {} };
+    go(); setTimeout(go, 130000);
+    if (manual) say('Checking for an unfinished payment… Try your payment again in 2 minutes.');
+  };
+  function hookPending() {
+    if (!window.Pi || !Pi.createPayment || Pi._pendWrapped) return;
+    var cp = Pi.createPayment.bind(Pi); Pi._pendWrapped = true;
+    Pi.createPayment = function (data, cb) {
+      var c = Object.assign({}, cb);
+      c.onError = function (err) {
+        if (/pending payment/i.test(String(err && err.message || err))) { hmResolvePending(); err = new Error('An earlier payment is being finished automatically. Please try again in 2 minutes'); say('An earlier payment is being finished automatically. Please try again in 2 minutes.'); }
+        return cb.onError && cb.onError.call(this, err);
+      };
+      return cp(data, c);
+    };
+  }
+  setTimeout(hookPending, 2000); setTimeout(hookPending, 6000);
   function hookSounds() {
     if (typeof window.addNotif === 'function' && !window.addNotif._fx) {
       var orig = window.addNotif;

@@ -3231,7 +3231,7 @@ function piLogin() {
     /* ✅ MAINNET */
     Pi.init({ version: "2.0", sandbox: window.PI_SANDBOX });
 
-    Pi.authenticate(['username', 'payments'], onIncompletePayment)
+    Pi.authenticate(['username', 'payments', 'wallet_address'], onIncompletePayment)
       .then(function(auth) {
         user = auth.user;
         window.HM_TOKEN = auth.accessToken;
@@ -8113,11 +8113,11 @@ function orderQurbani(){
 <script src="haramain-live.js?v=1"></script>
 <script src="haramain-adhkar.js?v=1"></script>
 <script src="haramain-receipt.js?v=3"></script>
-<script src="haramain-wallet.js?v=16"></script>
-<script src="haramain-transfer.js?v=8"></script>
+<script src="haramain-wallet.js?v=18"></script>
+<script src="haramain-transfer.js?v=10"></script>
 <script src="haramain-notify.js?v=2"></script>
-<script src="haramain-fin.js?v=3"></script>
-<script src="haramain-home.js?v=4"></script>
+<script src="haramain-fin.js?v=4"></script>
+<script src="haramain-home.js?v=5"></script>
 <script src="haramain-nav.js?v=5"></script>
 <script src="haramain-habit.js?v=1"></script>
 <script src="haramain-onboarding.js?v=3"></script>

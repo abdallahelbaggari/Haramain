@@ -63,6 +63,9 @@
     if (!window.HM_TOKEN || !CFG.enabled) return;
     api('/transfer', { a: 'list', accessToken: window.HM_TOKEN }).then(function (d) {
       if (!d.ok) return; var news = 0;
+      // transfers still on their way: shown in the history as Processing until they are paid or refunded
+      var pend = (d.items || []).filter(function (t) { return t.dir === 'out' && t.status !== 'paid' && t.status !== 'refunded'; }).map(function (t) { return { pid: t.pid, amount: t.amount, to: t.to, narr: t.narr, ts: Number(t.ts) || Date.now() }; });
+      var had = JSON.stringify(get('tpend', [])); put('tpend', pend); if (JSON.stringify(pend) !== had) news++;
       (d.items || []).forEach(function (t) {
         if (t.status === 'paid') {
           if (saveReceipt(t, t.dir) && t.dir === 'in') {
@@ -197,6 +200,7 @@
         },
         onReadyForServerCompletion: function (pid, txid) {
           step(2, 'Confirming your payment on the blockchain…');
+          try { var P = get('tpend', []); if (!P.some(function (x) { return x.pid === pid; })) { P.unshift({ pid: pid, amount: amt, to: to, narr: narr, ts: Date.now() }); put('tpend', P); } } catch (e) {}
           api('/complete', { paymentId: pid, txid: txid }).then(function (d) {
             step(3, 'Paying @' + esc(to) + '…');
             var t = d && d.transfer;
@@ -208,7 +212,7 @@
               api('/transfer', { a: 'payout', paymentId: pid }).then(function (x) {
                 if (x.ok && x.row && x.row.txid) return finish(x.row);
                 if (x.refunded && x.row) { if (saveRefund(x.row)) refundNote(x.row); redraw(); return step(3, '↩️ This transfer could not be delivered, so ' + num(amt, 7) + ' π was refunded to you automatically on the Pi blockchain.', 'err'); }
-                if (++tries < 40) { step(3, 'Paying @' + esc(to) + '… the Pi blockchain is busy, retrying automatically.'); setTimeout(retry, 8000); }
+                if (++tries < 40) { if (x.need_signin) step(3, '@' + esc(to) + ' needs to open Haramain and sign in again (tap Allow) to receive Pi. Your Pi is safe: it is delivered as soon as they do, or refunded to you automatically.', 'wait'); else step(3, 'Paying @' + esc(to) + '… the Pi blockchain is busy, retrying automatically.'); setTimeout(retry, 8000); }
                 else step(3, 'Your payment is safe and recorded on the Pi blockchain. Haramain keeps trying automatically: @' + esc(to) + ' is paid, or you are refunded, and you will be notified.', 'wait');
               }).catch(function () { if (++tries < 40) setTimeout(retry, 8000); });
             })();
