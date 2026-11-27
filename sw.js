@@ -2,9 +2,9 @@
    Pages: network first, cached copy only when offline (so a new deploy is always picked up).
    Versioned files (?v=), icons, logo and onboarding photos: cache first.
    Server functions (payments, prices, live location, AI…) are never cached. */
-var CACHE = 'haramain-v13';
+var CACHE = 'haramain-v17';
 var SHELL = ['/', '/index.html', '/logo.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
-var LIVE = /^\/(approve|complete|cancel-payment|pi-price|fx|ai|alerts|live|family|lf|quran|quran-audio|verify|transfer|users|file|f|r|history|setup\.html|validation-key\.txt)(\/|$|\?)/;
+var LIVE = /^\/(approve|complete|cancel-payment|pi-price|fx|ai|alerts|live|family|lf|quran|quran-audio|verify|transfer|users|file|f|r|history|setup\.html|validation-key\.txt|recover|staff|report|merchants)(\/|$|\?)/;
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL).catch(function () {}); }).then(function () { return self.skipWaiting(); }));

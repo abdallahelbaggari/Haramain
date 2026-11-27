@@ -8121,5 +8121,64 @@ function orderQurbani(){
 <script src="haramain-nav.js?v=5"></script>
 <script src="haramain-habit.js?v=1"></script>
 <script src="haramain-onboarding.js?v=3"></script>
+
+
+
+
+
+
+<style id="wallet-link-css">#wl-open{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;background:rgba(6,30,20,.28);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}#wl-open.on{display:flex}#wl-open .wl-b{display:flex;align-items:center;gap:12px;padding:16px 22px;border-radius:18px;background:#fff;color:#07462F;font:700 16px/1.2 Poppins,system-ui,sans-serif;box-shadow:0 20px 50px -20px rgba(0,0,0,.5)}#wl-open i{width:22px;height:22px;border-radius:50%;border:3px solid #0A6B4533;border-top-color:#0A6B45;animation:wlspin .8s linear infinite}@keyframes wlspin{to{transform:rotate(360deg)}}#wl-frame{position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2147482000;background:#E9FBF2;visibility:hidden;pointer-events:none}#wl-frame.on{visibility:visible;pointer-events:auto}html.wl-on,html.wl-on body{overflow:hidden}</style><script id="wallet-link">(function () {
+  /* Wallet: the full Haramain Wallet opens inside the app, over this page: Haramain stays open and signed in.
+     Zakat, Sadaqah and Qurbani stay on the app's own screen. */
+  var fr = null, ready = false, want = null, isOpen = false, keep = false;
+  function frame() {
+    if (fr) return fr;
+    fr = document.createElement('iframe'); fr.id = 'wl-frame'; fr.title = 'Wallet'; fr.src = '/wallet?in=1';
+    fr.setAttribute('allow', 'camera; microphone; clipboard-read; clipboard-write; web-share; autoplay; fullscreen');
+    fr.addEventListener('load', function () { ready = true; if (want !== null) { var h = want; want = null; show(h); } });
+    document.body.appendChild(fr); return fr;
+  }
+  function spin(on) {
+    var o = document.getElementById('wl-open');
+    if (!o) { o = document.createElement('div'); o.id = 'wl-open'; o.setAttribute('role', 'status'); o.innerHTML = '<div class="wl-b"><i></i><b>Opening Wallet</b></div>'; document.body.appendChild(o); }
+    o.className = on ? 'on' : '';
+  }
+  function show(a) {
+    spin(false); fr.classList.add('on'); document.documentElement.classList.add('wl-on'); isOpen = true;
+    try { history.pushState({ wl: 1 }, ''); } catch (e) {}
+    try { fr.contentWindow.WALLET_SHOW && fr.contentWindow.WALLET_SHOW(a || ''); fr.contentWindow.focus(); } catch (e) {}
+  }
+  function W(h) {
+    var a = (/#go=([a-z-]+)/.exec(h || '') || [])[1] || '';
+    if (isOpen) { show(a); return; }
+    frame(); if (ready) show(a); else { want = a; spin(true); }
+  }
+  function close(tab, fromBack) {
+    if (!fr || !isOpen) return; isOpen = false;
+    fr.classList.remove('on'); document.documentElement.classList.remove('wl-on');
+    if (tab && tab !== 'payments' && window.goS) { try { var b = document.querySelector('#bnav [data-s="' + tab + '"]'); goS(tab, b || undefined); } catch (e) {} }
+    if (!fromBack && history.state && history.state.wl) { try { history.back(); } catch (e) {} }
+  }
+  addEventListener('popstate', function () { if (isOpen) close('', true); });
+  function signed() { try { return !!(window.user && window.HM_TOKEN); } catch (e) { return false; } }
+  window.WALLET_HOST = { close: close, open: W, signed: signed };
+  function install() {
+    var g = window.goS; if (g && !g.__wl) { window.goS = function (id) { if (id === 'payments' && !keep) return W(); return g.apply(this, arguments); }; window.goS.__wl = 1; }
+    var o = window.hmOpen; if (o && !o.__wl) { window.hmOpen = function (screen, util) { if (screen === 'payments' && util) { keep = true; try { return o.apply(this, arguments); } finally { keep = false; } } if (screen === 'payments') return W(); return o.apply(this, arguments); }; window.hmOpen.__wl = 1; }
+    window.hmBusiness = function () { W('#go=biz'); };
+    ['hmSendSheet', 'hmPay'].forEach(function (n) { window[n] = function () { W('#go=send'); }; });
+    ['hmGetPaid', 'hmRequestSheet'].forEach(function (n) { window[n] = function () { W('#go=receive'); }; });
+  }
+  install(); addEventListener('DOMContentLoaded', install); addEventListener('load', function () { install(); setTimeout(install, 0); setTimeout(install, 1500); });
+  // a tap on any Wallet button opens the wallet straight away
+  document.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[onclick]'); if (!t) return; var c = t.getAttribute('onclick') || ''; if (/^\s*(goS|hmOpen)\('payments'(,\s*this)?\)\s*;?\s*$/.test(c)) { e.preventDefault(); e.stopPropagation(); W(); } else if (/hmOpen\('payments'\);\s*setTimeout\(hmBusiness/.test(c)) { e.preventDefault(); e.stopPropagation(); W('#go=biz'); } }, true);
+  // the wallet gets ready in the background once signed in, so it appears at once when tapped
+  var iv = setInterval(function () { var c = navigator.connection; if (c && c.saveData) return; if (signed()) { clearInterval(iv); setTimeout(frame, 1500); } }, 1000);
+  setTimeout(function () { clearInterval(iv); }, 600000);
+  if (/^#(payments|wallet)$/.test(location.hash)) addEventListener('load', function () { setTimeout(W, 300); });
+  // links that open a part of Haramain (#tab=worship …)
+  var m = /^#tab=(dashboard|worship|guide|more|profile)$/.exec(location.hash);
+  if (m) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} var go = function () { try { var b = document.querySelector('#bnav [data-s="' + m[1] + '"]'); goS(m[1], b || undefined); } catch (e) {} }; if (document.readyState === 'complete') go(); else addEventListener('load', function () { go(); setTimeout(go, 600); }); }
+})();</script>
 </body>
 </html>

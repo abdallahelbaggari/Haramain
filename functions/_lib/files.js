@@ -2,7 +2,7 @@
 // The Pi Browser cannot save files made inside the page or share them as files, so Haramain keeps a copy for
 // 30 days at a private, unguessable link: saving downloads it from that link, and sharing sends the link,
 // which opens (and previews in chat apps) as the full receipt image. Stored in the app's D1 database.
-const DBB = (env) => env.HM_DB || env.DB || null;
+import { DBB } from './transfers.js';
 
 export const TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'application/pdf': 'pdf', 'text/csv': 'csv' };
 export const MAX_BYTES = 12 * 1024 * 1024;
