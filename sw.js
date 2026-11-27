@@ -3,7 +3,7 @@
    and used from the next opening (first visit and offline work the same way).
    Versioned files (?v=), icons, logo and onboarding photos: cache first.
    Server functions (payments, prices, live location, AI…) are never cached. */
-var CACHE = 'haramain-v18';
+var CACHE = 'haramain-v19';
 var SHELL = ['/', '/index.html', '/logo.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 var LIVE = /^\/(approve|complete|cancel-payment|pi-price|fx|ai|alerts|live|family|lf|quran|quran-audio|verify|transfer|users|file|f|r|history|setup\.html|validation-key\.txt|recover|staff|report|merchants)(\/|$|\?)/;
 
@@ -32,13 +32,12 @@ self.addEventListener('fetch', function (e) {
       .catch(function () { return caches.match(r).then(function (hit) { return hit || Response.error(); }); }));
     return;
   }
-  var net = fetch(r).then(function (res) {
-    if (res && res.ok && !res.redirected) { var cp = res.clone(); caches.open(CACHE).then(function (c) { c.put(r, cp); }); }
-    return res;
-  });
   e.respondWith(caches.match(r).then(function (hit) {
-    if (hit) { e.waitUntil(net.catch(function () {})); return hit; }
-    return net.catch(function () { return r.mode === 'navigate' ? caches.match('/index.html').then(function (h) { return h || caches.match('/'); }) : Response.error(); });
+    if (hit) { refreshLater(e, r, hit); return hit; }
+    return fetch(r).then(function (res) {
+      if (res && res.ok && !res.redirected) { var cp = res.clone(); caches.open(CACHE).then(function (c) { c.put(r, cp); }); }
+      return res;
+    }).catch(function () { return r.mode === 'navigate' ? caches.match('/index.html').then(function (h) { return h || caches.match('/'); }) : Response.error(); });
   }));
 });
 self.addEventListener('notificationclick', function (e) {
@@ -61,3 +60,13 @@ self.addEventListener('message', function (e) {
     }));
   }));
 });
+
+// the saved copy is refreshed quietly, at most every 10 minutes and 20 seconds after opening,
+// so sign-in and payments always get the connection first
+function refreshLater(e, r, hit) {
+  var d = hit.headers.get('date'), age = d ? Date.now() - Date.parse(d) : Infinity;
+  if (age < 600000) return;
+  e.waitUntil(new Promise(function (ok) { setTimeout(ok, 20000); }).then(function () {
+    return fetch(r).then(function (res) { if (res && res.ok && !res.redirected) return caches.open(CACHE).then(function (c) { return c.put(r, res); }); });
+  }).catch(function () {}));
+}
