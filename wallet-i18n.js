@@ -16,7 +16,7 @@
   };
   document.documentElement.lang = lang;
   if (lang === 'ar') document.documentElement.dir = 'rtl';
-  if (lang !== 'en') document.write('<script src="wallet-i18n/' + lang + '.js?v=edbc9a1d1f"><\/script>');
+  if (lang !== 'en') document.write('<script src="wallet-i18n/' + lang + '.js?v=0744358e8a"><\/script>');
 
   // the greeting carries the user's name, so it is matched by its start
   var PRE = ['Good morning', 'Good afternoon', 'Good evening'];

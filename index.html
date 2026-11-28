@@ -3231,7 +3231,18 @@ function piLogin() {
     /* ✅ MAINNET */
     Pi.init({ version: "2.0", sandbox: window.PI_SANDBOX });
 
-    Pi.authenticate(['username', 'payments', 'wallet_address'], onIncompletePayment)
+    var NET_ERR = /network|timeout|timed out|failed to fetch|consent|connection|offline/i;
+    var tryAuth = function(n) {
+      return Pi.authenticate(['username', 'payments', 'wallet_address'], onIncompletePayment).catch(function(err) {
+        var why = String((err && (err.message || err.error || err)) || '');
+        if (!NET_ERR.test(why) || n >= 4) throw err;
+        if (status) status.textContent = 'Weak connection. Trying again…';
+        return new Promise(function(ok) { setTimeout(ok, 2500 * n); }).then(function() {
+          if (navigator.onLine === false) return new Promise(function(ok) { window.addEventListener('online', ok, { once: true }); setTimeout(ok, 15000); });
+        }).then(function() { return tryAuth(n + 1); });
+      });
+    };
+    tryAuth(1)
       .then(function(auth) {
         user = auth.user;
         window.HM_TOKEN = auth.accessToken;
@@ -3245,7 +3256,8 @@ function piLogin() {
         console.error('[Haramain] Auth error:', err);
         if (btn) btn.disabled = false;
         if (btnText) btnText.textContent = 'Sign In with Pi';
-        if (status) status.textContent = 'Open in Pi Browser to sign in';
+        var why = String((err && (err.message || err.error || err)) || '');
+        if (status) status.textContent = NET_ERR.test(why) ? 'No connection to Pi right now. Check your internet and tap Sign in again.' : 'Sign-in did not complete. Please tap Sign in again.';
       });
 
   } else {
