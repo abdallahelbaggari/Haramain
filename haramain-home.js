@@ -66,7 +66,7 @@
   var QA = [['💎', 'Wallet', "goS('payments')", 'w'], ['📖', 'Quran', "goS('quran')", 'g'], ['🕰️', 'Prayer times', "hmOpen('worship')", 'g'], ['🧭', 'Qibla', "hmOpen('worship','qibla')", 'g'],
     ['🕋', 'Tawaf', "hmOpen('worship','tawaf')", 'o'], ['🤲', 'Duas', "hmOpen('worship','dua-lib')", 'o'], ['📜', '40 Hadith', "goS('hadith')", 'o'], ['🆘', 'Emergency', "hmOpen('emergency')", 'r']];
   function piCard() {
-    var p = window.PiPrice && PiPrice.get && PiPrice.get(), l = window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'NGN', sym: '₦', rate: null };
+    var p = window.PiPrice && PiPrice.get && PiPrice.get(), l = window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'USD', sym: '$', rate: null };
     var ch = p && typeof p.change24h === 'number' ? p.change24h : null;
     var big = !p || !p.usd ? '—' : (l.rate && l.code !== 'SAR' && l.code !== 'USD' ? l.sym + num(l.rate, l.rate < 10 ? 3 : 2) : 'SAR ' + num(p.sar, 4));
     return '<div class="hh-pi" role="button" tabindex="0" onclick="goS(\'payments\')">' +

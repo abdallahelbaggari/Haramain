@@ -1572,7 +1572,7 @@ select.fi{cursor:pointer;}
         <div class="ibox">Make a card with your name, hotel, group and tent. If you get lost, show the QR or the screen to a staff member or anyone helping you, so they can take you back or call your group.</div>
         <div class="ic">
           <div class="fg"><label class="flbl">Full Name</label><input class="fi" id="lost-name" type="text" placeholder="Your full name"></div>
-          <div class="fg"><label class="flbl">Country</label><input class="fi" id="lost-country" type="text" placeholder="e.g. Nigeria"></div>
+          <div class="fg"><label class="flbl">Country</label><input class="fi" id="lost-country" type="text" placeholder="Your country"></div>
           <div class="fg"><label class="flbl">Hotel Name</label><input class="fi" id="lost-hotel" type="text" placeholder="Hotel name"></div>
           <div class="frow">
             <div class="fg"><label class="flbl">Group / Agency</label><input class="fi" id="lost-group" type="text" placeholder="Group name"></div>
@@ -2303,7 +2303,7 @@ select.fi{cursor:pointer;}
       <div class="up" id="up-budget">
         <div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">💰 Budget Planner</div></div>
         <div class="ic"><div class="ic-title">Set Total Budget</div>
-          <div class="frow"><div class="fg"><label class="flbl">Budget (π)</label><input class="fi" type="number" id="bud-total" placeholder="e.g. 5000" oninput="updateBudget()"></div><div class="fg"><label class="flbl">Currency</label><select class="fi" id="bud-curr" onchange="updateBudget()"><option value="SAR">SAR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="NGN">NGN</option><option value="PKR">PKR</option></select></div></div>
+          <div class="frow"><div class="fg"><label class="flbl">Budget (π)</label><input class="fi" type="number" id="bud-total" placeholder="e.g. 5000" oninput="updateBudget()"></div><div class="fg"><label class="flbl">Currency</label><select class="fi" id="bud-curr" onchange="updateBudget()"><option value="SAR">SAR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="EUR">EUR</option><option value="PKR">PKR</option></select></div></div>
         </div>
         <div id="budget-cats"></div>
         <div class="ic">
@@ -2595,7 +2595,7 @@ select.fi{cursor:pointer;}
       <div style="text-align:center;padding:1rem 0 .5rem">
         <div style="font-family:var(--serif);font-size:1.1rem;color:var(--gold2);letter-spacing:.12em">HARAMAIN</div>
         <div style="font-size:11.5px;color:var(--gold);letter-spacing:.1em;margin:.15rem 0">haramain.pi</div>
-        <div style="font-size:11.5px;color:var(--t4)">© 2026 Haramain · Built for Pi Browser</div>
+        <div style="font-size:11.5px;color:var(--t4)">© 2026 Haramain · haramain.pi</div>
       </div>
     </section>
 
@@ -3930,7 +3930,7 @@ function calcPi(){
   var p=parseFloat((document.getElementById('pi-p')||{}).value)||0.17;
   var el=document.getElementById('pi-res');if(!el)return;
   if(!a){el.textContent='Enter amount above';return;}
-  el.innerHTML=a+'π = $'+( a*p).toFixed(2)+' · £'+(a*p*.79).toFixed(2)+' · ﷼'+(a*p*3.75).toFixed(2)+'<br>₦'+(a*p*1580).toFixed(0)+' · ₨'+(a*p*278).toFixed(0)+' · Rp'+(a*p*16200).toFixed(0);
+  el.innerHTML=a+'π = $'+( a*p).toFixed(2)+' · £'+(a*p*.79).toFixed(2)+' · ﷼'+(a*p*3.75).toFixed(2)+'<br>₨'+(a*p*278).toFixed(0)+' · Rp'+(a*p*16200).toFixed(0);
 }
 function spi(n){var e=document.getElementById('pi-a');if(e){e.value=n;calcPi();}}
 
@@ -3993,7 +3993,7 @@ function updateBudget(){
   var alloc=Object.values(budgetData).reduce(function(a,b){return a+(+b);},0);
   var rem=total-alloc;
   var curr=(document.getElementById('bud-curr')||{}).value||'SAR';
-  var rates={SAR:3.75,USD:1,GBP:0.79,NGN:1580,PKR:278};
+  var rates={SAR:3.75,USD:1,GBP:0.79,EUR:0.92,PKR:278};
   var r=rates[curr]||1;
   var st=document.getElementById('bud-show-total');if(st)st.textContent=total+'π ($'+(total*0.17).toFixed(0)+')';
   var sa=document.getElementById('bud-allocated');if(sa)sa.textContent=alloc+'π';
@@ -4031,7 +4031,6 @@ function renderZamzam(){
   '<div class="sr"><span class="sk">United Kingdom</span><span class="sv">5 litres via airline · checked</span></div>'+
   '<div class="sr"><span class="sk">United States</span><span class="sv">Unlimited · personal use</span></div>'+
   '<div class="sr"><span class="sk">European Union</span><span class="sv">5 litres · liquid restrictions</span></div>'+
-  '<div class="sr"><span class="sk">Nigeria</span><span class="sv">10 litres · declaration</span></div>'+
   '</div>';
 }
 
@@ -4521,7 +4520,7 @@ function getReceiptText(rid, amt, memo, txid) {
     'Network: Pi Network\n' +
     'Status: ✅ Confirmed & Blockchain Verified\n' +
     '━━━━━━━━━━━━━━━━━━━\n' +
-    'Powered by Haramain.pi · ' + new Date().toLocaleString();
+    'Haramain · haramain.pi · ' + new Date().toLocaleString();
 }
 
 function shareReceiptWhatsApp(rid, amt, memo, txid) {
@@ -5373,7 +5372,7 @@ function shareApp() {
   var text = '🕋 I am using Haramain, a Hajj & Umrah companion on Pi Network.\n\n' +
     '📍 Prayer times · Qibla · Hajj & Umrah steps · duas · emergency help\n' +
     '👤 My Pilgrim ID: ' + myPilgrimId + '\n\n' +
-    '🔗 Get it: https://haramain.pages.dev\n' +
+    '🔗 Haramain · haramain.pi\n' +
     'Or open haramain.pi in Pi Browser';
   if (navigator.share) {
     navigator.share({ title: 'Haramain — Hajj & Umrah companion', text: text }).catch(function(){});
@@ -5573,16 +5572,7 @@ var noMovementTimer = null;
 var lastMovementTime = Date.now();
 var emerContacts = JSON.parse(localStorage.getItem(K+'emerContacts') || '[]');
 
-var EMBASSIES = {
-  'NG': { country: 'Nigeria', phone: '+966112882020', address: 'Riyadh, Saudi Arabia' },
-  'ID': { country: 'Indonesia', phone: '+966112800000', address: 'Riyadh, Saudi Arabia' },
-  'PK': { country: 'Pakistan', phone: '+966112882444', address: 'Riyadh, Saudi Arabia' },
-  'MY': { country: 'Malaysia', phone: '+966112882700', address: 'Riyadh, Saudi Arabia' },
-  'BD': { country: 'Bangladesh', phone: '+966112882300', address: 'Riyadh, Saudi Arabia' },
-  'IN': { country: 'India', phone: '+966112882200', address: 'Riyadh, Saudi Arabia' },
-  'EG': { country: 'Egypt', phone: '+966112882100', address: 'Riyadh, Saudi Arabia' },
-  'TR': { country: 'Turkey', phone: '+966112882500', address: 'Riyadh, Saudi Arabia' },
-};
+/* Embassy contacts come from the official directory of the Saudi Ministry of Foreign Affairs */
 
 function initEmergency() {
   // Start GPS tracking
@@ -5641,7 +5631,7 @@ function buildEmerMessage() {
     '📍 Location: ' + (emerLat || 'N/A') + ', ' + (emerLng || 'N/A') + '\n' +
     '🗺️ Map: ' + mapsUrl + '\n' +
     '🕐 Time: ' + new Date().toLocaleString() + '\n' +
-    '📱 HARAMAIN Emergency System · haramain.pages.dev';
+    '📱 Haramain · haramain.pi';
 }
 
 function updateEmerMessage() {
@@ -5699,15 +5689,11 @@ function removeEmerContact(i) {
 function renderEmbassy() {
   var el = document.getElementById('emer-embassy-box');
   if (!el) return;
-  // Default to showing all major embassies
-  var entries = Object.values(EMBASSIES).slice(0, 4);
-  el.innerHTML = entries.map(function(e) {
-    return '<div class="embassy-item">' +
-      '<div><div style="font-size:15.5px;font-weight:700;color:var(--t1)">' + e.country + ' Embassy</div>' +
-      '<div style="font-family:var(--dm);font-size:11.6px;color:var(--t3)">' + e.address + '</div></div>' +
-      '<button class="btn btn-ghost" style="font-size:12.3px;padding:.2rem .5rem" onclick="callEmergency(\'' + e.phone + '\')">Call</button>' +
+  el.innerHTML = '<div class="embassy-item">' +
+      '<div><div style="font-size:15.5px;font-weight:700;color:var(--t1)">Your embassy in Saudi Arabia</div>' +
+      '<div style="font-family:var(--dm);font-size:11.6px;color:var(--t3)">Ministry of Foreign Affairs directory</div></div>' +
+      '<button class="btn btn-ghost" style="font-size:12.3px;padding:.2rem .5rem" onclick="window.open(\'https://www.mofa.gov.sa\',\'_blank\')">Open</button>' +
     '</div>';
-  }).join('');
 }
 
 function toggleNoMovement() {
@@ -6455,7 +6441,7 @@ function exportItinerary() {
     });
     text += '\n';
   });
-  text += 'Generated by HARAMAIN · haramain.pages.dev\nMay Allah accept your Hajj 🤲';
+  text += 'Haramain · haramain.pi\nMay Allah accept your Hajj 🤲';
   if (navigator.share) {
     navigator.share({ title: 'My Hajj Itinerary', text: text }).catch(function(){});
   } else if (navigator.clipboard) {
@@ -7003,7 +6989,7 @@ function buildTrackerMsg() {
     '📍 Zone: ' + (zone ? zone.name : 'Unknown') + '\n' +
     '🗺️ Map: https://maps.google.com?q=' + trackerLat + ',' + trackerLng + '\n' +
     '🕐 Time: ' + new Date().toLocaleTimeString() + '\n' +
-    '📱 HARAMAIN · haramain.pages.dev';
+    '📱 Haramain · haramain.pi';
 }
 
 console.log('[HARAMAIN v3.0] ✅ 10 Advanced Utilities loaded · Payments untouched · Saudi-grade infrastructure');
@@ -8110,20 +8096,20 @@ function orderQurbani(){
 }
 </script>
 <script>/* Testnet copy: same code, a clear label so nobody mistakes test Pi for real Pi */(function(){if(!/(^|[.-])testnet[.-]/i.test(location.hostname))return;document.title="[Testnet] "+document.title;var b=document.createElement("div");b.textContent="TESTNET";b.setAttribute("aria-label","Testnet: test Pi only");b.style.cssText="position:fixed;left:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:99999;padding:3px 10px;border-radius:999px;background:#B45309;color:#fff;font:800 11px/1.4 system-ui,sans-serif;letter-spacing:.06em;pointer-events:none;opacity:.92";(document.body||document.documentElement).appendChild(b);})();</script>
-<script src="pi-price-widget.js?v=6"></script>
+<script src="pi-price-widget.js?v=7"></script>
 <script src="prayer-calc.js?v=1"></script>
-<script src="haramain-pro.js?v=6"></script>
+<script src="haramain-pro.js?v=7"></script>
 <script src="haramain-daily.js?v=3"></script>
-<script src="haramain-tools.js?v=1"></script>
+<script src="haramain-tools.js?v=2"></script>
 <script src="haramain-quran.js?v=2"></script>
-<script src="haramain-live.js?v=1"></script>
+<script src="haramain-live.js?v=2"></script>
 <script src="haramain-adhkar.js?v=1"></script>
 <script src="haramain-receipt.js?v=3"></script>
-<script src="haramain-wallet.js?v=19"></script>
-<script src="haramain-transfer.js?v=10"></script>
+<script src="haramain-wallet.js?v=20"></script>
+<script src="haramain-transfer.js?v=11"></script>
 <script src="haramain-notify.js?v=2"></script>
 <script src="haramain-fin.js?v=5"></script>
-<script src="haramain-home.js?v=5"></script>
+<script src="haramain-home.js?v=6"></script>
 <script src="haramain-nav.js?v=5"></script>
 <script src="haramain-habit.js?v=3"></script>
 <script src="haramain-onboarding.js?v=3"></script>

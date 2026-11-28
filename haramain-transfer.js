@@ -15,7 +15,7 @@
   var me = function () { return (typeof user !== 'undefined' && user && !user.guest) ? user.username : ''; };
   var fullName = function () { return get('fullname', '') || (me() ? '@' + me() : 'Guest'); };
   var price = function () { return window.PiPrice && PiPrice.get(); };
-  var loc = function () { return window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'NGN', sym: '₦', rate: null }; };
+  var loc = function () { return window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'USD', sym: '$', rate: null }; };
   var r7 = function (n) { return Math.round(Number(n) * 1e7) / 1e7; };
   var api = function (path, body) { return fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}).then(function (r) { return r.json(); }); };
   var CFG = { enabled: false, fee: 0.01, max: 50, daily: 200 };

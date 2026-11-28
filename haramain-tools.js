@@ -5,7 +5,7 @@
   var K = window.K || 'hm_v1_';
   var get = function (k, d) { try { var v = localStorage.getItem(K + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
   var put = function (k, v) { try { localStorage.setItem(K + k, JSON.stringify(v)); } catch (e) {} };
-  var CUR = [['SAR', 'Saudi riyal'], ['PI', 'Pi (π)'], ['USD', 'US dollar'], ['NGN', 'Nigerian naira'], ['PKR', 'Pakistani rupee'], ['INR', 'Indian rupee'], ['IDR', 'Indonesian rupiah'],
+  var CUR = [['SAR', 'Saudi riyal'], ['PI', 'Pi (π)'], ['USD', 'US dollar'], ['NGN', 'Naira'], ['PKR', 'Pakistani rupee'], ['INR', 'Indian rupee'], ['IDR', 'Indonesian rupiah'],
     ['BDT', 'Bangladeshi taka'], ['EGP', 'Egyptian pound'], ['TRY', 'Turkish lira'], ['MYR', 'Malaysian ringgit'], ['GBP', 'British pound'], ['EUR', 'Euro'], ['AED', 'UAE dirham'],
     ['KWD', 'Kuwaiti dinar'], ['QAR', 'Qatari riyal'], ['XOF', 'West African CFA'], ['XAF', 'Central African CFA'], ['GHS', 'Ghanaian cedi'], ['DZD', 'Algerian dinar'], ['MAD', 'Moroccan dirham'], ['SDG', 'Sudanese pound'], ['IRR', 'Iranian rial'], ['UZS', 'Uzbek som']];
   var FX = { rates: get('fx', null), busy: false };
@@ -61,7 +61,7 @@
     if (grid) grid.insertAdjacentHTML('beforeend',
       '<div class="tc tc-blue" onclick="oUtil(\'fx\')"><span class="tc-icon">💱</span><div class="tc-name">Currency Converter</div><div class="tc-desc">SAR · Pi · live rates</div></div>' +
       '<div class="tc tc-gold" onclick="oUtil(\'dates\')"><span class="tc-icon">📅</span><div class="tc-name">Date Converter</div><div class="tc-desc">Hijri ↔ Gregorian</div></div>');
-    var sel = get('fxsel', { from: 'SAR', to: 'NGN' }), opts = function (v) { return CUR.map(function (c) { return '<option value="' + c[0] + '"' + (c[0] === v ? ' selected' : '') + '>' + c[0] + ' · ' + c[1] + '</option>'; }).join(''); };
+    var sel = get('fxsel', { from: 'SAR', to: 'USD' }), opts = function (v) { return CUR.map(function (c) { return '<option value="' + c[0] + '"' + (c[0] === v ? ' selected' : '') + '>' + c[0] + ' · ' + c[1] + '</option>'; }).join(''); };
     var h = window.HM_CAL && HM_CAL.hijri(new Date()) || { y: 1448, m: 1, d: 1 };
     sec.insertAdjacentHTML('beforeend',
       '<div class="up" id="up-fx"><div class="up-hdr"><button class="back-btn" onclick="cUtil()">←</button><div class="up-title">💱 Currency Converter</div></div>' +

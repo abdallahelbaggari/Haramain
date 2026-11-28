@@ -81,6 +81,7 @@
 
   /* ── icons (Feather, MIT) ── */
   var P = {
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>', half: '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
     scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/>',
     pos: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="16" y2="18"/>',
     pin: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
@@ -149,8 +150,10 @@
   function fpi(n) { return Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 7 }); }
   var REG = { NG: 'NGN', PK: 'PKR', IN: 'INR', ID: 'IDR', BD: 'BDT', EG: 'EGP', TR: 'TRY', MY: 'MYR', GB: 'GBP', SA: 'SAR', AE: 'AED', GH: 'GHS', KE: 'KES', PH: 'PHP', VN: 'VND', US: 'USD', CN: 'CNY', KR: 'KRW', JP: 'JPY', TH: 'THB', CA: 'CAD', AU: 'AUD', DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR', NL: 'EUR', BR: 'BRL', MX: 'MXN', ZA: 'ZAR', MA: 'MAD', CM: 'XAF', SN: 'XOF', CI: 'XOF', UG: 'UGX', TZ: 'TZS', ET: 'ETB' };
   function curr() { var c = get('cur', ''); if (c) return c; var m = /[-_]([A-Z]{2})\b/.exec(navigator.language || ''); return (m && REG[m[1]]) || 'USD'; }
-  var DN = null; try { DN = new Intl.DisplayNames(['en'], { type: 'currency' }); } catch (e) {}
-  function cname(c) { try { return DN ? DN.of(c) : c; } catch (e) { return c; } }
+  var DN = null; try { DN = new Intl.DisplayNames([UIL()], { type: 'currency' }); } catch (e) {}
+  // dates in the interface follow the chosen language (documents and shared text stay in English)
+  function UIL() { var l = window.FPL && FPL.lang ? FPL.lang() : 'en'; return l === 'en' || l === 'ha' ? 'en-GB' : l; }
+  function cname(c) { if (c === 'NGN') return (window.FPL && FPL.lang() === 'ar') ? 'نايرا' : 'Naira'; try { return DN ? DN.of(c) : c; } catch (e) { return c; } }
   function money(v, c, dp) {
     if (v == null || isNaN(v)) return '—';
     var d = dp != null ? dp : (v === 0 || Math.abs(v) >= 1000 ? (v === 0 ? 2 : 0) : Math.abs(v) >= 1 ? 2 : 4);
@@ -165,7 +168,7 @@
   }
   function cur2() { var t = get('cur2', ''); return t && t !== curr() && t !== 'USD' ? t : ''; }
   function conv(a) { var c = curr(), r = rateIn(c), u = rateIn('USD'), t = cur2(), rt = t ? rateIn(t) : 0; if (!(a > 0) || !u) return ''; return '≈ ' + money(a * u, 'USD') + (r && c !== 'USD' ? ' · ' + money(a * r, c) : '') + (rt ? ' · ' + money(a * rt, t) : ''); }
-  function ago(t) { var s = Math.max(0, (Date.now() - t) / 1000); return s < 60 ? 'just now' : s < 3600 ? Math.round(s / 60) + ' min ago' : s < 86400 ? Math.round(s / 3600) + ' h ago' : new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
+  function ago(t) { var s = Math.max(0, (Date.now() - t) / 1000); return s < 60 ? 'just now' : s < 3600 ? Math.round(s / 60) + ' min ago' : s < 86400 ? Math.round(s / 3600) + ' h ago' : new Date(t).toLocaleDateString(UIL(), { day: 'numeric', month: 'short' }); }
   function short(a) { a = String(a || ''); return a.length > 16 ? a.slice(0, 6) + '…' + a.slice(-6) : a; }
   function spark(arr, w, h, col, area) {
     if (!arr || arr.length < 2) return '';
@@ -181,6 +184,13 @@
   var tT = null;
   function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tT); tT = setTimeout(function () { t.classList.remove('on'); }, 3200); }
   window.toast = toast;
+  /* ── appearance: automatic (follows the phone), light or dark ── */
+  var THEMES = [['auto', 'Automatic', 'half'], ['light', 'Light', 'sun'], ['dark', 'Dark', 'moon']];
+  function wantDark() { var m = get('theme', 'auto'); if (m === 'dark') return true; if (m === 'light') return false; return !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
+  function applyTheme() { var d = wantDark(); document.documentElement.classList.toggle('dk', d); var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.content = d ? '#08140F' : '#07462F'; }
+  function themeName() { var m = get('theme', 'auto'); return THEMES.filter(function (x) { return x[0] === m; })[0][1]; }
+  applyTheme();
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
   function sheet(title, body, o) {
     o = o || {};
     if (!o.stack) closeSheets();
@@ -376,7 +386,7 @@
   function valTxt(r) { return r && r.usd ? (r.lr && r.lc && r.lc !== 'USD' ? money(r.amount * r.lr, r.lc) + ' · ' : '') + money(r.amount * r.usd, 'USD') : ''; }
   function rateTxt(r) { return r && r.usd ? '1 π = ' + money(r.usd, 'USD', 4) + (r.lr && r.lc && r.lc !== 'USD' ? ' · ' + money(r.lr, r.lc, r.lr < 1 ? 4 : 2) : '') : ''; }
   function spec(r) {
-    var d = new Date(r.ts), when = [['Date', d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })], ['Time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })]];
+    var d = new Date(r.ts), when = [['Date', d.toLocaleDateString(UIL(), { day: 'numeric', month: 'long', year: 'numeric' })], ['Time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })]];
     var sub = r.usd ? '≈ ' + money(r.amount * r.usd, 'USD') + (r.lr && r.lc && r.lc !== 'USD' ? ' · ' + money(r.amount * r.lr, r.lc) : '') + ' at payment time' : '';
     var mine = (get('name', '') || '@' + (r.me || me())) + (get('name', '') && (r.me || me()) ? ' (@' + (r.me || me()) + ')' : '');
     var base = { amount: fpi(r.amount), sub: sub, verify: verifyUrl(r), status: { text: '✓  Verified on the Pi blockchain', ok: true } };
@@ -428,7 +438,7 @@
     if (r.usd) rows.push(['Value at payment time', (r.lr && r.lc && r.lc !== 'USD' ? money(r.amount * r.lr, r.lc) + ' · ' : '') + money(r.amount * r.usd, 'USD')]);
     if (rateTxt(r)) rows.push([Math.abs((r.saved || r.ts) - r.ts) > 3600e3 ? 'Pi rate (when saved)' : 'Pi rate', rateTxt(r)]);
     if (fee) rows.push(['Amount', fpi(r.amount) + ' π'], ['Blockchain fee', fpi(fee) + ' π'], ['Total paid', fpi(r7(Number(r.amount) + fee)) + ' π']);
-    rows.push(['Date', d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })], ['Time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })], ['Network', r.net || NETN], ['Status', 'Completed']);
+    rows.push(['Date', d.toLocaleDateString(UIL(), { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })], ['Time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })], ['Network', r.net || NETN], ['Status', 'Completed']);
     if (r.pid) rows.push([r.kind === 'supporter' ? 'Payment ID' : 'Reference', r.pid, 1]);
     if (r.kind === 'wallet') { if (r.from) rows.push(['Sender address', r.from, 1]); if (inn ? r.to : r.addr) rows.push(['Recipient address', inn ? r.to : r.addr, 1]); }
     else if (r.addr) rows.push([inn || r.kind === 'refund' ? 'Your address' : 'Recipient address', r.addr, 1]);
@@ -628,14 +638,14 @@
   function sendSheet(pre) {
     pre = pre || {};
     var addrOn = true, userOn = S.cfg.enabled ? !!S.cfg.usernames : true, okName = '', kind = !userOn || (pre.u && isG(pre.u)) ? 'addr' : 'user';
-    var payees = contacts().map(function (c) { return c.to; }).concat(get('payees', [])).filter(function (p, i, L) { return (userOn || isG(p)) && L.map(function (q) { return q.toLowerCase(); }).indexOf(p.toLowerCase()) === i; }).slice(0, 8);
+    var payees = favs().map(function (c) { return c.to; }).concat(contacts().map(function (c) { return c.to; })).concat(get('payees', [])).filter(function (p, i, L) { return (userOn || isG(p)) && L.map(function (q) { return q.toLowerCase(); }).indexOf(p.toLowerCase()) === i; }).slice(0, 8);
     var w = sheet('Send Pi',
       (pre.link || pre.x && pre.a ? '<div class="note gray" style="margin-bottom:8px">' + ic('qr') + '<span>Payment request from ' + esc(isG(pre.u) ? short(pre.u) : '@' + pre.u) + (pre.a ? ' for <b>' + fpi(pre.a) + ' π</b>' : '') + (pre.x ? ' · “' + esc(pre.x) + '”' : '') + '. Check it is someone you know.</span></div>' : '') +
       (userOn ? '<div class="seg" role="tablist" style="margin-bottom:4px"><button type="button" data-k="user">Username</button><button type="button" data-k="addr">Wallet address</button></div>' : '') +
       '<div id="k-user"><label class="l" for="s-u">To</label><div class="to"><span>@</span><input id="s-u" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="username" maxlength="60"></div></div>' +
       '<div id="k-addr" hidden><label class="l" for="s-g">Pi wallet address</label><textarea class="in num" id="s-g" rows="2" maxlength="60" autocapitalize="characters" spellcheck="false" placeholder="G…" style="font-size:14px;resize:none"></textarea></div>' +
       '<div class="hint" id="s-uh"></div>' +
-      (payees.length && !pre.u ? '<div class="chips" style="margin-top:2px">' + payees.map(function (p) { return '<button type="button" class="chip" data-pu="' + esc(p) + '">' + (isG(p) ? ic('card', 'width:15px;height:15px;vertical-align:-3px') + ' ' : '') + esc(cName(p) || toLabel(p)) + '</button>'; }).join('') + '</div>' : '') +
+      (payees.length && !pre.u ? '<div class="chips" style="margin-top:2px">' + payees.map(function (p) { return '<button type="button" class="chip" data-pu="' + esc(p) + '">' + (favs().some(function (c) { return c.to.toLowerCase() === p.toLowerCase(); }) ? ic('star', 'width:14px;height:14px;vertical-align:-2px;color:#E0B24E;fill:currentColor') + ' ' : isG(p) ? ic('card', 'width:15px;height:15px;vertical-align:-3px') + ' ' : '') + esc(cName(p) || toLabel(p)) + '</button>'; }).join('') + '</div>' : '') +
       '<label class="l" for="s-a">Amount</label><div class="amt"><input id="s-a" type="number" inputmode="decimal" min="0" step="any" placeholder="0.00"><span>π</span></div><div class="hint num" id="s-c"></div>' +
       '<label class="l">Category</label><div class="chips" id="s-cat">' + CATS.map(function (c) { return '<button type="button" class="chip" data-c="' + c + '">' + c + '</button>'; }).join('') + '</div>' +
       '<label class="l" for="s-x">Narration</label><input class="in" id="s-x" maxlength="80" placeholder="What is it for? e.g. Rent, groceries, gift">' +
@@ -1254,7 +1264,7 @@
       '<div class="stats"><div><small>7-day low</small><b>' + money(mn, 'USD', 4) + '</b></div><div><small>7-day high</small><b>' + money(mx, 'USD', 4) + '</b></div><div><small>In ' + esc(c) + '</small><b>' + (r ? money(r, c, r < 1 ? 4 : 2) : '—') + '</b></div></div>' ;
   }
   function curSheet(travel) {
-    var codes = S.fx ? Object.keys(S.fx).filter(function (c) { return /^[A-Z]{3}$/.test(c); }) : ['USD', 'NGN', 'SAR'];
+    var codes = S.fx ? Object.keys(S.fx).filter(function (c) { return /^[A-Z]{3}$/.test(c); }) : ['USD', 'SAR', 'EUR'];
     if (codes.indexOf('USD') < 0) codes.push('USD');
     var list = codes.map(function (c) { return { c: c, n: cname(c) }; }).sort(function (a, b) { return a.n.localeCompare(b.n); });
     var cur = travel ? get('cur2', '') : curr();
@@ -1283,12 +1293,14 @@
   /* ── month maths ── */
   function monthRange(off) { var d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); d.setMonth(d.getMonth() + (off || 0)); var e = new Date(d); e.setMonth(e.getMonth() + 1); return [d.getTime(), e.getTime(), d]; }
   function catKey(r) { return String(r.other || r.addr || '').replace(/^@/, '').toLowerCase(); }
+  var CATC = { Food: '#F59E0B', Transport: '#3B82F6', Shopping: '#EC4899', Bills: '#8B5CF6', Family: '#10B981', Business: '#0EA5E9', Gifts: '#F43F5E', Charity: '#14B8A6', Other: '#94A3B8', 'Not sorted': '#CBD5E1' };
+  function catC(c) { return CATC[c] || '#94A3B8'; }
   function catOf(r) { return r.cat || (get('catMap', {}) || {})[catKey(r)] || ''; }
   function rkeyOf(r) { return String(r.txid || r.pid || r.ts); }
   function catSort(off) {
     var m = monthRange(off || 0), L = rcpts().filter(function (r) { return r.dir === 'out' && r.kind !== 'refund' && r.kind !== 'supporter' && r.ts >= m[0] && r.ts < m[1] && !catOf(r); }).sort(function (a, b) { return b.ts - a.ts; });
     if (!L.length) { toast('All payments are sorted'); return render(S.tab); }
-    var w = sheet('Sort payments', '<p class="small muted" style="margin:0 2px 10px">Choose a category. Haramain remembers it for the same recipient.</p><div class="list">' + L.slice(0, 40).map(function (r) { return '<div class="li cs-li" data-ck="' + esc(rkeyOf(r)) + '"><span class="grow"><b>' + esc(r.other || short(r.addr)) + '</b><small>' + new Date(r.ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + (r.narr ? ' · ' + esc(r.narr) : '') + '</small></span><b class="num">−' + fpi(r.amount) + ' π</b><div class="chips cs-ch">' + CATS.map(function (c) { return '<button type="button" class="chip" data-cc="' + c + '">' + c + '</button>'; }).join('') + '</div></div>'; }).join('') + '</div>');
+    var w = sheet('Sort payments', '<p class="small muted" style="margin:0 2px 10px">Choose a category. Haramain remembers it for the same recipient.</p><div class="list">' + L.slice(0, 40).map(function (r) { return '<div class="li cs-li" data-ck="' + esc(rkeyOf(r)) + '"><span class="grow"><b>' + esc(r.other || short(r.addr)) + '</b><small>' + new Date(r.ts).toLocaleDateString(UIL(), { day: 'numeric', month: 'short' }) + (r.narr ? ' · ' + esc(r.narr) : '') + '</small></span><b class="num">−' + fpi(r.amount) + ' π</b><div class="chips cs-ch">' + CATS.map(function (c) { return '<button type="button" class="chip" data-cc="' + c + '">' + c + '</button>'; }).join('') + '</div></div>'; }).join('') + '</div>');
     $$('[data-cc]', w).forEach(function (b) {
       b.onclick = function () {
         var li = b.closest('[data-ck]'), k = li.dataset.ck, c = b.dataset.cc, R = rcpts(), hit = null;
@@ -1314,7 +1326,7 @@
   }
   function trendSvg() {
     var B = [], L = [];
-    for (var i = -5; i <= 0; i++) { var s0 = monthStats(i); B.push(Math.max(0, s0.out)); L.push(monthRange(i)[2].toLocaleDateString('en-GB', { month: 'short' })); }
+    for (var i = -5; i <= 0; i++) { var s0 = monthStats(i); B.push(Math.max(0, s0.out)); L.push(monthRange(i)[2].toLocaleDateString(UIL(), { month: 'short' })); }
     var mx = Math.max.apply(null, B.concat([0])), W = 300, H = 90, bw = W / 6;
     return '<svg class="tr-ch" viewBox="0 0 ' + W + ' ' + (H + 18) + '" role="img" aria-label="Spending in the last 6 months">' + B.map(function (v, i) { var h = mx ? Math.max(v ? 4 : 2, v / mx * (H - 16)) : 2; return '<rect x="' + (i * bw + bw * .22).toFixed(1) + '" y="' + (H - h).toFixed(1) + '" width="' + (bw * .56).toFixed(1) + '" height="' + h.toFixed(1) + '" rx="5" fill="' + (i === 5 ? '#19BA71' : '#C2FCE2') + '"><title>' + fpi(r7(v)) + ' π</title></rect>' + (v ? '<text x="' + (i * bw + bw / 2).toFixed(1) + '" y="' + (H - h - 4).toFixed(1) + '" text-anchor="middle" font-size="8.5" fill="#475569">' + fpi(Math.round(v)) + '</text>' : ''); }).join('') +
       L.map(function (l, i) { return '<text x="' + (i * bw + bw / 2).toFixed(1) + '" y="' + (H + 14) + '" text-anchor="middle" font-size="9.5" fill="#64748B"' + (i === 5 ? ' font-weight="700"' : '') + '>' + l + '</text>'; }).join('') + '</svg>';
@@ -1330,7 +1342,7 @@
   }
   function monthHTML() {
     var s = monthStats(0), b = get('budget', 0), u = rateIn('USD'), pct = b ? Math.min(100, s.out / b * 100) : 0;
-    return '<div class="row"><div class="grow"><h3>This month</h3><p>' + new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) + '</p></div><button type="button" class="lnk" data-tab="activity" data-seg="ins">Insights</button></div>' +
+    return '<div class="row"><div class="grow"><h3>This month</h3><p>' + new Date().toLocaleDateString(UIL(), { month: 'long', year: 'numeric' }) + '</p></div><button type="button" class="lnk" data-tab="activity" data-seg="ins">Insights</button></div>' +
       '<div class="stats"><div><small>Sent</small><b>' + fpi(s.out) + ' π</b></div><div><small>Received</small><b class="pos">' + fpi(s.inn) + ' π</b></div><div><small>Payments</small><b>' + s.n + '</b></div></div>' +
       (b ? '<div style="margin-top:12px" class="row small"><span class="grow muted">Budget ' + fpi(b) + ' π' + (u ? ' (' + money(b * u, 'USD') + ')' : '') + '</span><b class="num">' + Math.round(s.out / b * 100) + '%</b></div><div class="bar"><i class="' + (s.out > b ? 'over' : '') + '" style="width:' + pct + '%"></i></div>' : '<button type="button" class="lnk small" data-act="budget">+ Set a monthly budget</button>');
   }
@@ -1360,10 +1372,10 @@
   var T = {
     home: function () {
       var R = rcpts();
-      return '<div class="band"><div class="hello"><h1>' + hour() + (signedIn() ? ', @' + esc(me()) : '') + '</h1><p>' + (signedIn() ? 'Your Pi at a glance.' : '') + '</p>' + (signedIn() ? '' : '<button type="button" class="hello-si" data-act="signin"><span class="pi-dot">π</span>Sign in with Pi</button>') + '</div>' +
+      return '<div class="band"><div class="hello"><h1>' + hour() + (signedIn() ? ', @' + esc(me()) : '') + '</h1><p>' + (signedIn() ? 'Your finances at a glance.' : '') + '</p>' + (signedIn() ? '' : '<button type="button" class="hello-si" data-act="signin"><span class="pi-dot">π</span>Sign in with Pi</button>') + '</div>' +
         '<div class="hero" data-act="price" data-p="hero" role="button" tabindex="0" aria-label="Pi price details">' + heroHTML() + '</div></div>' +
         '<div class="qa"><button type="button" data-act="send"><i>' + ic('send') + '</i>Send</button><button type="button" data-act="request"><i class="t">' + ic('req') + '</i>Request</button><button type="button" data-act="scan"><i class="n">' + ic('qr') + '</i>Scan</button><button type="button" data-act="receive"><i class="a">' + ic('card') + '</i>Receive</button></div>' +
-        dueHTML() + '<div class="sec"><h2>Services</h2><button type="button" data-tab="pay">All services</button></div>' + svcGrid(HOME_SVC.map(svcById), 'home') + hook('home') + '<div class="sec"><h2>Overview</h2></div><div class="card" data-p="month">' + monthHTML() + '</div>' +
+        favHTML() + dueHTML() + '<div class="sec"><h2>Services</h2><button type="button" data-tab="pay">All services</button></div>' + svcGrid(HOME_SVC.map(svcById), 'home') + hook('home') + '<div class="sec"><h2>Overview</h2></div><div class="card" data-p="month">' + monthHTML() + '</div>' +
         '<div class="sec"><h2>Recent activity</h2>' + (R.length ? '<button type="button" data-tab="activity">See all</button>' : '') + '</div>' +
         (pendingList().length ? '<div class="list" style="margin-bottom:10px">' + pendingList().slice(0, 3).map(pendRow).join('') + '</div>' : '') +
         (R.length ? '<div class="list">' + R.slice(0, 4).map(txRow).join('') + '</div>' : pendingList().length ? '' : '<div class="list"><div class="empty">' + ic('act') + '<div>No payments yet.</div></div></div>') +
@@ -1371,7 +1383,7 @@
     },
     pay: function () {
       var pl = contacts().map(function (c) { return c.to; }).concat(get('payees', [])).filter(function (p, i, L) { return (isG(p) || userSends()) && L.map(function (q) { return q.toLowerCase(); }).indexOf(p.toLowerCase()) === i; });
-      return '<div class="ph"><h1>Tools</h1><p>Payments, business, receipts and tools.</p></div>' +
+      return '<div class="ph"><h1>Tools</h1><p>Payments, business and financial tools in one place.</p></div>' +
         '<div class="act-q sv-q">' + ic('search') + '<input class="in" id="sv-q" type="search" autocomplete="off" placeholder="Search services"></div>' +
         (pl.length ? '<div class="sec sv-again"><h2>Pay again</h2><button type="button" data-act="contacts">Contacts</button></div><div class="chips sv-again">' + pl.slice(0, 8).map(function (p) { return '<button type="button" class="chip" data-act="send-to" data-u="' + esc(p) + '">' + esc(cName(p) || toLabel(p)) + '</button>'; }).join('') + '</div>' : '') +
         SVC_G.map(function (g) { var L = SVC.filter(function (x) { return x.g === g[0]; }); return '<div class="sv-grp" data-g="' + g[0] + '"><div class="sec"><h2>' + g[1] + '</h2></div>' + svcGrid(L) + '</div>'; }).join('') +
@@ -1379,16 +1391,16 @@
     },
     wallet: function () {
       var c = curr();
-      return '<div class="ph"><h1>Balance</h1><p>Live Pi rate in any currency, converter and blockchain tools.</p></div>' +
+      return '<div class="ph"><h1>Balance</h1><p>Real-time Pi rates, conversion and blockchain insights.</p></div>' +
         '<div class="card" data-p="wchart">' + wChartHTML() + '</div>' +
         '<div class="sec"><h2>Converter</h2><button type="button" data-act="currency">' + esc(c) + ' ▾</button></div>' +
         '<div class="card conv"><label><span>π</span><input id="cv-pi" type="number" inputmode="decimal" value="1" aria-label="Pi"></label><label><span>USD</span><input id="cv-usd" type="number" inputmode="decimal" aria-label="US dollars"></label>' + (c !== 'USD' ? '<label><span>' + esc(c) + '</span><input id="cv-loc" type="number" inputmode="decimal" aria-label="' + esc(cname(c)) + '"></label>' : '') + (cur2() ? '<label class="cv-tr"><span>' + esc(cur2()) + '</span><input id="cv-tr" type="number" inputmode="decimal" aria-label="' + esc(cname(cur2())) + '"></label>' : '') + '</div>' + '<button type="button" class="lnk" data-act="travel" style="margin:8px 4px 0">' + ic('globe', 'width:15px;height:15px;vertical-align:-3px') + ' ' + (cur2() ? 'Travel currency: ' + esc(cname(cur2())) : 'Add a travel currency') + '</button>' +
-        '<div class="sec"><h2>Tools</h2></div><div class="tiles"><button type="button" class="tile" data-act="get-rcpt"><i class="n">' + ic('rcpt') + '</i><b>Get a receipt</b><small>For any Pi payment, from its transaction ID</small></button><button type="button" class="tile" data-act="verify"><i>' + ic('check') + '</i><b>Verify receipt</b><small>Scan, upload or enter any receipt</small></button><button type="button" class="tile" data-act="check-addr"><i class="t">' + ic('search') + '</i><b>Check an address</b><small>Balance and payments of any Pi address</small></button><button type="button" class="tile" data-act="receive"><i class="a">' + ic('qr') + '</i><b>My QR code</b><small>Your wallet address to get paid</small></button><button type="button" class="tile" data-act="alerts"><i class="t">' + ic('bell') + '</i><b>Price alerts</b><small>Know when Pi reaches your price</small></button><button type="button" class="tile" data-act="statement"><i>' + ic('rcpt') + '</i><b>Statement</b><small>Monthly PDF of your payments</small></button></div>' +
+        '<div class="sec"><h2>Tools</h2></div><div class="tiles"><button type="button" class="tile" data-act="get-rcpt"><i class="n">' + ic('rcpt') + '</i><b>Get a receipt</b><small>For any Pi payment, from its transaction ID</small></button><button type="button" class="tile" data-act="verify"><i>' + ic('check') + '</i><b>Verify receipt</b><small>Confirm any receipt against the Pi blockchain in seconds</small></button><button type="button" class="tile" data-act="check-addr"><i class="t">' + ic('search') + '</i><b>Check an address</b><small>Balance and payments of any Pi address</small></button><button type="button" class="tile" data-act="receive"><i class="a">' + ic('qr') + '</i><b>My QR code</b><small>Your wallet address to get paid</small></button><button type="button" class="tile" data-act="alerts"><i class="t">' + ic('bell') + '</i><b>Price alerts</b><small>Know when Pi reaches your price</small></button><button type="button" class="tile" data-act="statement"><i>' + ic('rcpt') + '</i><b>Statement</b><small>Monthly PDF of your payments</small></button></div>' +
         '';
     },
     activity: function () {
       var R = rcpts();
-      var head = '<div class="ph"><h1>Activity</h1><p>All your payments and receipts.</p></div><div class="seg" role="tablist"><button type="button" data-seg="tx" class="' + (S.seg === 'tx' ? 'on' : '') + '">Transactions</button><button type="button" data-seg="ins" class="' + (S.seg === 'ins' ? 'on' : '') + '">Insights</button></div>';
+      var head = '<div class="ph"><h1>Activity</h1><p>Every transaction and receipt in one ledger.</p></div><div class="seg" role="tablist"><button type="button" data-seg="tx" class="' + (S.seg === 'tx' ? 'on' : '') + '">Transactions</button><button type="button" data-seg="ins" class="' + (S.seg === 'ins' ? 'on' : '') + '">Insights</button></div>';
       if (S.seg === 'ins') return head + insightsHTML();
       return head + '<div class="act-tools"><div class="act-q">' + ic('search') + '<input class="in" id="act-q" type="search" autocomplete="off" placeholder="Search payments" value="' + esc(S.q || '') + '"></div>' +
         '<div class="seg act-seg" role="tablist">' + FLT.map(function (x) { return '<button type="button" data-flt="' + x[0] + '" class="' + (S.filter === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' +
@@ -1400,7 +1412,7 @@
       return '<div class="pcard"><div class="avatar">' + esc(signedIn() ? me().charAt(0) : 'G') + '</div><div class="grow"><b>' + (signedIn() ? '@' + esc(me()) : 'Guest') + '</b><small>' + (get('name', '') ? esc(get('name', '')) + ' · ' : '') + NETN + '</small>' + (sup ? '<div class="badge">' + ic('star') + 'Haramain Supporter</div>' : '') + '</div></div>' +
         (!signedIn() ? '<button type="button" class="btn" data-act="signin" style="margin-top:14px"><span class="pi-dot">π</span>Sign in with Pi</button>' : '') +
         '<div class="sec"><h2>Settings</h2></div><div class="list">' +
-        row('edit', 'Name on receipts', get('name', '') ? NTYPE[nType()].l + ' · ' + get('name', '') : 'Your name, business, store or shop', 'name') + row('globe', 'Currency', cname(curr()) + ' (' + curr() + ')', 'currency') + (window.FPL && Object.keys(FPL.LANGS).length > 1 ? row('globe', 'Language', FPL.LANGS[FPL.lang()], 'lang') : '') + (canInstall() ? row('down', 'Install Haramain', 'Add to home screen', 'install') : '') +
+        row('edit', 'Name on receipts', get('name', '') ? NTYPE[nType()].l + ' · ' + get('name', '') : 'Your name, business, store or shop', 'name') + row('globe', 'Currency', cname(curr()) + ' (' + curr() + ')', 'currency') + row('moon', 'Appearance', themeName(), 'theme') + (window.FPL && Object.keys(FPL.LANGS).length > 1 ? row('globe', 'Language', FPL.LANGS[FPL.lang()], 'lang') : '') + (canInstall() ? row('down', 'Install Haramain', 'Add to home screen', 'install') : '') +
         row('bell', 'Notifications', !('Notification' in window) ? 'In-app alerts on' : get('push', false) ? 'Phone and in-app alerts' : 'In-app alerts on', 'push') + row('pie', 'Monthly budget', get('budget', 0) ? fpi(get('budget', 0)) + ' π' : 'Not set', 'budget') + row('card', 'Wallet address', get('addr', '') ? short(get('addr', '')) : 'Not added', 'addr-set') + hook('settings') + '</div>' +
         '<div class="sec"><h2>Support</h2></div><div class="list">' +
         row('shield', 'Trust center', 'Payments, limits and records', 'security') + row('refresh', 'Reset', 'Pending payment or a problem? Reset fixes it', 'repair') + row('heart', sup ? 'You are a Supporter' : 'Become a Supporter', sup ? 'Thank you!' : '1 π · Supporter badge', 'supporter') +
@@ -1415,7 +1427,7 @@
   var PER = [['all', 'All time'], ['today', 'Today'], ['7d', '7 days'], ['30d', '30 days'], ['month', 'This month'], ['last', 'Last month'], ['custom', 'Custom']];
   var SORTS = { new: 'Newest first', old: 'Oldest first', big: 'Largest first', small: 'Smallest first' };
   var FLT = [['all', 'All'], ['out', 'Sent'], ['in', 'Received'], ['ref', 'Refunds']];
-  function dShort(v) { var d = new Date(v + 'T00:00:00'); return isNaN(d) ? v : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  function dShort(v) { var d = new Date(v + 'T00:00:00'); return isNaN(d) ? v : d.toLocaleDateString(UIL(), { day: 'numeric', month: 'short', year: 'numeric' }); }
   function perLabel() { if (S.per === 'custom') return (S.from ? dShort(S.from) : 'Start') + ' – ' + (S.to ? dShort(S.to) : 'Today'); return PER.filter(function (x) { return x[0] === S.per; })[0][1]; }
   function perSheet() {
     var w = sheet('Period', '<div class="list pick">' + PER.filter(function (x) { return x[0] !== 'custom'; }).map(function (x) { return '<button type="button" class="li' + (S.per === x[0] ? ' on' : '') + '" data-pp="' + x[0] + '"><span class="grow"><b>' + x[1] + '</b></span>' + (S.per === x[0] ? ic('check') : '') + '</button>'; }).join('') + '</div>' +
@@ -1453,7 +1465,7 @@
     F.forEach(function (x) { var r = x[0], a = Number(r.amount) || 0; if (r.kind === 'refund') { if (f === 'ref') inn += a; else out -= a; } else if (r.dir === 'in') inn += a; else out += a; }); out = Math.max(0, out);
     var html = '', groups = [], cur = null;
     F.slice(0, lim).forEach(function (x) {
-      var key = byDay ? new Date(x[0].ts).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '';
+      var key = byDay ? new Date(x[0].ts).toLocaleDateString(UIL(), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '';
       if (!cur || cur.k !== key) { cur = { k: key, rows: [], net: 0 }; groups.push(cur); }
       cur.rows.push(x); cur.net += (x[0].dir === 'in' ? 1 : -1) * (Number(x[0].amount) || 0);
     });
@@ -1482,14 +1494,14 @@
     { id: 'pidomain', n: 'Pay a .pi name', s: 'Coming soon', i: 'at', c: 'n', g: 'pay', a: 'pi-domain', soon: 1 },
     { id: 'myqr', n: 'My Pi QR', s: 'Poster to print or share', i: 'qr', c: 't', g: 'get', a: 'myqr' },
     { id: 'links', n: 'Payment links', s: 'Share a link to get paid', i: 'link', c: 'b', g: 'get', a: 'links' },
-    { id: 'invoice', n: 'Invoices', s: 'Paid automatically on arrival', i: 'inv', c: 'n', g: 'get', a: 'invs' },
+    { id: 'invoice', n: 'Invoices', s: 'Settled automatically on payment', i: 'inv', c: 'n', g: 'get', a: 'invs' },
     { id: 'split', n: 'Split a bill', s: 'Request each share', i: 'users', c: 'a', g: 'get', a: 'split' },
     { id: 'collect', n: 'Group collection', s: 'One link for a family or event fund', i: 'heart', c: 't', g: 'get', a: 'collect' },
-    { id: 'sale', n: 'Quick sale', s: 'Charge a customer by QR', i: 'pos', c: 'g', g: 'biz', a: 'sale' },
+    { id: 'sale', n: 'Quick sale', s: 'Accept payment by QR in seconds', i: 'pos', c: 'g', g: 'biz', a: 'sale' },
     { id: 'newinv', n: 'New invoice', s: 'Items, tax and due date', i: 'plus', c: 'n', g: 'biz', a: 'inv-new' },
     { id: 'prod', n: 'Products', s: 'Catalog, prices and stock', i: 'tag', c: 'a', g: 'biz', a: 'prods' },
-    { id: 'cust', n: 'Customers', s: 'Who pays you', i: 'userplus', c: 't', g: 'biz', a: 'cust' },
-    { id: 'biz', n: 'Dashboard', s: 'Sales and outstanding', i: 'bars', c: 'b', g: 'biz', a: 'biz' },
+    { id: 'cust', n: 'Customers', s: 'Client records and payment history', i: 'userplus', c: 't', g: 'biz', a: 'cust' },
+    { id: 'biz', n: 'Dashboard', s: 'Sales performance and receivables', i: 'bars', c: 'b', g: 'biz', a: 'biz' },
     { id: 'daysum', n: 'Day summary', s: 'Sales, expenses and profit', i: 'sun', c: 'g', g: 'biz', a: 'daysum' },
     { id: 'expenses', n: 'Expenses', s: 'Spending and profit', i: 'exp', c: 'a', g: 'biz', a: 'expenses' },
     { id: 'reports', n: 'Reports', s: 'Sales and invoices CSV', i: 'down', c: 'b', g: 'biz', a: 'reports' },
@@ -1624,17 +1636,22 @@
   function insightsHTML() {
     var s = monthStats(S.month), m = monthRange(S.month)[2], b = get('budget', 0), u = rateIn('USD'), c = curr(), r = rateIn(c);
     var cats = Object.keys(s.cats).map(function (k) { return [k, s.cats[k]]; }).sort(function (a, b2) { return b2[1] - a[1]; }), top = cats.length ? cats[0][1] : 0;
-    return '<div class="card" style="margin-top:14px"><div class="row"><button type="button" class="tbtn" data-mon="-1" aria-label="Previous month">' + ic('chevl') + '</button><div class="grow" style="text-align:center"><b>' + m.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) + '</b></div><button type="button" class="tbtn" data-mon="1" aria-label="Next month"' + (S.month >= 0 ? ' disabled style="opacity:.4"' : '') + '>' + ic('chev') + '</button></div>' +
+    return '<div class="card" style="margin-top:14px"><div class="row"><button type="button" class="tbtn" data-mon="-1" aria-label="Previous month">' + ic('chevl') + '</button><div class="grow" style="text-align:center"><b>' + m.toLocaleDateString(UIL(), { month: 'long', year: 'numeric' }) + '</b></div><button type="button" class="tbtn" data-mon="1" aria-label="Next month"' + (S.month >= 0 ? ' disabled style="opacity:.4"' : '') + '>' + ic('chev') + '</button></div>' +
       '<div class="stats"><div><small>Spent</small><b>' + fpi(s.out) + ' π</b></div><div><small>Received</small><b class="pos">' + fpi(s.inn) + ' π</b></div><div><small>Net</small><b>' + (s.inn - s.out >= 0 ? '+' : '−') + fpi(Math.abs(r7(s.inn - s.out))) + ' π</b></div></div>' +
       (u ? '<p class="small muted" style="margin-top:8px">Spent ≈ ' + money(s.out * u, 'USD') + (r && c !== 'USD' ? ' · ' + money(s.out * r, c) : '') + ' at today’s rate</p>' : '') +
       (b && S.month === 0 ? '<div class="row small" style="margin-top:12px"><span class="grow muted">Monthly budget ' + fpi(b) + ' π</span><b class="num">' + Math.round(s.out / b * 100) + '%</b></div><div class="bar"><i class="' + (s.out > b ? 'over' : '') + '" style="width:' + Math.min(100, s.out / b * 100) + '%"></i></div>' + (s.out > b ? '<div class="note warn" style="margin-top:10px">' + ic('warn') + '<span>You are ' + fpi(r7(s.out - b)) + ' π over your budget this month.</span></div>' : '') : '') + '</div>' +
       (S.month === 0 ? forecastHTML(b) : '') +
       '<div class="card tr-card"><div class="row small"><b class="grow">Spending · last 6 months</b><span class="muted">π</span></div>' + trendSvg() + '</div>' +
       '<div class="sec"><h2>Where your Pi went</h2><button type="button" data-act="budget">' + (b ? 'Edit budget' : 'Set budget') + '</button></div>' +
-      (cats.length ? '<div class="card">' + cats.map(function (x) { return '<div class="cat' + (x[0] === 'Not sorted' ? ' ns' : '') + '"><div class="row"><span>' + esc(x[0]) + '</span><b>' + fpi(x[1]) + ' π</b></div><div class="bar"><i style="width:' + Math.max(4, x[1] / top * 100) + '%"></i></div><small>' + Math.round(x[1] / (s.out || 1) * 100) + '% of spending' + (x[0] === 'Not sorted' ? ' · <button type="button" class="lnk" data-act="catsort">Sort these payments</button>' : '') + '</small></div>'; }).join('') + '</div>'
+      (cats.length ? '<div class="card">' + '<div class="cat-ring">' + catRing(cats, s.out) + '</div>' + cats.map(function (x) { return '<div class="cat' + (x[0] === 'Not sorted' ? ' ns' : '') + '"' + (x[0] !== 'Not sorted' ? ' data-catq="' + esc(x[0]) + '" role="button" tabindex="0"' : '') + ' style="--cc:' + catC(x[0]) + '"><div class="row"><span><i class="cat-d"></i>' + esc(x[0]) + '</span><b>' + fpi(x[1]) + ' π</b></div><div class="bar"><i style="width:' + Math.max(4, x[1] / top * 100) + '%"></i></div><small>' + Math.round(x[1] / (s.out || 1) * 100) + '% of spending' + (x[0] === 'Not sorted' ? ' · <button type="button" class="lnk" data-act="catsort">Sort these payments</button>' : '') + '</small></div>'; }).join('') + '</div>'
         : '<div class="list"><div class="empty">' + ic('pie') + '<div>No spending this month. Choose a category when you send Pi to see it here.</div></div></div>');
   }
 
+  function catRing(cats, total) {
+    if (!cats.length || !(total > 0)) return '';
+    var R = 15.915, off = 25, segs = cats.map(function (x) { var p = Math.min(100, x[1] / total * 100), c = '<circle r="' + R + '" cx="21" cy="21" fill="none" stroke="' + catC(x[0]) + '" stroke-width="5" stroke-dasharray="' + p.toFixed(2) + ' ' + (100 - p).toFixed(2) + '" stroke-dashoffset="' + off.toFixed(2) + '"></circle>'; off -= p; return c; }).join('');
+    return '<svg viewBox="0 0 42 42" class="ring" aria-hidden="true"><circle r="' + R + '" cx="21" cy="21" fill="none" stroke="var(--line2)" stroke-width="5"></circle>' + segs + '</svg><div class="ring-c"><b class="num">' + fpi(total) + ' π</b><small>Spent</small></div>';
+  }
   function render(tab) {
     S.tab = tab; var v = $('#view'); if (!v) return;
     try { v.innerHTML = T[tab](); } catch (e) { guardErr(e && e.message); v.innerHTML = '<div class="list" style="margin-top:20px"><div class="empty">' + ic('refresh') + '<div>This screen did not load.</div><button type="button" class="btn" data-act="repair" style="margin-top:14px">' + ic('refresh') + 'Repair app</button></div></div>'; }
@@ -1646,21 +1663,33 @@
 
   /* ── contacts: people and businesses you pay often (stay on this phone) ── */
   function contacts() { return get('contacts', []); }
+  function favs() { return contacts().filter(function (c) { return c.fav; }); }
+  var CCOL = ['#1AC271', '#D97706', '#2563EB', '#DB2777', '#7C3AED', '#0D9488', '#B45309', '#DC2626'];
+  function avCol(n) { var h = 0; String(n || '').split('').forEach(function (ch) { h = (h * 31 + ch.charCodeAt(0)) >>> 0; }); return CCOL[h % CCOL.length]; }
+  function favHTML() {
+    var F = favs().slice(0, 8); if (!F.length) return '';
+    return '<div class="sec"><h2>Favourites</h2><button type="button" data-act="contacts">Edit</button></div><div class="favs">' + F.map(function (c) {
+      return '<button type="button" class="fav" data-fav="' + esc(c.to) + '"><span class="fav-a" style="background:' + avCol(c.name || c.to) + '">' + esc((c.name || toLabel(c.to)).replace(/^@/, '').charAt(0).toUpperCase()) + '</span><span class="fav-n">' + esc(c.name || toLabel(c.to)) + '</span></button>'; }).join('') + '</div>';
+  }
+  function toggleFav(i) { var L = contacts(); if (!L[i]) return; L[i].fav = !L[i].fav; put('contacts', L); toast(L[i].fav ? 'Added to favourites' : 'Removed from favourites'); return L[i].fav; }
   function cName(to) { to = String(to || '').toLowerCase(); var c = contacts().filter(function (x) { return x.to.toLowerCase() === to; })[0]; return c ? c.name : ''; }
-  function userSends() { return !!(S.cfg.enabled && S.cfg.usernames); }
+  // @username: with in-app sending on, when switched on there; before that, through the recipient's saved address
+  function userSends() { return S.cfg.enabled ? !!S.cfg.usernames : true; }
   function payTo(to, pre) {
-    pre = pre || {}; pre.u = to;
+    pre = pre || {}; pre.u = isG(to) ? to : String(to || '').replace(/^@/, '');
     if (!isG(to) && !userSends()) return toast('Paying a @username opens soon. Use their wallet address for now.');
     sendSheet(pre);
   }
   function contactsSheet() {
     var L = contacts();
+    if (L.some(function (c) { return c.fav; })) { L = L.map(function (c, i) { return [c, i]; }).sort(function (a, b) { return (b[0].fav ? 1 : 0) - (a[0].fav ? 1 : 0) || a[1] - b[1]; }).map(function (x) { return x[0]; }); put('contacts', L); }
     var w = sheet('Contacts', ''+
-      (L.length ? '<div class="list">' + L.map(function (c, i) { return '<div class="li"><span class="ico">' + ic(isG(c.to) ? 'card' : 'user') + '</span><button type="button" class="grow lb" data-cs="' + i + '"><b>' + esc(c.name) + (c.trusted ? ' <span class="tr-b">' + ic('shield') + 'Trusted</span>' : '') + '</b><small class="num">' + esc(toLabel(c.to)) + '</small></button><button type="button" class="tbtn" data-ce="' + i + '" aria-label="Edit ' + esc(c.name) + '">' + ic('edit') + '</button></div>'; }).join('') + '</div>'
+      (L.length ? '<div class="list">' + L.map(function (c, i) { return '<div class="li"><span class="ico">' + ic(isG(c.to) ? 'card' : 'user') + '</span><button type="button" class="grow lb" data-cs="' + i + '"><b>' + esc(c.name) + (c.trusted ? ' <span class="tr-b">' + ic('shield') + 'Trusted</span>' : '') + '</b><small class="num">' + esc(toLabel(c.to)) + '</small></button><button type="button" class="tbtn fv-t' + (c.fav ? ' on' : '') + '" data-cf="' + i + '" aria-pressed="' + (c.fav ? 'true' : 'false') + '" aria-label="Favourite ' + esc(c.name) + '">' + ic('star') + '</button><button type="button" class="tbtn" data-ce="' + i + '" aria-label="Edit ' + esc(c.name) + '">' + ic('edit') + '</button></div>'; }).join('') + '</div>'
         : '<div class="list"><div class="empty">' + ic('users') + '<div>No contacts yet. Add the people you pay often.</div></div></div>') +
       '<button type="button" class="btn" data-x="add">' + ic('users') + 'Add contact</button>');
     $$('[data-cs]', w).forEach(function (b) { b.onclick = function () { payTo(L[+b.dataset.cs].to); }; });
     $$('[data-ce]', w).forEach(function (b) { b.onclick = function () { contactEdit(+b.dataset.ce); }; });
+    $$('[data-cf]', w).forEach(function (b) { b.onclick = function () { var on = toggleFav(+b.dataset.cf); b.classList.toggle('on', !!on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); if (S.tab === 'home') render('home'); }; });
     $('[data-x="add"]', w).onclick = function () { contactEdit(-1); };
   }
   function contactEdit(i, preTo) {
@@ -1694,7 +1723,7 @@
   function rerenderUnder() { var v = $('#view'); if (v && !$('#app').hidden) { S.y = scrollY; v.innerHTML = T[S.tab](); } }
 
   /* ── payment links: reusable links and QR codes that open Haramain ready to pay you ── */
-  function myTarget() { var un = userSends() && signedIn(); return un ? me() : get('addr', ''); }
+  function myTarget() { var un = !!(S.cfg.enabled && S.cfg.usernames) && signedIn(); return un ? me() : get('addr', ''); }
   function links() { return get('links', []); }
   function linkText(o) { var who = isG(o.u) ? 'I' : '@' + o.u; return who + (o.a ? ' requested ' + fpi(o.a) + ' π' + (conv(o.a) ? ' (' + conv(o.a).replace('≈ ', '≈') + ')' : '') : ' shared a payment link') + (o.x ? ' for “' + o.x + '”' : '') + '. Pay with Haramain:\n' + payLink({ u: o.u, a: o.a || 0, x: o.x || '' }); }
   function showLink(o, title) {
@@ -1788,13 +1817,13 @@
   function dueHTML() {
     var D = dueRems(); if (!D.length) return '';
     return '<div class="sec"><h2>Payments due</h2><button type="button" data-act="rems">All reminders</button></div><div class="list">' + D.slice(0, 3).map(function (r) {
-      return '<div class="li"><span class="ico rf">' + ic('bell') + '</span><span class="grow"><b>' + esc(r.narr) + '</b><small>' + fpi(r.amt) + ' π to ' + esc(cName(r.to) || toLabel(r.to)) + ' · due ' + new Date(r.next).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + '</small></span><button type="button" class="chip on" data-act="rem-pay" data-id="' + r.id + '">Pay</button></div>';
+      return '<div class="li"><span class="ico rf">' + ic('bell') + '</span><span class="grow"><b>' + esc(r.narr) + '</b><small>' + fpi(r.amt) + ' π to ' + esc(cName(r.to) || toLabel(r.to)) + ' · due ' + new Date(r.next).toLocaleDateString(UIL(), { day: 'numeric', month: 'short' }) + '</small></span><button type="button" class="chip on" data-act="rem-pay" data-id="' + r.id + '">Pay</button></div>';
     }).join('') + '</div>';
   }
   function remsSheet() {
     var L = rems().slice().sort(function (a, b) { return a.next - b.next; });
     var w = sheet('Payment reminders', '<p class="sh-sub">Rent, fees and regular payments, on schedule.</p>' +
-      (L.length ? '<div class="list">' + L.map(function (r) { var due = r.next <= Date.now(); return '<div class="li"><span class="ico' + (due ? ' rf' : '') + '">' + ic('bell') + '</span><button type="button" class="grow lb" data-re="' + r.id + '"><b>' + esc(r.narr) + '</b><small>' + fpi(r.amt) + ' π to ' + esc(cName(r.to) || toLabel(r.to)) + ' · ' + FREQ[r.freq] + '</small><small>' + (due ? 'Due now' : 'Next: ' + new Date(r.next).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })) + '</small></button>' + (due ? '<button type="button" class="chip on" data-act="rem-pay" data-id="' + r.id + '">Pay</button>' : '') + '</div>'; }).join('') + '</div>'
+      (L.length ? '<div class="list">' + L.map(function (r) { var due = r.next <= Date.now(); return '<div class="li"><span class="ico' + (due ? ' rf' : '') + '">' + ic('bell') + '</span><button type="button" class="grow lb" data-re="' + r.id + '"><b>' + esc(r.narr) + '</b><small>' + fpi(r.amt) + ' π to ' + esc(cName(r.to) || toLabel(r.to)) + ' · ' + FREQ[r.freq] + '</small><small>' + (due ? 'Due now' : 'Next: ' + new Date(r.next).toLocaleDateString(UIL(), { weekday: 'short', day: 'numeric', month: 'short' })) + '</small></button>' + (due ? '<button type="button" class="chip on" data-act="rem-pay" data-id="' + r.id + '">Pay</button>' : '') + '</div>'; }).join('') + '</div>'
         : '<div class="list"><div class="empty">' + ic('bell') + '<div>No reminders yet. Add rent, school fees, dues or any regular payment.</div></div></div>') +
       '<button type="button" class="btn" data-x="add">' + ic('bell') + 'Add reminder</button>');
     $('[data-x="add"]', w).onclick = function () { remEdit(''); };
@@ -1877,7 +1906,7 @@
     for (var k = 0; k > -12; k--) { var m = monthRange(k); if (k === 0 || R.some(function (r) { return r.ts >= m[0] && r.ts < m[1]; })) opts.push(k); }
     var sel = 0;
     var w = sheet('Monthly statement', '<p class="sh-sub">All your payments for a month, with values and transaction IDs.</p>' +
-      '<label class="l">Month</label><div class="chips" id="st-m">' + opts.map(function (k) { return '<button type="button" class="chip' + (k === 0 ? ' on' : '') + '" data-m="' + k + '">' + monthRange(k)[2].toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) + '</button>'; }).join('') + '</div>' +
+      '<label class="l">Month</label><div class="chips" id="st-m">' + opts.map(function (k) { return '<button type="button" class="chip' + (k === 0 ? ' on' : '') + '" data-m="' + k + '">' + monthRange(k)[2].toLocaleDateString(UIL(), { month: 'short', year: 'numeric' }) + '</button>'; }).join('') + '</div>' +
       '<div class="card" id="st-s" style="margin-top:12px"></div>' +
       '<div class="two"><button type="button" class="btn" data-x="dl">' + ic('down') + 'Download</button><button type="button" class="btn ghost" data-x="sh">' + ic('share') + 'Share</button></div>');
     function info() { var s = monthStats(sel); $('#st-s', w).innerHTML = '<div class="stats" style="margin-top:0"><div><small>Sent</small><b>' + fpi(s.out) + ' π</b></div><div><small>Received</small><b class="pos">' + fpi(s.inn) + ' π</b></div><div><small>Payments</small><b>' + s.n + '</b></div></div>'; }
@@ -1897,7 +1926,7 @@
   function buildStatement(off) {
     var m = monthRange(off), R = rcpts().filter(function (r) { return r.ts >= m[0] && r.ts < m[1]; }).sort(function (a, b) { return a.ts - b.ts; }), s = monthStats(off);
     var F = "Poppins,'Segoe UI',Roboto,Arial,sans-serif", MF = "'JetBrains Mono',Menlo,Consolas,monospace", W = 1240, H = 1754, X = 80;
-    var mon = m[2].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    var mon = m[2].toLocaleDateString(UIL(), { month: 'long', year: 'numeric' });
     var uv = function (r) { return r.usd ? Number(r.amount) * r.usd : 0; };
     var outU = 0, inU = 0; R.forEach(function (r) { if (r.dir === 'in') inU += uv(r); else outU += uv(r); });
     var P1 = 11, PN = 15, pages = [], i = 0; pages.push(R.slice(0, P1)); i = P1; while (i < R.length) { pages.push(R.slice(i, i + PN)); i += PN; }
@@ -1948,7 +1977,7 @@
         if (!rows.length) txt(x, 'No payments this month.', W / 2, y + 90, '400 26px ' + F, '#64748B', 'center');
         rows.forEach(function (r) {
           var d = new Date(r.ts), inn = r.dir === 'in';
-          txt(x, d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }), X, y + 40, '600 22px ' + F, '#0B2A1C');
+          txt(x, d.toLocaleDateString(UIL(), { day: '2-digit', month: 'short' }), X, y + 40, '600 22px ' + F, '#0B2A1C');
           txt(x, d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), X, y + 70, '400 18px ' + F, '#64748B');
           x.font = '600 22px ' + F; txt(x, fit(x, rcptTitle(r), 560), X + 170, y + 40, '600 22px ' + F, '#0B2A1C');
           var sub = [r.narr, r.cat && !inn ? r.cat : '', r.txid ? 'Tx ' + r.txid.slice(0, 10) + '…' : ''].filter(Boolean).join(' · ');
@@ -1961,7 +1990,7 @@
         });
         /* footer */
         x.fillStyle = '#E3EFEA'; x.fillRect(X, H - 120, W - 2 * X, 1);
-        txt(x, 'Generated by Haramain on ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '.', X, H - 80, '400 17px ' + F, '#64748B');
+        txt(x, 'Generated by Haramain on ' + new Date().toLocaleDateString(UIL(), { day: 'numeric', month: 'long', year: 'numeric' }) + '.', X, H - 80, '400 17px ' + F, '#64748B');
         txt(x, '© Haramain ' + new Date().getFullYear() + ' · haramain.pi', X, H - 52, '400 17px ' + F, '#94A3B8');
         txt(x, 'Page ' + (pi + 1) + ' of ' + pages.length, W - X, H - 80, '600 17px ' + F, '#64748B', 'right');
         if (DOC) txt(x, 'Document ID ' + DOC, W - X, H - 52, '600 17px ' + MF, '#0D5C38', 'right');
@@ -2000,10 +2029,10 @@
 
   /* ── welcome screens (first open) ── */
   var ONB = [
-    { t: 'Welcome to Haramain', p: 'Live Pi rate in your currency and a verified receipt for every payment', img: 'icons/onb-v3-1.webp' },
-    { t: 'Send and receive Pi', p: 'Pay any Pioneer by @username or Pi wallet address', img: 'icons/onb-v3-2.webp' },
+    { t: 'Welcome to Haramain', p: 'Smart Pi payments with real-time rates and a verified receipt for every transaction', img: 'icons/onb-v3-1.webp' },
+    { t: 'Send and receive Pi', p: 'Instant transfers to any Pioneer by @username or wallet address', img: 'icons/onb-v3-2.webp' },
     { t: 'Scan to pay', p: 'Scan a Haramain QR code to pay a merchant or a friend', img: 'icons/onb-v3-3.webp' },
-    { t: 'Run your business', p: 'Quick sale, invoices, products and business reports', img: 'icons/onb-v3-4.webp' },
+    { t: 'Grow your business', p: 'Point of sale, invoicing, inventory and business analytics', img: 'icons/onb-v3-4.webp' },
     { t: 'Verify any receipt', p: 'Check any receipt against the Pi blockchain in seconds', img: 'icons/onb-v3-5.webp' }
   ];
 
@@ -2045,6 +2074,11 @@
 
   /* ── actions ── */
   var A = {
+    theme: function () {
+      var cur = get('theme', 'auto');
+      var w = sheet('Appearance', '<div class="list th-list">' + THEMES.map(function (x) { return '<button type="button" class="li' + (x[0] === cur ? ' on' : '') + '" data-th="' + x[0] + '"><span class="ico">' + ic(x[2]) + '</span><span class="grow"><b>' + x[1] + '</b></span>' + (x[0] === cur ? '<span class="go th-ok">' + ic('check') + '</span>' : '') + '</button>'; }).join('') + '</div>');
+      [].forEach.call(w.querySelectorAll('[data-th]'), function (b) { b.onclick = function () { put('theme', b.getAttribute('data-th')); applyTheme(); closeSheets(); render(S.tab); }; });
+    },
     send: function () { sendSheet(); }, receive: function () { receiveSheet(); }, request: function () { requestSheet(); }, scan: function () { scanSheet(); }, 'get-rcpt': function () { addTxSheet(null); },
     'send-to': function (el) { payTo(el.dataset.u); },
     contacts: contactsSheet, links: linksSheet, split: splitSheet, rems: remsSheet, alerts: alertsSheet, statement: statementSheet, tour: function () { onboarding(true); },
@@ -2134,8 +2168,10 @@
     if (e.target.closest('[data-more]')) { S.page += 100; actPaint(); return; }
     var ol = e.target.closest('[data-older]'); if (ol) { hOlder(ol); return; }
     var mo = e.target.closest('[data-mon]'); if (mo) { S.month = Math.min(0, S.month + Number(mo.dataset.mon)); render('activity'); return; }
+    var fv = e.target.closest('[data-fav]'); if (fv && !fv.closest('.sh-wrap')) { payTo(fv.dataset.fav); return; }
     var rc = e.target.closest('[data-rc]'); if (rc) { var ri = rc.dataset.rc; showRcpt(ri.charAt(0) === 'x' ? S.extra[+ri.slice(1)] : rcpts()[+ri]); return; }
     var pe = e.target.closest('[data-pend]'); if (pe) { pendSheet(pe.dataset.pend); return; }
+    var cq = e.target.closest('[data-catq]'); if (cq) { S.q = cq.dataset.catq; S.filter = 'out'; S.seg = 'tx'; go('activity'); return; }
     var a = e.target.closest('[data-act]'); if (a && A[a.dataset.act]) { A[a.dataset.act](a, e); }
   });
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-act]')) { e.preventDefault(); e.target.click(); } });

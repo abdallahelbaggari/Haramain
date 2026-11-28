@@ -205,7 +205,7 @@
   };
 
   /* ── Emergency ────────────────────────────────────────────────── */
-  var COUNTRIES = ['Nigeria', 'Pakistan', 'India', 'Indonesia', 'Bangladesh', 'Egypt', 'Türkiye', 'Malaysia', 'Algeria', 'Morocco', 'Sudan', 'Iran', 'Iraq', 'Niger', 'Senegal', 'Ghana', 'Cameroon', 'Mali', 'Afghanistan', 'Uzbekistan', 'United Kingdom', 'United States', 'France', 'Other'];
+  var COUNTRIES = ['Pakistan', 'India', 'Indonesia', 'Bangladesh', 'Egypt', 'Türkiye', 'Malaysia', 'Algeria', 'Morocco', 'Sudan', 'Iran', 'Iraq', 'Niger', 'Senegal', 'Ghana', 'Cameroon', 'Mali', 'Afghanistan', 'Uzbekistan', 'United Kingdom', 'United States', 'France', 'Other'];
   window.renderEmbassy = function () {
     var el = $('emer-embassy-box'); if (!el) return;
     var c = ''; try { c = localStorage.getItem(K + 'country') || ''; } catch (e) {}
@@ -476,8 +476,8 @@
     var p = parseFloat((inp || {}).value) || (d && d.usd) || 0, el = $('pi-res'); if (!el) return;
     if (!a) { el.textContent = 'Enter amount above'; return; }
     if (!p) { el.textContent = 'Live price unavailable — enter a price'; return; }
-    var r = d && d.usd ? { sar: d.sar / d.usd, ngn: d.ngn ? d.ngn / d.usd : null } : { sar: 3.75, ngn: null };
-    el.innerHTML = a + 'π = $' + (a * p).toFixed(2) + ' · ' + (a * p * r.sar).toFixed(2) + ' SAR' + (r.ngn ? ' · ₦' + Math.round(a * p * r.ngn).toLocaleString() : '');
+    var r = d && d.usd ? { sar: d.sar / d.usd } : { sar: 3.75 };
+    el.innerHTML = a + 'π = $' + (a * p).toFixed(2) + ' · ' + (a * p * r.sar).toFixed(2) + ' SAR';
   };
   /* document tiles open the form with that type chosen */
   window.hmAddDoc = function (type) {

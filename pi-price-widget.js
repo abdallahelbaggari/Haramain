@@ -1,13 +1,13 @@
 /* Live Pi price widget — reads this app's /pi-price (OKX first, then CoinGecko and other listed exchanges; cached on the server).
-   PiPrice.mount(element, { accent:'#0E7A52', style:'card'|'chip', currency:'USD'|'SAR'|'NGN' })
+   PiPrice.mount(element, { accent:'#0E7A52', style:'card'|'chip', currency:'USD'|'SAR' })
    Refreshes every 60 s while the app is open; keeps the last good price on the phone for offline use. */
 (function () {
   'use strict';
   if (window.PiPrice) return;
   var S = { d: null, mounts: [], busy: false, last: 0, fx: null };
-  var CURS = [['NGN','₦','Nigerian naira'],['PKR','Rs ','Pakistani rupee'],['INR','₹','Indian rupee'],['IDR','Rp ','Indonesian rupiah'],['BDT','৳','Bangladeshi taka'],['EGP','E£','Egyptian pound'],['TRY','₺','Turkish lira'],['MYR','RM ','Malaysian ringgit'],['GBP','£','British pound'],['EUR','€','Euro'],['AED','AED ','UAE dirham'],['XOF','CFA ','West African CFA'],['GHS','GH₵','Ghanaian cedi'],['MAD','MAD ','Moroccan dirham']];
+  var CURS = [['NGN','₦','Naira'],['PKR','Rs ','Pakistani rupee'],['INR','₹','Indian rupee'],['IDR','Rp ','Indonesian rupiah'],['BDT','৳','Bangladeshi taka'],['EGP','E£','Egyptian pound'],['TRY','₺','Turkish lira'],['MYR','RM ','Malaysian ringgit'],['GBP','£','British pound'],['EUR','€','Euro'],['AED','AED ','UAE dirham'],['XOF','CFA ','West African CFA'],['GHS','GH₵','Ghanaian cedi'],['MAD','MAD ','Moroccan dirham']];
   var LKEY = 'pi_price_local_v1';
-  function local() { try { return localStorage.getItem(LKEY) || 'NGN'; } catch (e) { return 'NGN'; } }
+  function local() { try { return localStorage.getItem(LKEY) || 'USD'; } catch (e) { return 'USD'; } }
   function localVal(d) { var c = local(); if (!d) return null; if (S.fx && S.fx[c] && d.sar) return d.sar * S.fx[c]; if (c === 'NGN') return d.ngn; return null; }
   var DN = null; try { DN = new Intl.DisplayNames(['en'], { type: 'currency' }); } catch (e) {}
   function cname(c) { var x = CURS.filter(function (k) { return k[0] === c; })[0]; if (x) return x[2]; try { return DN ? DN.of(c) : c; } catch (e) { return c; } }
@@ -18,7 +18,6 @@
   }
   function allCurs() {
     var codes = S.fx ? Object.keys(S.fx).filter(function (c) { return /^[A-Z]{3}$/.test(c) && c !== 'SAR'; }) : CURS.map(function (c) { return c[0]; });
-    if (codes.indexOf('NGN') < 0) codes.push('NGN');
     return codes.map(function (c) { return { code: c, name: cname(c), sym: lsym(c).trim() }; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
   }
   function loadFx() { if (S.fx !== null) return; S.fx = false; fetch('/fx').then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok && d.rates) { S.fx = d.rates; paintAll(); } }).catch(function () {}); }

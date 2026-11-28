@@ -16,7 +16,7 @@
   var short = function (a) { a = String(a || ''); return a.length > 16 ? a.slice(0, 6) + '…' + a.slice(-6) : a; };
   var num = function (n, d) { return Number(n).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d }); };
   function price() { return window.PiPrice && PiPrice.get(); }
-  function loc() { return window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'NGN', sym: '₦', rate: null }; }
+  function loc() { return window.PiPrice && PiPrice.local ? PiPrice.local() : { code: 'USD', sym: '$', rate: null }; }
   function sheetEl(title, inner) {
     var w = document.createElement('div'); w.className = 'hm-sheet-wrap';
     w.innerHTML = '<div class="hm-sheet" role="dialog" aria-label="' + esc(title) + '"><div class="hm-sheet-t">' + title + '</div>' + inner + '<button type="button" class="hm-sheet-x">Close</button></div>';
@@ -286,7 +286,7 @@
   window.hmPickCurrency = function () {
     var L = (window.PiPrice && PiPrice.currencies) ? PiPrice.currencies() : [], cur = loc().code;
     var w = sheetEl('💱 Your currency',
-      '<input class="fi" id="cu-q" type="search" placeholder="Search: naira, dollar, PKR…" autocomplete="off">' +
+      '<input class="fi" id="cu-q" type="search" placeholder="Search: dollar, riyal, PKR…" autocomplete="off">' +
       '<div class="wf-cur" id="cu-l"></div>');
     var draw = function () {
       var q = ($('cu-q').value || '').trim().toLowerCase();

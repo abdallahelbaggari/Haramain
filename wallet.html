@@ -10,8 +10,8 @@
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="wallet.css?v=3952d7ce1d">
-<script src="wallet-i18n.js?v=00cd4064db"></script>
+<link rel="stylesheet" href="wallet.css?v=ce695cf461">
+<script src="wallet-i18n.js?v=bdf499e4f3"></script>
 <script>(function () {
   /* opened inside the app: use the app's Pi connection (already signed in); opened on its own: load Pi */
   var H = null; try { if (window.parent !== window && window.parent.WALLET_HOST && window.parent.Pi) H = window.parent; } catch (e) {}
@@ -24,6 +24,7 @@
     }, true);
   } else document.write('<script src="https://sdk.minepi.com/pi-sdk.js"><\/script>');
 })();</script>
+<script>(function () { try { var m = JSON.parse(localStorage.getItem('hmw_v1_theme') || '"auto"'), d = m === 'dark' || (m === 'auto' && !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches)); if (d) document.documentElement.className += ' dk'; } catch (e) {} })();</script>
 </head>
 <body>
 
@@ -37,9 +38,9 @@
   <section class="ld-card">
     <div class="ld-feat">
       <div><i><svg class="ic" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></i><span><b>Send &amp; receive Pi</b><small>By @username or wallet address, with a verified receipt for every payment.</small></span></div>
-      <div><i class="t"><svg class="ic" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></i><span><b>Your wallet at a glance</b><small>Balance and history in your own currency.</small></span></div>
+      <div><i class="t"><svg class="ic" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></i><span><b>Your wallet at a glance</b><small>Real-time balance and activity in your currency.</small></span></div>
       <div><i><svg class="ic" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></i><span><b>Receipts verified on the blockchain</b><small>Anyone can scan and check them.</small></span></div>
-      <div><i class="t"><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></i><span><b>Business tools</b><small>Quick sale, invoices, products and reports.</small></span></div>
+      <div><i class="t"><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></i><span><b>Business tools</b><small>Point of sale, invoicing, inventory and analytics.</small></span></div>
     </div>
     <button class="btn" id="signin" type="button"><span class="pi-dot">π</span><span id="signin-t">Sign in with Pi</span></button>
     <button class="btn ghost" id="explore" type="button">Explore without signing in</button>
@@ -71,8 +72,8 @@
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="wallet-qr.js?v=c80c369b36"></script>
 <script src="wallet-receipt.js?v=f931892587"></script>
-<script src="wallet.js?v=5d1c32d501"></script>
+<script src="wallet.js?v=683ac54f3f"></script>
 <script src="wallet-bar.js?v=4edd2da65c"></script>
-<script src="wallet-biz.js?v=9c60a7f857"></script>
+<script src="wallet-biz.js?v=213e295a81"></script>
 </body>
 </html>
