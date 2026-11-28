@@ -3,7 +3,7 @@
    and used from the next opening (first visit and offline work the same way).
    Versioned files (?v=), icons, logo and onboarding photos: cache first.
    Server functions (payments, prices, live location, AI…) are never cached. */
-var CACHE = 'haramain-v23';
+var CACHE = 'haramain-v24';
 var SHELL = ['/', '/index.html', '/logo.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 var LIVE = /^\/(approve|complete|cancel-payment|pi-price|fx|ai|alerts|live|family|lf|quran|quran-audio|verify|transfer|users|file|f|r|history|setup\.html|validation-key\.txt|recover|staff|report|merchants)(\/|$|\?)/;
 
