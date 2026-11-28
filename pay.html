@@ -165,7 +165,7 @@ h2{font-size:15px;margin:22px 4px 10px}
         ['Date', new Date(tx.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })], ['Time', new Date(tx.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })],
         ['Network', NETN], ['Seller address', inv.t, 1], ['Transaction ID', tx.hash, 1]],
       verify: location.origin + '/receipt.html#tx=' + tx.hash + '&net=' + (TEST ? 'test' : 'main'),
-      thanks: 'Paid with Haramain Pay', note: 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
+      thanks: 'Paid with Haramain Pay', note: 'Verified on the Pi blockchain.' };
   }
   function paid(tx) {
     clearTimeout(timer);

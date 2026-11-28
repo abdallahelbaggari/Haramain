@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+<script>/* copy: fall back when the browser blocks clipboard access */(function(){try{var c=navigator.clipboard;if(!c||!c.writeText||c.__fb)return;var o=c.writeText.bind(c);function fb(t){return new Promise(function(ok,no){try{var a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;top:-1000px;opacity:0';document.body.appendChild(a);a.select();var r=document.execCommand('copy');a.remove();r?ok():no(new Error('copy failed'))}catch(e){no(e)}})}c.writeText=function(t){return o(t).catch(function(){return fb(String(t))})};c.__fb=1}catch(e){}})();</script>
 <script>/* Pi sandbox: true only when the app is opened inside the Pi Sandbox (desktop testing at sandbox.minepi.com); false in the Pi Browser. The same code runs as the mainnet and the testnet app: the network comes from the Pi app and its API key. */
 window.PI_SANDBOX=(function(){try{var r=document.referrer||'',a=location.ancestorOrigins?[].slice.call(location.ancestorOrigins).join(' '):'';return /sandbox\.minepi\.com/.test(r+' '+a);}catch(e){return false;}})();</script>
 
@@ -1129,7 +1130,6 @@ select.fi{cursor:pointer;}
     </div>
     <button class="ld-pi" id="loginBtn" onclick="piLogin()"><span class="ld-pi-i">π</span><span id="loginBtnText" data-i="signin">Sign in with Pi</span></button>
     <button class="ld-guest" type="button" onclick="guestLogin()">Explore without signing in</button>
-    <div class="ld-safe">🔒 Haramain never sees your Pi passphrase.</div>
     <div class="login-status" id="ls-msg"></div>
     <div class="ld-foot"><a href="/privacy-policy">Privacy</a><span>·</span><a href="/terms-of-service">Terms</a><span>·</span><a href="#" onclick="openModal('modal-about');return false">About</a><span>·</span><span>haramain.pi</span></div>
     <div hidden><span id="lc-pi"></span><span id="lc-weather"></span><span id="lc-weather-sub"></span><span id="infra-clock"></span></div>
@@ -4787,11 +4787,6 @@ function openTracker() {
     '<div id="trk-trail-box" style="display:none;margin-top:.5rem">'+
       '<div style="font-family:var(--dm);font-size:11.6px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem">📍 Location Trail</div>'+
       '<div id="trk-trail-list" style="max-height:120px;overflow-y:auto"></div>'+
-    '</div>'+
-
-    /* Privacy note */
-    '<div class="ibox" style="margin-top:.6rem;font-size:13px;border-color:rgba(46,204,113,.15);background:rgba(46,204,113,.04)">'+
-      '🔒 <strong style="color:var(--grn)">Privacy First:</strong> Your location is stored only on your device. Family sees only what you share via link. Stop tracking anytime — link becomes invalid immediately.'+
     '</div>';
 
   openModal('modal-tracker');
@@ -5352,7 +5347,6 @@ function checkFirstVisit() {
   setTimeout(function() {
     addNotif('🕋', 'Welcome to HARAMAIN!', 'Start by exploring: Dashboard for prayer times → Worship for ritual tools → Guide for step-by-step Hajj guidance → Ask for questions.', 'now');
     addNotif('⭐', 'Every tool is free', 'If Haramain helps you, you can support it with a 1π Supporter Pass in Profile.', 'now');
-    addNotif('📍', 'Privacy First', 'Your health card, notes and documents stay on this phone. Your location is used only when you choose to share it or use prayer times and Qibla.', 'now');
   }, 2000);
 }
 
@@ -8121,14 +8115,14 @@ function orderQurbani(){
 <script src="haramain-pro.js?v=6"></script>
 <script src="haramain-daily.js?v=3"></script>
 <script src="haramain-tools.js?v=1"></script>
-<script src="haramain-quran.js?v=1"></script>
+<script src="haramain-quran.js?v=2"></script>
 <script src="haramain-live.js?v=1"></script>
 <script src="haramain-adhkar.js?v=1"></script>
 <script src="haramain-receipt.js?v=3"></script>
-<script src="haramain-wallet.js?v=18"></script>
+<script src="haramain-wallet.js?v=19"></script>
 <script src="haramain-transfer.js?v=10"></script>
 <script src="haramain-notify.js?v=2"></script>
-<script src="haramain-fin.js?v=4"></script>
+<script src="haramain-fin.js?v=5"></script>
 <script src="haramain-home.js?v=5"></script>
 <script src="haramain-nav.js?v=5"></script>
 <script src="haramain-habit.js?v=3"></script>

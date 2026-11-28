@@ -102,7 +102,7 @@
           '<div class="hq-ay-act"><button type="button" onclick="HMQ.play(' + d.n + ',' + y.k + ')">▶ Listen</button><button type="button" onclick="HMQ.bm(' + d.n + ',' + y.k + ')">🔖 Bookmark</button><button type="button" onclick="HMQ.share(' + y.k + ')">Share</button></div></div>';
       }).join('') +
       '<div class="hq-foot">' + (d.n > 1 ? '<button type="button" class="btn btn-ghost btn-sm" onclick="HMQ.open(' + (d.n - 1) + ')">‹ Previous surah</button>' : '<span></span>') + (d.n < 114 ? '<button type="button" class="btn btn-gold btn-sm" onclick="HMQ.open(' + (d.n + 1) + ')">Next surah ›</button>' : '') + '</div>' +
-      '<div class="hm-note">Arabic: Uthmani script · English: Saheeh International · Audio: everyayah.com</div>';
+      '';
     $('hq-rsel').onchange = function () { S.opt.r = this.value; put('qopt', S.opt); if (S.playing && S.cur) play(S.cur.s, S.cur.a); };
     var target = a ? $('hq-a' + a) : null;
     if (target) setTimeout(function () { target.scrollIntoView({ block: 'center' }); mark(a); }, 60); else window.scrollTo(0, 0);

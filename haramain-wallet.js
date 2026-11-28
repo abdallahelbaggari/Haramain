@@ -58,14 +58,14 @@
       return { title: r.dir === 'in' ? 'Transfer received' : 'Transfer receipt', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
         rows: [['From', (r.name || '—') + (r.user ? ' (@' + r.user + ')' : '')], ['To', (r.toName ? r.toName + ' · ' : '') + short(r.to)], ['Narration', r.narr || '—'], ['Reference', r.ref]]
           .concat(when, [['Network', r.net], ['Recipient address', r.to, 1], ['Transaction ID', r.txid, 1]]),
-        thanks: r.dir === 'in' ? 'Received with Haramain' : 'Sent with Haramain', note: r.inapp ? 'Paid in Haramain and delivered automatically from the Haramain app wallet through Pi Network’s official payments. Check it on the Pi blockchain with the code above.' : 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
+        thanks: r.dir === 'in' ? 'Received with Haramain' : 'Sent with Haramain', note: r.inapp ? 'Paid in Haramain and delivered automatically from the Haramain app wallet through Pi Network’s official payments. Check it on the Pi blockchain with the code above.' : 'Verified on the Pi blockchain.' };
     }
     if (r.kind === 'p2p') {
       var inn = r.dir === 'in';
       return { title: inn ? 'Sale receipt' : 'Payment receipt', status: { text: '✓  Verified on the Pi blockchain', ok: true }, amount: r.amount, sub: sub,
         rows: [['Paid to', inn ? (r.name || r.seller || '—') + (r.user ? ' (@' + r.user + ')' : '') : r.other], ['Paid by', inn ? short(r.from) : (r.name || short(r.from))], ['For', r.item || r.memo || 'Payment'], ['Reference', r.ref]]
           .concat(when, [['Network', r.net], ['Seller address', r.to, 1], ['Transaction ID', r.txid, 1]]),
-        thanks: 'Paid with Haramain Pay', note: 'Verified by Haramain on the Pi blockchain. Haramain never holds funds.' };
+        thanks: 'Paid with Haramain Pay', note: 'Verified on the Pi blockchain.' };
     }
     return { title: 'Payment receipt', status: { text: r.status === 'Pending' ? 'Pending' : '✓  Completed', ok: r.status !== 'Pending' }, amount: r.amount, sub: sub,
       rows: [['Name', r.name || '—'], ['Pi username', r.user ? '@' + r.user : '—'], ['Payment for', TYPES[r.kind] || r.memo || 'Pi payment']].concat(when, [['Network', r.net || 'Pi Network'], ['Payment ID', r.pid, 1], ['Transaction ID', r.txid, 1]]),

@@ -325,7 +325,7 @@
     HMReceipt.sheet({ title: 'Invoice ' + s.no, status: { text: s.paid ? '✓  Paid' : st[0] === 'Overdue' ? 'Overdue' : 'Unpaid' + (s.due ? ' · due ' + dstr(s.due + 'T12:00:00', { day: 'numeric', month: 'short' }) : ''), ok: !!s.paid },
       amount: fmt(s.a, 7), sub: window.hmConvLine ? hmConvLine(+s.a) : '', rows: rows2, verify: '',
       thanks: s.paid ? 'Paid with Haramain Pay' : 'Pay securely with Haramain Pay',
-      note: s.paid ? 'Verified on the Pi blockchain. Haramain never holds funds.' : 'Open the payment link to pay inside Haramain. Reference ' + s.r + '.' },
+      note: s.paid ? 'Verified on the Pi blockchain.' : 'Open the payment link to pay inside Haramain. Reference ' + s.r + '.' },
       'Haramain-invoice-' + s.no + '.png', 'Invoice ' + s.no + ' from ' + s.n + ': ' + s.a + ' π', 'Invoice ' + s.no);
   };
   /* an invoice or request paid inside Haramain carries its reference in the narration: mark it paid */
